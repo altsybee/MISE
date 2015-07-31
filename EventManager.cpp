@@ -1,11 +1,11 @@
-#include "../../commonTools/Tools.cxx"
+#include "/Users/macbook/alice/simpleAnalysis/commonTools/Tools.cxx"  //  "../../commonTools/Tools.cxx"
 //#include "../../commonTools/SimpleTrack.cxx"
 
 
 #include "EventManager.h"
-#include "StringsGeneration/NucleusStructure.h"
+#include "StringGeneration/NucleusStructure.h"
 #include "StringDecayer/StringDescr.h"
-#include "../../simpleEventAnalyzer/AliSimpleEvent.h"
+#include "/Users/macbook/alice/simpleAnalysis/simpleEventAnalyzer/AliSimpleEvent.h"    // "../../simpleEventAnalyzer/AliSimpleEvent.h"
 
 #include "TH1D.h"
 #include "TH2D.h"

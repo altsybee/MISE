@@ -30,6 +30,8 @@ public:
     void setRandomGenerator(TRandom* rand);
 //    void setCoeffPtKickPerUnitMagn(float ptKickPerUnitMagn) { fPtKickPerUnitMagn = ptKickPerUnitMagn; }
 
+    StringFragmentation *getStringFragmentationPointer() { return strFr; }
+
     //String(const String& orig);
     virtual ~StringDescr();
     void hadronizeString(double stringBeta = 0, double boostPhi = 0 );

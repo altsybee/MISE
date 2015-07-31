@@ -69,11 +69,11 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
     //    double yStringSize = fabs( fRand->Gaus(4,0.4) ) + 2*fabs( fRand->Gaus(0,2) );
     //    double yStringSize = fabs( fRand->Gaus(4,0.2) ) + 2*fabs( fRand->Gaus(0,4) );
     //WAS USED FOR PROCEEDING...    double yStringSize = 10;//fRand->Uniform(2,10);
-    double yStringSize = 8;//fRand->Uniform(2,10);
+    double yStringSize = fYmax-fYmin;//fRand->Uniform(2,10);
     //    double yStringSize = fabs( fRand->Gaus(fYmax-fYmin,0.2) ) + 2*fabs( fRand->Gaus(0,0.5) );
     //    double yStringSize = fYmax-fYmin;//fabs( fRand->Gaus(3.6,0.2) ) + 2*fabs( fRand->Gaus(0,5) );
     //    double yStringShift = fRand->Uniform(-fStringShiftSigma,fStringShiftSigma) + fRand->Gaus(0,fStringShiftSigma);
-    double yStringShift = 0;//fRand->Gaus(0,fStringShiftSigma);
+    double yStringShift = (fYmax+fYmin)/2;//fRand->Gaus(0,fStringShiftSigma);
     //    double yStringShift = fRand->Gaus(0,2);
     //    double yStringSize = fabs( fRand->Gaus(3.6,0.2) ) + 2*fabs( fRand->Gaus(0,5) );
     //    double yStringSize = fabs( fRand->Gaus(3.6,0.2) ) + 2*fabs( fRand->Gaus(0,5) );
@@ -196,7 +196,8 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
             yParticle = fRand->Uniform( -yStringSize/2, yStringSize/2 );
         //            yParticle = fRand->Uniform( fYmin+yStringShift, fYmax+yStringShift ); //use it to "shuffle" particles in y!
         //        yParticle += fRand->Gaus(0,1);
-        yParticle = fRand->Uniform( -yStringSize/2, yStringSize/2 );//yStringSize/2+yStringShift, yStringSize/2+yStringShift );
+//        yParticle = fRand->Uniform( -yStringSize/2, yStringSize/2 );
+        yParticle = fRand->Uniform( -yStringSize/2+yStringShift, yStringSize/2+yStringShift );
 
         // prepare lorentz vector
         double mT = sqrt( ptParticle*ptParticle + particleMass*particleMass );

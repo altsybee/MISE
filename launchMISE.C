@@ -10,9 +10,9 @@ void launchMISE( int nEvents = 1, int flagMBorFixedB = 0, float bImpact=0
     // dist to form a cluster: now (from Aug 2014) we consider All strings to be in cluster
     double clusterFormDist = 100; //0.4;
 
-    gROOT->ProcessLine(".L StringsGeneration/DistanceEntry.cpp+");
-    gROOT->ProcessLine(".L StringsGeneration/MinDistanceFinder.cpp+");
-    gROOT->ProcessLine(".L StringsGeneration/NucleusStructure.cpp+");
+    gROOT->ProcessLine(".L StringGeneration/DistanceEntry.cpp+");
+    gROOT->ProcessLine(".L StringGeneration/MinDistanceFinder.cpp+");
+    gROOT->ProcessLine(".L StringGeneration/NucleusStructure.cpp+");
 
     gROOT->ProcessLine(".L StringDecayer/ParticleDescr.cpp+");
     gROOT->ProcessLine(".L StringDecayer/DecayInTwo.cpp+");
@@ -24,9 +24,9 @@ void launchMISE( int nEvents = 1, int flagMBorFixedB = 0, float bImpact=0
 
     //    gROOT->ProcessLine(".L ../../newLRCan/AliSimpleEvent.cxx+");
 //    gROOT->LoadMacro( "/Users/macbook/alice/aliceAnalysis/analysisTask/analysis/AliSimpleEvent.cxx+g" );
-    gROOT->LoadMacro( "../../simpleEventAnalyzer/AliSimpleEvent.cxx+g" );
+    gROOT->LoadMacro( "/Users/macbook/alice/simpleAnalysis/simpleEventAnalyzer/AliSimpleEvent.cxx+g" );    // "../../simpleEventAnalyzer/AliSimpleEvent.cxx+g" );
 
-    gROOT->ProcessLine(".L ../../commonTools/QAforWindows.cxx+");
+    gROOT->ProcessLine( ".L /Users/macbook/alice/simpleAnalysis/commonTools/QAforWindows.cxx+" );     // ".L ../../commonTools/QAforWindows.cxx+");
     //    gROOT->ProcessLine(".L ../../analysers/AnalyserBase.cxx+");
     //    gROOT->ProcessLine(".L ../../analysers/diHadronMethod/DiHadronAnalyser.cxx+");
     //    gROOT->ProcessLine(".L ../../analysers/tileCorrelations/TileCorrelations.cxx+");
