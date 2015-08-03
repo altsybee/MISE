@@ -121,32 +121,25 @@ void MinDistanceFinder::FindMinDistancesBetweenPairs( const float *x1, const flo
         cout << endl;
         cout << "check occupation..." << endl;
         for ( int i = 0; i < Nrows; i++ )
-        {
             cout << occupiedX[i] << " ";
-        }
         cout << endl;
 
         for ( int i = 0; i < Nrows; i++ )
-        {
             cout << occupiedY[i] << " ";
-        }
         cout << endl;
 
         for ( int i = 0; i < Nrows*Ncols; i++ )
-        {
             cout << arrDist[i].x << " ";
-        }
         cout << endl;
+
         for ( int i = 0; i < Nrows*Ncols; i++ )
-        {
             cout << arrDist[i].y << " ";
-        }
         cout << endl;
+
         for ( int i = 0; i < Nrows*Ncols; i++ )
-        {
             cout << arrDist[i].inInteraction << " ";
-        }
         cout << endl;
+
         cout << "after taking minimums:" << endl;
     }
 }

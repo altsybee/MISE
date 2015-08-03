@@ -8,6 +8,7 @@
 #ifndef NUCLEUSSTRUCTURE_H
 #define	NUCLEUSSTRUCTURE_H
 
+#include "TString.h"
 
 //#define MAX_PARTONS 10000
 //#define MAX_PARTONS 208 // for Pb
@@ -153,6 +154,8 @@ public:
     virtual ~NucleusStructure();
     
     void setRandomGenerator(TRandom* rand) { fRand = rand; }
+    void setOutputDirectoryName(TString strDirName) { fOutDirName = strDirName; }
+
     void initDataMembers();
     void setEventId(int eventId) { fEventId = eventId; }
 //    void changePartonState(int &state, bool hardScatteringFlag = false );
@@ -318,6 +321,9 @@ private:
 
     int fNparticipants; // for nu calculation
     int fNcollisions; // for nu calculation
+
+    // ##### output directory name
+    TString fOutDirName;
 
     //##### histos
     TCanvas *fCanvEventView;

@@ -1,4 +1,4 @@
-void launchMISE( int nEvents = 1, int flagMBorFixedB = 0, float bImpact=0
+void launchMISE( int nEvents = 100, int flagMBorFixedB = 0, float bImpact=0
         , double partonInteractionDist = 0.25
         , double stringInteractionDist = 0.4
 //        , double strIntDistFractionParA = 10.
@@ -10,19 +10,19 @@ void launchMISE( int nEvents = 1, int flagMBorFixedB = 0, float bImpact=0
     // dist to form a cluster: now (from Aug 2014) we consider All strings to be in cluster
     double clusterFormDist = 100; //0.4;
 
+    //nuclei generation routine
     gROOT->ProcessLine(".L StringGeneration/DistanceEntry.cpp+");
     gROOT->ProcessLine(".L StringGeneration/MinDistanceFinder.cpp+");
     gROOT->ProcessLine(".L StringGeneration/NucleusStructure.cpp+");
 
+    //string fragmentation and particle decays
     gROOT->ProcessLine(".L StringDecayer/ParticleDescr.cpp+");
     gROOT->ProcessLine(".L StringDecayer/DecayInTwo.cpp+");
     gROOT->ProcessLine(".L StringDecayer/StringFragmentation.cpp+");
     gROOT->ProcessLine(".L StringDecayer/StringDescr.cpp+");
 
 
-
-
-    //    gROOT->ProcessLine(".L ../../newLRCan/AliSimpleEvent.cxx+");
+    //simple event routine
 //    gROOT->LoadMacro( "/Users/macbook/alice/aliceAnalysis/analysisTask/analysis/AliSimpleEvent.cxx+g" );
     gROOT->LoadMacro( "/Users/macbook/alice/simpleAnalysis/simpleEventAnalyzer/AliSimpleEvent.cxx+g" );    // "../../simpleEventAnalyzer/AliSimpleEvent.cxx+g" );
 
@@ -33,7 +33,14 @@ void launchMISE( int nEvents = 1, int flagMBorFixedB = 0, float bImpact=0
 
     gROOT->ProcessLine(".L EventManager.cpp+");
 
-    gROOT->ProcessLine(".mkdir tmpOutputs");
+    //create directory for output files
+//    gROOT->ProcessLine(".mkdir tmpOutputs");
+
+    //prepare directories for outputs
+    char *strOutputDirName_NucleiCollision = "outputs_NucleiCollision";
+    char *strOutputDirName_EventManager = "outputs_EventManager";
+    gROOT->ProcessLine( Form( ".mkdir %s", strOutputDirName_NucleiCollision ) );
+    gROOT->ProcessLine( Form( ".mkdir %s", strOutputDirName_EventManager ) );
 
     gRandom->SetSeed(0);
 
@@ -44,6 +51,7 @@ void launchMISE( int nEvents = 1, int flagMBorFixedB = 0, float bImpact=0
     {
         NucleusStructure *d = new NucleusStructure;
         d->setRandomGenerator(gRandom);
+        d->setOutputDirectoryName( strOutputDirName_NucleiCollision );
 
         // set nuclei type
 //          d->setNucleusType( nucleus_Pb );
@@ -77,6 +85,7 @@ void launchMISE( int nEvents = 1, int flagMBorFixedB = 0, float bImpact=0
 
         EventManager evMan;
         evMan.setFillEventTree( true );
+        evMan.setOutputDirectoryName( strOutputDirName_EventManager );
 
         //draw (yes/no) event view canvases to .eps .png
         if (bMode==0)
@@ -108,40 +117,6 @@ void launchMISE( int nEvents = 1, int flagMBorFixedB = 0, float bImpact=0
 
     }
 //    gROOT->ProcessLine(".q");
-
-
-    if(0)
-    {
-        gROOT->ProcessLine(".L DistanceEntry.cpp+");
-        gROOT->ProcessLine(".L MinDistanceFinder.cpp+");
-        const int nRows = 4;
-        const int nCols = 4;
-        float x1[nRows] = {5,3,1,7};
-        float y1[nCols] = {0,4,2,3};
-        float x2[nRows] = {3,2,4,5};
-        float y2[nCols] = {11,4,2,8};
-
-        cout << ">> x1:  ";
-        for ( int i = 0; i < nRows; i++ )
-            cout << x1[i] << " ";
-        cout << endl;
-        cout << ">> y1:  ";
-        for ( int i = 0; i < nCols; i++ )
-            cout << y1[i] << " ";
-        cout << endl;
-
-        cout << ">> x2:  ";
-        for ( int i = 0; i < nRows; i++ )
-            cout << x2[i] << " ";
-        cout << endl;
-        cout << ">> y2:  ";
-        for ( int i = 0; i < nCols; i++ )
-            cout << y2[i] << " ";
-        cout << endl;
-
-        MinDistanceFinder minDistanceFinder;
-        minDistanceFinder.minDistancePairsFinder(x1,y1,x2,y2,nRows,nCols);
-    }
 
     //time estimation
     timer.Stop();

@@ -188,6 +188,7 @@ NucleusStructure::NucleusStructure(/*int seed*/) :
   , fImpactParSpecification(0) //MB
   , fCanvEventView(0x0)
   , fCanvEventStatistics(0x0)
+  , fOutDirName("outputs_NucleiCollision")
 {
 }
 
@@ -490,8 +491,8 @@ void NucleusStructure::buildEvent()
         if ( fFlagWriteEventViewCanvases && fEventId < 10 )
         {
             drawEventStructure();
-            fCanvEventView->SaveAs( Form( "tmpOutputs/canv_eventView_%d.eps", fEventId));
-            fCanvEventView->SaveAs( Form( "tmpOutputs/canv_eventView_%d.png", fEventId));
+            fCanvEventView->SaveAs( Form( "%s/canv_eventView_%d.eps", fOutDirName.Data(), fEventId));
+            fCanvEventView->SaveAs( Form( "%s/canv_eventView_%d.png", fOutDirName.Data(), fEventId));
         }
     }
 }
@@ -1071,11 +1072,11 @@ void NucleusStructure::getIngredientsForEccentricity( Nucleus *nucl, Nucleus *nu
 void NucleusStructure::drawStatisticHists()
 {
     //save analyzer lists to file
-    TFile *fileNuclStructStats = new TFile("tmpOutputs/stats_NuclearStructure.root","RECREATE");
+    TFile *fileNuclStructStats = new TFile( Form( "%s/stats_NuclearStructure.root", fOutDirName.Data() ),"RECREATE");
 
     if (!fCanvEventStatistics)
     {
-        fCanvEventStatistics = new TCanvas("Stats Canvas","Statistics",180,50,1200,800);
+        fCanvEventStatistics = new TCanvas("Stats Canvas","Nuclei Generation Statistics",180,50,1200,800);
         fCanvEventStatistics->Divide(3,3);
     }
     if (1)
@@ -1206,9 +1207,9 @@ void NucleusStructure::drawStatisticHists()
 
         fileNuclStructStats->Close();
 
-        fCanvEventStatistics->SaveAs("tmpOutputs/canvNuclearStructureStats.root");
-        fCanvEventStatistics->SaveAs("tmpOutputs/canvNuclearStructureStats.eps");
-        fCanvEventStatistics->SaveAs("tmpOutputs/canvNuclearStructureStats.png");
+        fCanvEventStatistics->SaveAs( Form( "%s/canvNuclearStructureStats.root", fOutDirName.Data()) );
+        fCanvEventStatistics->SaveAs( Form( "%s/canvNuclearStructureStats.eps", fOutDirName.Data()));
+        fCanvEventStatistics->SaveAs( Form( "%s/canvNuclearStructureStats.png", fOutDirName.Data()));
     }
     
     if (0)
@@ -1241,7 +1242,7 @@ void NucleusStructure::finalActions()
         double percParErr = fHistNstrings->GetRMS() * S_string / S_impact;
         cout << "percolation par for this b: " << fImpactParameter << " " <<  fNumberOfStrings * S_string / S_impact << endl;
 
-        ofstream fout( "tmpOutputs/tmpTextOutput0.txt", ios::out | ios::binary);
+        ofstream fout( Form( "%s/tmpTextOutput0.txt", fOutDirName.Data() ), ios::out | ios::binary);
         fout << fImpactParameterByHand
              << " " << percPar
              << " " << percParErr
@@ -1266,7 +1267,7 @@ void NucleusStructure::finalActions()
         double ratioToNstringsTotal = sqrt(err1*err1 + err2*err2) / nStringsMean;
 
         //print fraction of strings in cluster to n of all strings
-        ofstream fout1( "tmpOutputs/tmpTextOutput1.txt", ios::out | ios::binary);
+        ofstream fout1( Form( "%s/tmpTextOutput1.txt", fOutDirName.Data() ), ios::out | ios::binary);
         fout1 << fImpactParameterByHand //_0_100
               << " " << ratioToNstrings
               << " " << ratioToNstringsTotal
@@ -1275,7 +1276,7 @@ void NucleusStructure::finalActions()
 
         //print mean number of strings in the EVENT vs impact par
         float nStringsRMS= fHistNstrings->GetRMS();
-        ofstream fout1_0( "tmpOutputs/tmpTextOutput1_0.txt", ios::out | ios::binary);
+        ofstream fout1_0( Form( "%s/tmpTextOutput1_0.txt", fOutDirName.Data() ), ios::out | ios::binary);
         fout1_0 << fImpactParameterByHand //_0_100
                 << " " << nStringsMean
                 << " " << nStringsRMS
@@ -1287,7 +1288,7 @@ void NucleusStructure::finalActions()
     cout << "mean N wounded = " << fHistNumberWoundedNucleons->GetMean() << endl;
     if (1)
     {
-        ofstream fout2( "tmpOutputs/tmpTextOutput2.txt", ios::out | ios::binary);
+        ofstream fout2( Form( "%s/tmpTextOutput2.txt", fOutDirName.Data() ), ios::out | ios::binary);
         fout2 << fImpactParameterByHand //_0_100
               << " " << fHistNumberWoundedNucleons->GetMean()
               << " " << fHistNumberWoundedNucleons->GetMeanError()
@@ -1299,7 +1300,7 @@ void NucleusStructure::finalActions()
     if (1)
     {
         cout << "mean Ncoll = " << fHistNcoll->GetMean() << endl;
-        ofstream fout3( "tmpOutputs/tmpTextOutput3.txt", ios::out | ios::binary);
+        ofstream fout3( Form( "%s/tmpTextOutput3.txt", fOutDirName.Data() ), ios::out | ios::binary);
         fout3 << fImpactParameterByHand //_0_100
               << " " << fHistNcoll->GetMean()
               << " " << fHistNcoll->GetMeanError()
@@ -1319,7 +1320,7 @@ void NucleusStructure::finalActions()
     if (1)
     {
         cout << "forceEccentricity = " << forceEccentricity << endl;
-        ofstream fout( "tmpOutputs/tmpTextOutput4.txt", ios::out | ios::binary);
+        ofstream fout( Form( "%s/tmpTextOutput4.txt", fOutDirName.Data() ), ios::out | ios::binary);
         fout << fImpactParameterByHand
              << " " << forceEccentricity
              << " " << errTotal
@@ -1329,7 +1330,7 @@ void NucleusStructure::finalActions()
 
     if (1)
     {
-        ofstream fout( "tmpOutputs/tmpTextOutput5.txt", ios::out | ios::binary);
+        ofstream fout( Form( "%s/tmpTextOutput5.txt", fOutDirName.Data() ), ios::out | ios::binary);
         fout << fImpactParameterByHand
              << " " << fHistStringInteractionsMagnitude->GetMean()
              << " " << fHistStringInteractionsMagnitude->GetMeanError()

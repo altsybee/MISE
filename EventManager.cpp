@@ -11,6 +11,7 @@
 #include "TH2D.h"
 #include "TGraph.h"
 #include "TCanvas.h"
+#include "TLegend.h"
 #include "TTree.h"
 
 #include <fstream>
@@ -26,6 +27,14 @@ const int nBinsForNparticlesHist = 500;
 //const int nMaxPartForHist = 400;
 //const int nBinsForNparticlesHist = 400;
 
+const double kPtCutsForEtaDistr[5] =
+{
+    0.1,
+    0.5,
+    1.0,
+    2.0,
+    3.0
+};
 
 
 inline void FixAngleInTwoPi( float &lPhi )
@@ -159,7 +168,8 @@ EventManager::EventManager():
 
 
 
-    
+    fOutputDirName = "outputs_EventManager";
+
     fOutputFileName = "testOutput.root";
     fOutputFile = 0x0;
     fDrawHistos = true;
@@ -194,7 +204,7 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
 //    SimpleTrack *fSimpleTrack = new SimpleTrack;
 
     //output file for the events
-    fOutputFileName = Form( "tmpOutputs/eventTree_nEv%d.root", nEvents );
+    fOutputFileName = Form( "%s/eventTree_nEv%d.root", fOutputDirName.Data(), nEvents );
     TFile* outFile = new TFile( fOutputFileName, "RECREATE" );
     //Form(
     //                  "%s/%s_%devents.root"
@@ -227,7 +237,7 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
             printf("generating %d event...\n",(int)iEvent );
 
         //building event, spec impact parameter if requested:
-        fPtrNuclStruct->setEventId( iEvent ); //to be used in d for output files (tmp?)
+        fPtrNuclStruct->setEventId( iEvent ); //to be used in fPtrNuclStruct for output files (tmp?)
         fPtrNuclStruct->buildEvent();
         //        fPtrNuclStruct->drawEventStructure();
 
@@ -238,7 +248,7 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
             continue;
         }
 
-        //do analysis using NuclearStructure data
+        //do analysis of NuclearStructure data, store simple events in tree
         if (1)
         {
             // ##### get random EP for the event!
@@ -253,18 +263,18 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
             }
 
             // ##### loop over strings: hadronized and count multiplicity in VZERO
-            const double cutEtaCMS = 2;
+            const double cutEtaWithinDetectorAcceptance = 2;
             int nParticles = 0;
             int nParticlesWithinEtaPtCuts = 0;
             for ( int iString = 0; iString < fPtrNuclStruct->getNstrings(); iString++)
             {
                 int nParticlesInString = 0;
-                if ( fPtrNuclStruct->isHardInteractionString(iString) == 0 ) //soft interaction - string
+                if ( !fPtrNuclStruct->isHardInteractionString(iString) ) // this string is a soft interaction
                 {
                     strDescr->hadronizeString(fPtrNuclStruct->getStringBoostMagn(iString), fPtrNuclStruct->getStringBoostAngle(iString) );
                     nParticlesInString = strDescr->getNparticles();
                 }
-                else //hard interaction - two jets
+                else //hard interaction - create two jets
                 {
                     strDescr->makeTwoJets();
                     nParticlesInString = strDescr->getNparticles();
@@ -273,7 +283,7 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
                 for ( int iP = 0; iP < nParticlesInString; iP++ )
                 {
                     ParticleDescr *p = strDescr->getParticle(iP);
-                    //rotate all tracks in phi
+                    //rotate all tracks in phi by event plane phi-angle
                     float phiMod = phiEP + p->phi;
                     FixAngleInTwoPi(phiMod);
 
@@ -281,49 +291,39 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
                     //                    if ( fabs(p->eta) < 0.3 && ( p->pt > 0.15 && p->pt < 10 ) )
 //                    if ( p->eta < -3.7 || p->eta > 1. )//fabs(p->eta) > 3.7 ) // out of our intresting range
 //                        continue;
-                    if ( fabs(p->eta) > cutEtaCMS )//fabs(p->eta) > 3.7 ) // out of our intresting range
+                    double weightForPt = 1./ ( 2*TMath::Pi()*p->pt );
+                    fHistPt->Fill(p->pt, weightForPt );
+
+                    if ( fabs(p->eta) > cutEtaWithinDetectorAcceptance )//fabs(p->eta) > 3.7 ) // out of our intresting range
                         continue;
 
 //                    if ( p->eta > -3.7 && p->eta < -1.7 )  //VZERO-C
                    // if ( fabs(p->eta) < 1. )  //STAR TPC
-                    if ( fabs(p->eta) < cutEtaCMS )  //CMS
+
+//                    if ( fabs(p->eta) < 0.5 )
+
+
+                    if ( fabs(p->eta) < cutEtaWithinDetectorAcceptance )//0.5 )//&& ( p->pt > 0. && p->pt < 1000 ) )
                     {
                         nParticlesWithinEtaPtCuts++;
 
-                    }
+//                        if ( p->pt > 0.05 )
+                        fHistPtAfterCuts->Fill(p->pt, weightForPt );
 
-
-                    if ( fabs(p->eta) < cutEtaCMS )//0.5 )//&& ( p->pt > 0. && p->pt < 1000 ) )
-                    {
-                        if ( p->pt > 0.05 )
+                        if ( 0 )//not used... ( p->ptBeforeKick > 0.0 )
                         {
-                            double weight = 1./ ( 2*TMath::Pi()*p->pt );
-                            fHistPtAfterCuts->Fill(p->pt, weight );
+                            double weightForPtBeforeKick = 1./ ( 2*TMath::Pi()*p->ptBeforeKick );
+                            fHistPtBeforeKick->Fill(p->ptBeforeKick, weightForPtBeforeKick );
                         }
-//                        fHistPtAfterCuts->Fill( p->pt, 1./ ( 2*TMath::Pi()*p->pt)  );
-                        //nParticlesWithinEtaPtCuts++;
                     }
+
                     fHistEta->Fill(p->eta);
-                    if ( p->pt > 0.1 ) fHistEtaInPtCuts[0]->Fill(p->eta);
-                    if ( p->pt > 0.5 ) fHistEtaInPtCuts[1]->Fill(p->eta);
-                    if ( p->pt > 1.0 ) fHistEtaInPtCuts[2]->Fill(p->eta);
-                    if ( p->pt > 2.0 ) fHistEtaInPtCuts[3]->Fill(p->eta);
-                    if ( p->pt > 3.0 ) fHistEtaInPtCuts[4]->Fill(p->eta);
+                    if ( p->pt > kPtCutsForEtaDistr[0] ) fHistEtaInPtCuts[0]->Fill(p->eta);
+                    if ( p->pt > kPtCutsForEtaDistr[1] ) fHistEtaInPtCuts[1]->Fill(p->eta);
+                    if ( p->pt > kPtCutsForEtaDistr[2] ) fHistEtaInPtCuts[2]->Fill(p->eta);
+                    if ( p->pt > kPtCutsForEtaDistr[3] ) fHistEtaInPtCuts[3]->Fill(p->eta);
+                    if ( p->pt > kPtCutsForEtaDistr[4] ) fHistEtaInPtCuts[4]->Fill(p->eta);
                     fHistPhi->Fill(phiMod);
-                    if ( fabs(p->eta) < 0.5 )
-                    {
-                        if ( p->pt > 0.0 )
-                        {
-                            double weight = 1./ ( 2*TMath::Pi()*p->pt );
-                            fHistPt->Fill(p->pt, weight );
-                        }
-                        if ( p->ptBeforeKick > 0.0 )
-                        {
-                            double weight = 1./ ( 2*TMath::Pi()*p->ptBeforeKick );
-                            fHistPtBeforeKick->Fill(p->ptBeforeKick, weight );
-                        }
-
-                    }
                     fHist2DEtaPhi->Fill( p->eta, phiMod );
 
                     // ##### add particle to analysers
@@ -340,12 +340,17 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
                 }
             }
             fHistParticlesInEvent->Fill(nParticles);
-            fHistParticlesInCutConditionInEvent->Fill(nParticlesWithinEtaPtCuts/2/cutEtaCMS); // !
-            fHistParticlesInCutConditionVsNu->Fill(nParticlesWithinEtaPtCuts/2/cutEtaCMS, fPtrNuclStruct->getNu() );
+            //Aug15 (IA): why was /2 ?..
+//            fHistParticlesInCutConditionInEvent->Fill(nParticlesWithinEtaPtCuts/2/cutEtaWithinDetectorAcceptance); // !
+//            fHistParticlesInCutConditionVsNu->Fill(nParticlesWithinEtaPtCuts/2/cutEtaWithinDetectorAcceptance, fPtrNuclStruct->getNu() );
+            fHistParticlesInCutConditionInEvent->Fill(nParticlesWithinEtaPtCuts/cutEtaWithinDetectorAcceptance); // !
+            fHistParticlesInCutConditionVsNu->Fill(nParticlesWithinEtaPtCuts/cutEtaWithinDetectorAcceptance, fPtrNuclStruct->getNu() );
 
             if ( fFillEventTree )
             {
-                fSimpleEvent->GetHeader()->SetCentrality(nParticlesWithinEtaPtCuts/2/cutEtaCMS);
+                //Aug15 (IA): why was /2 ?..
+//                fSimpleEvent->GetHeader()->SetCentrality(nParticlesWithinEtaPtCuts/2/cutEtaWithinDetectorAcceptance);
+                fSimpleEvent->GetHeader()->SetCentrality(nParticlesWithinEtaPtCuts/cutEtaWithinDetectorAcceptance);
                 fSimpleEvent->FinishEventFilling();
             }
             fEventTree->Fill();  //fill the tree
@@ -395,7 +400,7 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
 
     fHistParticlesInCutConditionInEvent->SetLineColor(kRed);
     fHistParticlesInCutConditionInEvent->DrawCopy();
-    fHistParticlesInCutConditionInEvent->SaveAs("tmpOutputs/histParticlesInCutCondition.root");
+    fHistParticlesInCutConditionInEvent->SaveAs(Form( "%s/histParticlesInCutCondition.root", fOutputDirName.Data() ) );
     //    fHistParticlesInCutConditionInEvent->GetQuantiles();
 
     cout << ">>> Mean Nch overall = " << fHistParticlesInCutConditionInEvent->GetMean() << endl;
@@ -506,14 +511,27 @@ void EventManager::drawStatHists()
     fCanv->cd(2)->SetLogy();
     fHistPtAfterCuts->SetLineColor(kRed);
     fHistPtBeforeKick->SetLineColor(kGreen);
-    fHistPt->DrawNormalized();
-    fHistPtAfterCuts->DrawNormalized("same");
+//    fHistPt->DrawNormalized();
+//    fHistPtAfterCuts->DrawNormalized("same");
 //    fHistPtBeforeKick->DrawNormalized("same");
-//    fHistPt->Draw();
-//    fHistPtAfterCuts->Draw("same");
+    fHistPt->Draw();
+    fHistPtAfterCuts->Draw("same");
 //    fHistPtBeforeKick->Draw("same");
+    TLegend *legPt = new TLegend(0.65,0.5,0.95,0.8);
+    legPt->SetFillStyle(0);
+    legPt->SetBorderSize(0);
+    legPt->AddEntry(fHistPt,  "no #eta cut",  "l");
+    legPt->AddEntry(fHistPtAfterCuts,  "after #eta cut",  "l");
+//    legPt->AddEntry(fHistPtBeforeKick,  "after #eta cut, before kick",  "l");
+    legPt->Draw();
+
 
     fCanv->cd(3);
+    TLegend *legEta = new TLegend(0.65,0.5,0.95,0.8);
+    legEta->SetFillStyle(0);
+    legEta->SetBorderSize(0);
+    legEta->AddEntry(fHistEta,  "all p_{T}",  "l");
+
     fHistEta->DrawNormalized();
     fHistEtaInPtCuts[0]->SetLineColor(kRed);
     fHistEtaInPtCuts[1]->SetLineColor(kGreen);
@@ -521,7 +539,12 @@ void EventManager::drawStatHists()
     fHistEtaInPtCuts[3]->SetLineColor(kOrange);
     fHistEtaInPtCuts[4]->SetLineColor(kBlack);
     for ( int iPtBin = 0; iPtBin < 3/*5*/; iPtBin++)
+    {
         fHistEtaInPtCuts[iPtBin]->DrawNormalized("same");
+        legEta->AddEntry(fHistEtaInPtCuts[iPtBin],  Form("p_{T}<%.2f", kPtCutsForEtaDistr[iPtBin]),  "l");
+    }
+    legEta->Draw();
+
     fCanv->cd(4);
     fHistPhi->DrawCopy();
     //fCanv->cd(7);
@@ -539,23 +562,24 @@ void EventManager::drawStatHists()
     fCanv->cd(6);
     fHistParticlesInCutConditionVsNu->DrawCopy("colz");
 
-    fCanv->SaveAs("tmpOutputs/canvEvManagerStats.root");
-    fCanv->SaveAs("tmpOutputs/canvEvManagerStats.eps");
-    fCanv->SaveAs("tmpOutputs/canvEvManagerStats.png");
+    fCanv->SaveAs(Form( "%s/canvEvManagerStats.root", fOutputDirName.Data() ) );
+    fCanv->SaveAs(Form( "%s/canvEvManagerStats.eps", fOutputDirName.Data() ));
+    fCanv->SaveAs(Form( "%s/canvEvManagerStats.png", fOutputDirName.Data() ));
 
 
     //write stats to file
-    TFile *fileEvManagerStats = new TFile("tmpOutputs/stats_EvManager.root","RECREATE");
+    TFile *fileEvManagerStats = new TFile(Form( "%s/stats_EvManager.root", fOutputDirName.Data() ),"RECREATE");
     fHistParticlesInEvent->Write();
     fHistParticlesInCutConditionInEvent->Write();
     fHistPt->Write();
     fHistPtAfterCuts->Write();
+//    fHistPtBeforeKick->Write();
     fHistEta->Write();
     fHistPhi->Write();
     fileEvManagerStats->Close();
 
     // ###### spec output txt files
-    ofstream fout( "tmpOutputs/tmpTextOutput_EventManager_ptVsNch.txt", ios::out | ios::binary);
+    ofstream fout( Form( "%s/tmpTextOutput_EventManager_ptVsNch.txt", fOutputDirName.Data() ), ios::out | ios::binary);
     fout << fHistParticlesInCutConditionInEvent->GetMean() //fPtrNuclStruct->getImpactParameterByHand() //_0_100
          << " " << fHistPtAfterCuts->GetMean()
          << " " << fHistPtAfterCuts->GetMeanError()

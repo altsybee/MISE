@@ -22,7 +22,8 @@ public:
     EventManager(const EventManager&);
     virtual ~EventManager();
     
-    void setOutputFileName(TString name) {    fOutputFileName = name; }
+    void setOutputDirectoryName(TString strDirName) { fOutputDirName = strDirName; }
+    void setOutputFileName(TString name) { fOutputFileName = name; }
     void setDrawHistos(bool flag) { fDrawHistos = flag; }
 
     void setFillEventTree(bool flag) { fFillEventTree = flag; }
@@ -51,6 +52,7 @@ private:
     bool fPrintInfo;
     bool fDrawHistos;
     bool fFillEventTree;
+    TString fOutputDirName;
     TString fOutputFileName;
     TString fOutputListName;
 //    Event *fEvent;
