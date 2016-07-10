@@ -1,7 +1,17 @@
 #ifndef PARTICLE_H
 #define	PARTICLE_H
 
-#define MAX_PARTICLES_IN_ARRAY 1000
+#define MAX_PARTICLES_IN_ARRAY 2000
+
+enum MISE_pids
+{
+    kPid_pion = 0,
+    kPid_kaon = 1,
+    kPid_proton = 2,
+
+//    pid_rho = 3,
+};
+
 
 //particle
 struct ParticleDescr
@@ -12,6 +22,7 @@ struct ParticleDescr
     double pt;
     double ptBeforeKick;
     int charge;
+    int pid;
 };
 
 //particle array

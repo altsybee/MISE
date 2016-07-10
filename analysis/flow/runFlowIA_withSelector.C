@@ -45,7 +45,9 @@ void runFlowIA_withSelector(int centralityClassId = 0)
 //    TString fileName("/Users/macbook/alice/simpleAnalysis/toyAnalysis/NuclearStructure/tmpOutputs/eventTree_nEv100000.root");
 //    TString fileName("/Users/macbook/alice/simpleAnalysis/toyAnalysis/NuclearStructure/tmpOutputs/eventTree_nEv400200.root");
 //    TString fileName("../../outputs_EventManager/eventTree_nEv100000.root");
-    TString fileName("../../outputs_EventManager/eventTree_nEv9000.root");
+//    TString fileName("../../outputs_EventManager/eventTree_nEv9000.root");
+//    TString fileName("../../outputs_EventManager/eventTree_nEv15000.root");
+    TString fileName("../../outputs_EventManager/eventTree_nEv100000.root");
 
 
     // ##### prepare analysers and run

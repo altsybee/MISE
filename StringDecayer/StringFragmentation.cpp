@@ -26,6 +26,45 @@ StringFragmentation::StringFragmentation() :
     //        funcPt->SetParameter(1,1.05);
     //        funcPt->SetParameter(2,7.92);
 
+    if (0)
+    {
+        funcPtBoltzmanLikePion = new TF1( "funcPtBoltzmanLikePion", "[0]*x*TMath::Exp(-sqrt([1]*[1]+x*x)/[2])", 0, 10 );
+        funcPtBoltzmanLikePion->SetParameter( 0, 1 );
+        funcPtBoltzmanLikePion->SetParameter( 1, mPion );
+    //    funcPtBoltzmanLikePion->SetParameter( 2, 0.01 );//0.3 );
+    //    funcPtBoltzmanLikePion->SetParameter( 2, 0.14 );//0.3 );
+        funcPtBoltzmanLikePion->SetParameter( 2, 0.1 );//0.3 );
+
+        funcPtBoltzmanLikeKaon = new TF1( "funcPtBoltzmanLikeKaon", "[0]*x*TMath::Exp(-sqrt([1]*[1]+x*x)/[2])", 0, 10 );
+        funcPtBoltzmanLikeKaon->SetParameter( 0, 1 );
+        funcPtBoltzmanLikeKaon->SetParameter( 1, mKaon );
+        funcPtBoltzmanLikeKaon->SetParameter( 2, 0.1 );//0.3 );
+
+        funcPtBoltzmanLikeProton = new TF1( "funcPtBoltzmanLikeProton", "[0]*x*TMath::Exp(-sqrt([1]*[1]+x*x)/[2])", 0, 10 );
+        funcPtBoltzmanLikeProton->SetParameter( 0, 1 );
+        funcPtBoltzmanLikeProton->SetParameter( 1, mProton );
+        funcPtBoltzmanLikeProton->SetParameter( 2, 0.1 );//0.3 );
+    }
+    else //Schwinger-like fragmentation into hadrons! (from Grigory&Co paper)
+    {
+        funcPtBoltzmanLikePion = new TF1( "funcPtBoltzmanLikePion", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
+        funcPtBoltzmanLikePion->SetParameter( 0, 1 );
+        funcPtBoltzmanLikePion->SetParameter( 1, mPion );
+        funcPtBoltzmanLikePion->SetParameter( 2, 0.568 ); // t = 0.568 ± 0.001 GeV2
+
+        funcPtBoltzmanLikeKaon = new TF1( "funcPtBoltzmanLikeKaon", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
+        funcPtBoltzmanLikeKaon->SetParameter( 0, 1 );
+        funcPtBoltzmanLikeKaon->SetParameter( 1, mKaon );
+        funcPtBoltzmanLikeKaon->SetParameter( 2, 0.568 );
+
+        funcPtBoltzmanLikeProton = new TF1( "funcPtBoltzmanLikeProton", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
+        funcPtBoltzmanLikeProton->SetParameter( 0, 1 );
+        funcPtBoltzmanLikeProton->SetParameter( 1, mProton );
+        funcPtBoltzmanLikeProton->SetParameter( 2, 0.568 );
+
+    }
+
+
 
 }
 
@@ -94,14 +133,20 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
         //        yStringSize = TMath::Max(0.5, fabs(fRand->Gaus(0,1)) );
         //TMath::Max( 0.5, fabs( fRand->Gaus(1.5,0.3) ) + 2*fabs( fRand->Gaus(0,0.2) ) );
     }
-    int nParticlesInString = 0.72 /*coeffToTuneMult*/ * TMath::Max(1,TMath::Nint( fRand->Gaus(yStringSize,yStringSize/10) )); // /2270*1550;
-    nParticlesInString *= 1.14; //for energy-dependence! (30.01.2015, tuning basing on STAR)
+
+    //    int nParticlesInString = 0.72 /*coeffToTuneMult*/ * TMath::Max(1,TMath::Nint( fRand->Gaus(yStringSize,yStringSize/10) )); // /2270*1550;
+    //    nParticlesInString *= 1.14; //for energy-dependence! (30.01.2015, tuning basing on STAR)
+
+    int nParticlesInString = TMath::Max(1,TMath::Nint( fRand->Gaus(yStringSize,yStringSize/10) )); // /2270*1550;
+    //    nParticlesInString *= 1.25; //arbitrary factor to increase multiplicity
+    nParticlesInString *= 1.25*0.7; //arbitrary factor to tune multiplicity IN CASE OF ALL PARTICLES - RHOS
+
     //nParticlesInString; // to take into account two pions from single rho!!!!!!!
     //    int nParticlesInString = TMath::Max(1,TMath::Nint( fRand->Gaus(yStringSize,yStringSize/5) ));
     //WAS USED FOR PROCEEDING...    int nParticlesInString = TMath::Max(2,TMath::Nint( fRand->Gaus(1.2,0.5) ));
 
     int nCutPoints = nParticlesInString + 1;
-    for ( int iCut = 0; iCut < nCutPoints; iCut++ )
+    for ( int iBreak = 0; iBreak < nCutPoints; iBreak++ )
     {
         //        double y = fRand->Uniform( fRand->Gaus(fYmin,0.2)+yStringShift, fRand->Gaus(fYmax,0.2)+yStringShift );
         //        double y = fRand->Uniform( fYmin+yStringShift, fYmax+yStringShift );
@@ -109,48 +154,50 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
         double y = fRand->Uniform( -yStringSize/2 + yStringShift, yStringSize/2+yStringShift );
         //        double y = fRand->Gaus( 0, fRand->Gaus(fYmin,0.2) ) + yStringShift;
         //y += yStringShift; //fRand->Gaus(0,2);
-        yCutPoints[iCut] = y;
+        yBreakPoints[iBreak] = y;
     }
 
     //sort cut points
-    TMath::Sort<double, int>( nCutPoints, yCutPoints, indecesCutsSorted, kFALSE );
+    TMath::Sort<double, int>( nCutPoints, yBreakPoints, indecesCutsSorted, kFALSE );
 
     //fill array with sorted y of the string cuts
-    for ( int iCut = 0; iCut < nCutPoints; iCut++ )
-        yCutPointsSorted[iCut] = yCutPoints[ indecesCutsSorted[iCut] ];
+    for ( int iBreak = 0; iBreak < nCutPoints; iBreak++ )
+        yBreakPointsSorted[iBreak] = yBreakPoints[ indecesCutsSorted[iBreak] ];
 
     //    double particleMass = mRho;
     //        double particleMass = mPion;
-    // LOGICAL ERROR HERE!!! :
-    double particleMass = fRand->Gaus(mRho,mRhoWidth/2);//( fRand->Uniform(0,1) > 0.5 ? fRand->Gaus(mRho,mRhoWidth/2) : mPion );
+    // possible LOGICAL ERROR HERE!!! (if use the mass in cut point calculations)
+
+
+
     //double factorToPtExp = ( particleMass == mPion ? 2.5 : 1.57 );
     //make pTs at string cuts
-    for ( int iCut = 0; iCut < nCutPoints; iCut++ )
+    for ( int iBreak = 0; iBreak < nCutPoints; iBreak++ )
     {
         // !!! use some numerical factor to MATCH MEAN PT when later merge two quarks of string fragments
         //        if ( particleMass == mPion )
-        //            cutPointPt[iCut] = fRand->Exp( 0.25 ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
+        //            breakPointPt[iBreak] = fRand->Exp( 0.25 ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
         //        else //rho
-        cutPointPt[iCut] = fRand->Exp( 0.75 );//fictionRhoPt ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
-        //        cutPointPt[iCut] = funcPt->GetRandom( /*fictionRhoPt*/ ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
+        breakPointPt[iBreak] = fRand->Exp( 0.25 ); //0.75 );//fictionRhoPt ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
+        //        breakPointPt[iBreak] = funcPt->GetRandom( /*fictionRhoPt*/ ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
 
 
         //        if ( fictionRhoPt == 0 )
-        //            cutPointPt[iCut] = 0;
+        //            breakPointPt[iBreak] = 0;
         //        else
-        //            cutPointPt[iCut] = fRand->Gaus(fictionRhoPt,0.01); //funcPt->GetRandom();//fRand->Exp(pTtau);
+        //            breakPointPt[iBreak] = fRand->Gaus(fictionRhoPt,0.01); //funcPt->GetRandom();//fRand->Exp(pTtau);
 
-        //        cutPointPt[iCut] = fRand->Uniform( 0.1, 0.5 );
-        cutPointPhi[iCut] = fRand->Uniform( 0, 2*TMath::Pi() );
+        //        breakPointPt[iBreak] = fRand->Uniform( 0.1, 0.5 );
+        breakPointPhi[iBreak] = fRand->Uniform( 0, 2*TMath::Pi() );
     }
 
     //calc kinematic params of "particles"=string fragments
-    for ( int iCut = 0; iCut < nParticlesInString; iCut++ )
+    for ( int iBreak = 0; iBreak < nParticlesInString; iBreak++ )
     {
-        double pT1 = cutPointPt[iCut];
-        double pT2 = cutPointPt[iCut+1];
-        double phi1 = cutPointPhi[iCut];
-        double phi2 = cutPointPhi[iCut+1];
+        double pT1 = breakPointPt[iBreak];
+        double pT2 = breakPointPt[iBreak+1];
+        double phi1 = breakPointPhi[iBreak];
+        double phi2 = breakPointPhi[iBreak+1];
         phi2 += TMath::Pi();
         FixAngleInTwoPi(phi2);
 
@@ -171,9 +218,13 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
                 ptParticle = fRand->Exp(fictionRhoPt);
             //            ptParticle = fRand->Gaus(fictionRhoPt,0.01); //funcPt->GetRandom();//fRand->Exp(pTtau);
         }
+        // FOR TESTS!!!
+        if(0)
+            ptParticle = fRand->Exp(0.75);
+
 
         // !!! RANDOMIZE PT for generated particles:
-        //        fParticles[iCut].pt  = funcPt->GetRandom();
+        //        fParticles[iBreak].pt  = funcPt->GetRandom();
         //        cout << fParticles[iP].pt << endl;
 
         double phiVectorSum = asin( ptY/ptParticle );
@@ -190,21 +241,72 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
         if(0)
             phiParticle = fRand->Uniform( 0, 2*TMath::Pi() );//phiVectorSum;
 
-        double yParticle = (yCutPointsSorted[iCut] + yCutPointsSorted[iCut+1])/2;
+        double yParticle = (yBreakPointsSorted[iBreak] + yBreakPointsSorted[iBreak+1])/2;
 
         if(0)
             yParticle = fRand->Uniform( -yStringSize/2, yStringSize/2 );
         //            yParticle = fRand->Uniform( fYmin+yStringShift, fYmax+yStringShift ); //use it to "shuffle" particles in y!
         //        yParticle += fRand->Gaus(0,1);
-//        yParticle = fRand->Uniform( -yStringSize/2, yStringSize/2 );
+        //        yParticle = fRand->Uniform( -yStringSize/2, yStringSize/2 );
         yParticle = fRand->Uniform( -yStringSize/2+yStringShift, yStringSize/2+yStringShift );
 
+
+
+        // to get pions = 0.8 when half of them goes from rho decays:
+        // probabilities for rho, pions, kaons+protons should be 0.25, 0.5, 0.25
+        //        k=1 //ratio of pions from rho-s to pions from string
+        //        a=0.8 //ratio of final state pions to all charged
+        //        x=(a*k)/(2*k+2-a*k)
+        //        y=(a*k)/(2*k+2-a*k)*2/k
+        //        z=1-x-y
+        //        check: (2*x+y)/(2*x+y+z)
+
+        // TMP: just assign mass for particle. Todo?: separate mechanisms for mesons and proton (?)
+        double particleMass = mPion;
+        // ##### tune particle ratios!
+        if (0) // only rho mesons!!!
+        {
+            while ( fabs(particleMass-mRho) > mRhoWidth/2 )
+                particleMass = fRand->Gaus(mRho,mRhoWidth/2);//( fRand->Uniform(0,1) > 0.5 ? fRand->Gaus(mRho,mRhoWidth/2) : mPion );
+        }
+        else //if (0)
+        {
+            double probPID = fRand->Uniform(0,1);
+            if ( probPID < 0.0 )
+                particleMass = fRand->Gaus(mRho,mRhoWidth/2);//( fRand->Uniform(0,1) > 0.5 ? fRand->Gaus(mRho,mRhoWidth/2) : mPion );
+            else if ( probPID < 0.75 )
+                particleMass = mPion;
+            else //kaon or proton (13% and 4%)
+            {
+                if ( fRand->Uniform(0,1) < 13./(13+4) )
+                    particleMass = mKaon;
+                else
+                    particleMass = mProton;
+            }
+        }
+        //        cout << particleMass << endl;
+
+        //        ptParticle = fRand->Exp(0.45);
+
         // prepare lorentz vector
+        if (0) //use direct sampling of pt "boltzman" distr
+        {
+            if ( fabs( particleMass-mPion) < 0.001 )
+                ptParticle = funcPtBoltzmanLikePion->GetRandom();
+            else if ( fabs( particleMass-mKaon) < 0.001 )
+                ptParticle = funcPtBoltzmanLikeKaon->GetRandom();
+            else if ( fabs( particleMass-mProton) < 0.001 )
+                ptParticle = funcPtBoltzmanLikeProton->GetRandom();
+        }
+        if (0)
+            phiParticle = fRand->Uniform( 0, TMath::TwoPi() );
+
         double mT = sqrt( ptParticle*ptParticle + particleMass*particleMass );
         double pX = ptParticle * cos(phiParticle);
         double pY = ptParticle * sin(phiParticle);
         double pZ = mT*sinh(yParticle);
-        vArr[iCut].SetXYZM( pX, pY, pZ, particleMass );
+        vArr[iBreak].SetXYZM( pX, pY, pZ, particleMass );
+
     }
 
     return nParticlesInString;
@@ -237,7 +339,7 @@ int StringFragmentation::probabilityChargePlusMinusNeutral()
     //all +,-,0 have probability 1/3
     int chargeSign = 0;
 
-    double randForCharge = fRand->Uniform(-2,2);
+    double randForCharge = fRand->Uniform(-1,2);
 
     if ( randForCharge < 0 )
         chargeSign = 0; // neutral (probability is same as for charged! quark combinatorics...)
@@ -248,5 +350,16 @@ int StringFragmentation::probabilityChargePlusMinusNeutral()
     return chargeSign;
 }
 
+int StringFragmentation::probabilityChargePlusMinus()
+{
+    int chargeSign = 0;
+    double randForCharge = fRand->Uniform(-1,1);
+
+    if ( randForCharge > 0 )
+        chargeSign = 1; // positive
+    else
+        chargeSign = -1; // negative
+    return chargeSign;
+}
 
 

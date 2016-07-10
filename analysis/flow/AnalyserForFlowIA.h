@@ -41,6 +41,8 @@ protected:
     Int_t fNtracks;
     Int_t fPID;
 
+    Int_t fNeventsQA;
+
     //centrality class
     Float_t fMinCentrality;    // min bound on centrality percentile
     Float_t fMaxCentrality;    // max bound on centrality percentile

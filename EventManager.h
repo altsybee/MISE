@@ -12,7 +12,7 @@ class TH1D;
 class TH2D;
 class TCanvas;
 //class Event;
-class NucleusStructure;
+class NucleiCollision;
 class StringDescr;
 class AnalyserBase;
 
@@ -28,6 +28,8 @@ public:
 
     void setFillEventTree(bool flag) { fFillEventTree = flag; }
 
+    void setNumberOfCentralityBins(int nCentralityBins) { fNumberOfCentralityBins = nCentralityBins; }
+
     //    Event *getEvent() /*const*/
 //    {
 //        //if (!fEvent)
@@ -35,7 +37,8 @@ public:
 //        return fEvent;
 //    }
 
-    void generateEvents(NucleusStructure *d, StringDescr *strDescr, int nEvents );
+    void initOutputObjects();
+    void generateEvents(NucleiCollision *d, StringDescr *strDescr, int nEvents );
     void drawStatHists();
 
 //    void SetFlagGenerateCentralEvent(bool flag) { fFlagGenerateCentralEventByHand = flag; }
@@ -47,7 +50,7 @@ public:
 private:
     //TString fStrSpecTitle;
 
-    NucleusStructure *fPtrNuclStruct;
+    NucleiCollision *fPtrNuclStruct;
 
     bool fPrintInfo;
     bool fDrawHistos;
@@ -56,7 +59,8 @@ private:
     TString fOutputFileName;
     TString fOutputListName;
 //    Event *fEvent;
-    int fNevents;
+//    int fNevents;
+    Int_t fNumberOfCentralityBins;
     //Distribution *fNsourcesDistr;
     //Distribution *fNparticlesDistr;
     //Distribution *fPtDistr;
@@ -83,6 +87,7 @@ private:
     TH1D* fHistEtaInPtCuts[5];
     TH1D* fHistPhi;
     TH1D* fHistPtAfterCuts;
+    TH1D* fHistPtAfterCutsPID[3];
     TH1D* fHistPtBeforeKick;
 
     TH1D* fHistNeventsInCentralityClasses;

@@ -41,7 +41,9 @@ StringDescr::StringDescr() //: //ParticleArr(fNparticles)
     strFr = new StringFragmentation;
     //    strFr->setStringEndPoinsY(-1,1,3);
 //    strFr->setStringEndPoinsY(kMinEta,kMaxEta,2);
-    strFr->setStringEndPoinsY(-0.75,0.75,2);
+//    strFr->setStringEndPoinsY(-0.75,0.75,2);
+//    strFr->setStringEndPoinsY(-3,3,2);
+    strFr->setStringEndPoinsY(-4,4,2);
 
     if(0)
     {
@@ -76,7 +78,7 @@ StringDescr::StringDescr() //: //ParticleArr(fNparticles)
 
     //    TLorentzVector *rhoVector = new TLorentzVector;
     //    TLorentzVector vMother;
-    vMothers = new TLorentzVector[N_STRING_CUTS];
+    vMothers = new TLorentzVector[N_LORENTZ_VECTORS_FROM_STRING];
 
 
 }
@@ -160,7 +162,8 @@ void StringDescr::hadronizeString( double stringBeta, double boostPhiDir )
         //                    motherEta = fRand->Uniform(-3,3);
         //                    vMother->SetPtEtaPhiM( motherPt, motherEta, motherPhi, vMother->M() );
 
-        double y = etaArrTmp[iMother];//fRand->Uniform(-4,4);
+//        double y = etaArrTmp[iMother];//fRand->Uniform(-4,4);
+        double y = fRand->Uniform(-3, 3);
         double mT = sqrt( motherPt*motherPt + vMother->M()*vMother->M() );
         double pX = motherPt * cos(motherPhi);
         double pY = motherPt * sin(motherPhi);
@@ -180,8 +183,11 @@ void StringDescr::hadronizeString( double stringBeta, double boostPhiDir )
         //            cout << "mother after boost: eta, pt: " << vMother->Eta() << " " << vMother->Pt() <<  endl;
         //        cout << "vMother->M(): " << vMother->M() <<  endl;
 
+//        cout << "StringDescr::hadronizeString : vMother->M() = " << vMother->M() << endl;
+
         if ( fabs( vMother->M() - mRho ) < 2*mRhoWidth/2 ) //rho meson
         {
+
             //perform decay to pions if it is rho-meson
             decayInTwo->generateDecayProducts( *vMother, v1, v2 );
 
@@ -207,6 +213,7 @@ void StringDescr::hadronizeString( double stringBeta, double boostPhiDir )
                 fParticles[nP].phi = v1.Phi();
                 fParticles[nP].pt  = v1.Pt();
                 fParticles[nP].charge  = charge[0];
+                fParticles[nP].pid  = kPid_pion;
                 FixAngleInTwoPi(fParticles[nP].phi);
                 nP++;
             }
@@ -216,15 +223,32 @@ void StringDescr::hadronizeString( double stringBeta, double boostPhiDir )
                 fParticles[nP].phi = v2.Phi();
                 fParticles[nP].pt  = v2.Pt();
                 fParticles[nP].charge  = charge[1];
+                fParticles[nP].pid  = kPid_pion;
                 FixAngleInTwoPi(fParticles[nP].phi);
                 nP++;
             }
         }
-        else if ( fabs( vMother->M() - mPion ) < 0.01 ) // pions
+        else // not a resonanse
         {
-            int charge  = strFr->probabilityChargePlusMinusNeutral();
+            int charge  = 0;
+            int pid  = -1;
 
-            //                    cout << "pionCharge=" << motherSimpleTrack->charge << endl;
+            //charge and pid depending on mass:
+            if ( fabs( vMother->M() - mPion ) < 0.01 ) // pions
+            {
+                charge  = strFr->probabilityChargePlusMinusNeutral();
+                pid  = kPid_pion;
+            }
+            else if ( fabs( vMother->M() - mKaon ) < 0.01 ) // kaons
+            {
+                charge  = strFr->probabilityChargePlusMinusNeutral();
+                pid  = kPid_kaon;
+            }
+            else if ( fabs( vMother->M() - mProton ) < 0.01 ) // protons
+            {
+                charge  = strFr->probabilityChargePlusMinus();
+                pid  = kPid_proton;
+            }
 
             // fill array with particle
             if ( charge != 0 )
@@ -233,6 +257,7 @@ void StringDescr::hadronizeString( double stringBeta, double boostPhiDir )
                 fParticles[nP].phi = vMother->Phi();
                 fParticles[nP].pt  = vMother->Pt();
                 fParticles[nP].charge  = charge;
+                fParticles[nP].pid  = pid;
                 FixAngleInTwoPi(fParticles[nP].phi);
                 nP++;
             }

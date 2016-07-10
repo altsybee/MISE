@@ -1,4 +1,4 @@
-#include "NucleusStructure.h"
+#include "NucleiCollision.h"
 #include "DistanceEntry.h"
 
 #include "TFile.h"
@@ -123,7 +123,7 @@ double circlesIntersectionArea( double d, double r, double R )
 //}
 
 
-//void NucleusStructure::changePartonState( int &state, bool hardScatteringFlag )
+//void NucleiCollision::changePartonState( int &state, bool hardScatteringFlag )
 //{
 //    //change parton state if the parton participates in string formation
 
@@ -139,7 +139,7 @@ double circlesIntersectionArea( double d, double r, double R )
 //    if ( state == -1 ) //it's "valence quark"
 //        state = 2;
 //}
-void NucleusStructure::changePartonPairState( int &stateA, int &stateB )
+void NucleiCollision::changePartonPairState( int &stateA, int &stateB )
 {
     //change parton state if the parton participates in string formation
     if ( stateA == -1 && stateB == -1 ) //both partons are "valence quarks"
@@ -155,7 +155,7 @@ void NucleusStructure::changePartonPairState( int &stateA, int &stateB )
 }
 
 
-NucleusStructure::NucleusStructure(/*int seed*/) :
+NucleiCollision::NucleiCollision(/*int seed*/) :
     fRand(0x0)
   , funcNucleonDensity(0x0)
   , funcPartonDensity(0x0)
@@ -172,11 +172,12 @@ NucleusStructure::NucleusStructure(/*int seed*/) :
   , fNucleusWSa(1.)
   //  , fRadiusParton(0.1)    //radius "parton", fm
   , fPartonInteractionDistance(0.2)//0.2)
-  , fStringInteractionDistance(0.2)//2) //fm
+  , fStringInteractionRadius(0.2)//2) //fm
   , fStringOverlapEnergyDensity(0.1)
   //  , fStringInteractionParA(0.05)
   , fClusterFormationDist(0.4)
   , fMeanNofPartonsInNucleon(5)
+  , fHardScatteringProbability(0.03)
   
   , fImpactParameter(0.) //fm (is MC-played)
   //  , fImpactParameterByHand_0_100(0.)
@@ -192,7 +193,7 @@ NucleusStructure::NucleusStructure(/*int seed*/) :
 {
 }
 
-void NucleusStructure::initDataMembers()
+void NucleiCollision::initDataMembers()
 {
     fFlagDataMembersInitialized = true;
     fEventId = 0;
@@ -208,7 +209,7 @@ void NucleusStructure::initDataMembers()
         kCoeffRadiusForMB = 2.1;
         break;
     case nucleus_Pb:
-        fNumberOfNucleons = 208;
+        fNumberOfNucleons = 207;//8;
         fNucleusRadius = 6.62;//6.413;
         fNucleusWSa = 0.546; // from ASer
         //        cout << "Pb" << endl;
@@ -238,13 +239,13 @@ void NucleusStructure::initDataMembers()
     funcPartonDensity->SetParameter(1, kNucleonParA); //parameter a
     
     //    funcStringInteractionDist = new TF1( "funcStringInteractionDist"
-    //                                         , "1. / (1 + TMath::Exp( (x-[0]) / [1] ))", 0, fStringInteractionDistance*2 );
-    //    funcStringInteractionDist->SetParameter(0, fStringInteractionDistance);//parameter R
+    //                                         , "1. / (1 + TMath::Exp( (x-[0]) / [1] ))", 0, fStringInteractionRadius*2 );
+    //    funcStringInteractionDist->SetParameter(0, fStringInteractionRadius);//parameter R
     //    funcStringInteractionDist->SetParameter(1, fStringInteractionParA ); //parameter a
 
 
     funcImpactPar1D = new TF1( "funcImpactPar1D", "x", 0, 2*fNucleusRadius*kCoeffRadiusForMB ); // !!! tmp!!! make wider!
-    //    funcImpactPar1D->SetParameter(0, fStringInteractionDistance);//parameter R
+    //    funcImpactPar1D->SetParameter(0, fStringInteractionRadius);//parameter R
     //    funcImpactPar1D->SetParameter(1, fStringInteractionParA ); //parameter a
 
     fA = new Nucleus( fNumberOfNucleons, fMaxPartons);
@@ -274,7 +275,8 @@ void NucleusStructure::initDataMembers()
     
     fXstring = new float[fMaxPartons];
     fYstring = new float[fMaxPartons];
-    
+    fStringRadiusVectorAngle = new float[fMaxPartons];
+
     fXstringInteraction = new float[fMaxPartons];
     fYstringInteraction = new float[fMaxPartons];
     fStringIntDist = new float[fMaxPartons];
@@ -322,6 +324,8 @@ void NucleusStructure::initDataMembers()
     fHist2DN2stringsXY = new TH2D("fHist2DN2stringsXY", "nStr in xy"                    , nBinsXY, -sizeForXY, sizeForXY , nBinsXY, -sizeForXY, sizeForXY );
     fHist2DSigmaNstringsXY = new TH2D("fHist2DSigmaNstringsXY", "#sigma n strings in xy", nBinsXY, -sizeForXY, sizeForXY , nBinsXY, -sizeForXY, sizeForXY );
 
+    fHistStringRadiusVectorPhi = new TH1D("fHistStringRadiusVectorPhi", "string #phi angle wrt (0,0);#phi;n strings", 100, 0, 2*TMath::Pi() );
+
     fHistStringInteractionsPhi = new TH1D("fHistStringInteractionsPhi", "string kick #phi;#phi;n strings", 100, 0, 2*TMath::Pi() );
     fHistStringInteractionsDistance = new TH1D("fHistStringInteractionsDistance", "string pairs dist", 100, 0, fNucleusRadius );
     // fHistStringInteractionsMagnitude = new TH1D("fHistStringInteractionsMagnitude", "string interaction magnitude; arb. units;n strings", 500, 0, 100 );
@@ -358,13 +362,13 @@ void NucleusStructure::initDataMembers()
     
     //event construction helpers
     fPartonInteractionsFinder = new MinDistanceFinder( fPartonInteractionDistance );
-    //    fStringInteractionsFinder = new MinDistanceFinder( fStringInteractionDistance ); //NOT USED NOW!!! it's for old implementation of strings interactions
+    //    fStringInteractionsFinder = new MinDistanceFinder( fStringInteractionRadius ); //NOT USED NOW!!! it's for old implementation of strings interactions
 }
 
-NucleusStructure::NucleusStructure(const NucleusStructure& ) {
+NucleiCollision::NucleiCollision(const NucleiCollision& ) {
 }
 
-NucleusStructure::~NucleusStructure() {
+NucleiCollision::~NucleiCollision() {
     //    delete [] fX1;
     //    delete [] fY1;
     //    delete [] fX2;
@@ -372,11 +376,11 @@ NucleusStructure::~NucleusStructure() {
 }
 
 //######### build event
-void NucleusStructure::buildEvent()
+void NucleiCollision::buildEvent()
 {
     if ( !fRand )
     {
-        cout << "NucleusStructure: fRand IS NOT INITIALIZED!!! exiting..." << endl;
+        cout << "NucleiCollision: fRand IS NOT INITIALIZED!!! exiting..." << endl;
         return;
     }
 
@@ -497,7 +501,7 @@ void NucleusStructure::buildEvent()
     }
 }
 
-void NucleusStructure::createNucleiPair()
+void NucleiCollision::createNucleiPair()
 {
     bool flagGoodConfiguration = false;
     //nucleus 1 is in (0,0), make pos of the 2nd
@@ -580,7 +584,7 @@ void NucleusStructure::createNucleiPair()
 
 }
 
-void NucleusStructure::createNucleus( Nucleus *nucl, float bx, float by )
+void NucleiCollision::createNucleus( Nucleus *nucl, float bx, float by )
 {
     //remember impact parameter (bx,by)
     nucl->bx = bx;
@@ -615,7 +619,7 @@ void NucleusStructure::createNucleus( Nucleus *nucl, float bx, float by )
     }
 }
 
-void NucleusStructure::createPartons( Nucleus *nucl, int nId ) //float nucleonX, float nucleonY, float *x, float *y )
+void NucleiCollision::createPartons( Nucleus *nucl, int nId ) //float nucleonX, float nucleonY, float *x, float *y )
 {
     //nId - id of a nucleon inside nucleus
     
@@ -681,7 +685,7 @@ void NucleusStructure::createPartons( Nucleus *nucl, int nId ) //float nucleonX,
     nucl->nPartons += nPartonsInThisNucleon;
 }
 
-void NucleusStructure::createPartonsOld(float *x, float *y, float bx, float by )
+void NucleiCollision::createPartonsOld(float *x, float *y, float bx, float by )
 {
     double rRand = 0;
     double phiRand = 0;
@@ -702,7 +706,7 @@ void NucleusStructure::createPartonsOld(float *x, float *y, float bx, float by )
     }
 }
 
-void NucleusStructure::createStrings()
+void NucleiCollision::createStrings()
 {
     //find the closest parton pairs
     fPartonInteractionsFinder->FindMinDistancesBetweenPairs(fA->pX,fA->pY,fB->pX,fB->pY,fA->nPartons,fB->nPartons); //fX1,fY1,fX2,fY2,fMaxPartons,fMaxPartons);
@@ -750,12 +754,22 @@ void NucleusStructure::createStrings()
         fClusterIdForString[fNumberOfStrings] = -1;
         fFlagStringIsHardInteraction[fNumberOfStrings] = 0;//false;
 
-        fFlagStringIsHardInteraction[fNumberOfStrings] = ( fRand->Uniform() > 0.97 ? 1 : 0 );
+        fFlagStringIsHardInteraction[fNumberOfStrings] = ( fRand->Uniform() < fHardScatteringProbability ? 1 : 0 );
+
+        // calc angle of the radius-vector of the string
+        float middleX_shifted = middleX-fImpactParameter/2;
+        double stringRadiusVectorAngle = atan( middleY/middleX_shifted ); //   sqrt(middleX*middleX+middleY*middleY) );
+        if ( middleX_shifted < 0 )
+            stringRadiusVectorAngle = TMath::Pi()-stringRadiusVectorAngle;
+        FixAngleInTwoPi(stringRadiusVectorAngle);
+        FixAngleInTwoPi(stringRadiusVectorAngle);
+        fStringRadiusVectorAngle[fNumberOfStrings] = stringRadiusVectorAngle;
+        fHistStringRadiusVectorPhi->Fill( stringRadiusVectorAngle );
 
         fNumberOfStrings++;
         
         fHistStringPositionRadius->Fill( sqrt(middleX*middleX+middleY*middleY)/fNucleusRadius );
-        fHist2DNstringsXY_thisEvent->Fill( middleX-fImpactParameter/2, middleY );
+        fHist2DNstringsXY_thisEvent->Fill( middleX_shifted, middleY );
     }
     
     //set flag MB collision if have at least one string
@@ -764,7 +778,7 @@ void NucleusStructure::createStrings()
 }
 
 
-void NucleusStructure::startClusterSearch()
+void NucleiCollision::startClusterSearch()
 {
     int nOfLargeClusters = 0;
     int clusterId = 0;
@@ -802,7 +816,7 @@ void NucleusStructure::startClusterSearch()
     fHistNStringsInLargestCluster->Fill(maxClusterSize);
 }
 
-void NucleusStructure::findStringClusters(int iString, int &nLinked, int clusterId)
+void NucleiCollision::findStringClusters(int iString, int &nLinked, int clusterId)
 {
     //    cout << "deep: string id=" << iString << endl;
     const float rCluster2 = fClusterFormationDist*fClusterFormationDist;
@@ -841,13 +855,13 @@ void NucleusStructure::findStringClusters(int iString, int &nLinked, int cluster
 }
 
 
-void NucleusStructure::createForcesInsideCluster(int clusterId)
+void NucleiCollision::createForcesInsideCluster(int clusterId)
 {
-    float maxStringOverlapArea = TMath::Pi()*fStringInteractionDistance*fStringInteractionDistance; //circlesIntersectionArea(0, fStringInteractionDistance, fStringInteractionDistance);
+    float maxStringOverlapArea = TMath::Pi()*fStringInteractionRadius*fStringInteractionRadius; //circlesIntersectionArea(0, fStringInteractionRadius, fStringInteractionRadius);
 
     // !!!!! playing with params!
     // take DOUBLED parameter (distance) for cuts:
-    const float fInteractionDist = 2*fStringInteractionDistance; //3;//1.8; //4.*fClusterFormationDist;//3*fNucleusRadius; //10.*fClusterFormationDist;
+    const float fInteractionDist = 2*fStringInteractionRadius; //3;//1.8; //4.*fClusterFormationDist;//3*fNucleusRadius; //10.*fClusterFormationDist;
     const float rInteraction2 = fInteractionDist*fInteractionDist;
 
     StringCluster *thisCluster = fStringClusters[clusterId];
@@ -888,9 +902,9 @@ void NucleusStructure::createForcesInsideCluster(int clusterId)
                     //                    thisCluster->Fx[i2] += dx/dr * forceCoeff;
                     //                    thisCluster->Fy[i2] += dy/dr * forceCoeff;
                 }
-                float stringOverlapArea = circlesIntersectionArea(dr, fStringInteractionDistance, fStringInteractionDistance);
+                float stringOverlapArea = circlesIntersectionArea(dr, fStringInteractionRadius, fStringInteractionRadius);
                 float U = stringOverlapArea/maxStringOverlapArea * fStringOverlapEnergyDensity;
-                //                cout << circlesIntersectionArea(0, fStringInteractionDistance, fStringInteractionDistance)/maxStringOverlapArea << endl;
+                //                cout << circlesIntersectionArea(0, fStringInteractionRadius, fStringInteractionRadius)/maxStringOverlapArea << endl;
                 float momAbs = sqrt( (Mstring+U)*(Mstring+U) - Mstring*Mstring ); //acquired momentum, see Abramovsky paper
 //                cout << "momString = " << momAbs << endl;
                 thisCluster->Fx[i] += -dx/dr * momAbs;
@@ -903,7 +917,7 @@ void NucleusStructure::createForcesInsideCluster(int clusterId)
 }
 
 
-void NucleusStructure::createStringRepulsion()
+void NucleiCollision::createStringRepulsion()
 {
     for ( int iCluster = 0; iCluster < fNumberOfClusters; iCluster++ )
     {
@@ -938,7 +952,7 @@ void NucleusStructure::createStringRepulsion()
 }
 
 
-void NucleusStructure::createStringRepulsionOld()
+void NucleiCollision::createStringRepulsionOld()
 {
     //string interactions - find the closest string pairs
     fStringInteractionsFinder->FindMinDistancesWithinArray(fXstring,fYstring,fNumberOfStrings);
@@ -1000,7 +1014,7 @@ void NucleusStructure::createStringRepulsionOld()
     fHistStringInteractions->Fill( fNumberOfStringInteractions );
 }
 
-void NucleusStructure::calcEccentricity()
+void NucleiCollision::calcEccentricity()
 {
     float num = 0;
     float denom = 0;
@@ -1022,7 +1036,7 @@ void NucleusStructure::calcEccentricity()
         fEccentricity = -1;
 }
 
-void NucleusStructure::fillNumberOfStringsInXY()
+void NucleiCollision::fillNumberOfStringsInXY()
 {
     for ( int i = 0; i < fHist2DNstringsXY_thisEvent->GetNbinsX(); i++) //x
     {
@@ -1045,7 +1059,7 @@ void NucleusStructure::fillNumberOfStringsInXY()
 
 }
 
-void NucleusStructure::getIngredientsForEccentricity( Nucleus *nucl, Nucleus *nucl2, int &nWounded, float &num, float &denom )
+void NucleiCollision::getIngredientsForEccentricity( Nucleus *nucl, Nucleus *nucl2, int &nWounded, float &num, float &denom )
 {
     // nucl2 is ONLY for calculation of the middle b/n nuclei A&B centers
     float midX = (nucl->bx + nucl2->bx) / 2;
@@ -1069,7 +1083,7 @@ void NucleusStructure::getIngredientsForEccentricity( Nucleus *nucl, Nucleus *nu
 
 
 //######### drawings
-void NucleusStructure::drawStatisticHists()
+void NucleiCollision::drawStatisticHists()
 {
     //save analyzer lists to file
     TFile *fileNuclStructStats = new TFile( Form( "%s/stats_NuclearStructure.root", fOutDirName.Data() ),"RECREATE");
@@ -1136,6 +1150,9 @@ void NucleusStructure::drawStatisticHists()
         fCanvEventStatistics->cd(padId++);
         fHistStringInteractionsPhi->DrawCopy();
         fHistStringInteractionsPhi->Write();
+
+        fHistStringRadiusVectorPhi->SetLineColor(kRed);
+        fHistStringRadiusVectorPhi->DrawCopy( "same" );
         //pad 6
         //        fCanvEventStatistics->cd(6);
         //        fHistStringInteractionsDistance->DrawCopy();
@@ -1143,6 +1160,7 @@ void NucleusStructure::drawStatisticHists()
         fCanvEventStatistics->cd(padId++);//->SetLogy();
         fHistStringInteractionsMagnitude->DrawCopy();
         fHistStringInteractionsMagnitude->Write();
+        cout << ">> mean string boost (<beta>) = " << fHistStringInteractionsMagnitude->GetMean() << endl;
         //pad 8
         fCanvEventStatistics->cd(padId++);
         fHistImpactParameter->DrawCopy();
@@ -1229,8 +1247,9 @@ void NucleusStructure::drawStatisticHists()
     
 }
 
-void NucleusStructure::finalActions()
+void NucleiCollision::finalActions()
 {    
+    cout << "########## Begin NucleiCollision::finalActions()" << endl;
     if (1)
     {
         //percolation parameter vs bImpact
@@ -1382,15 +1401,17 @@ void NucleusStructure::finalActions()
         double crossSection = (double)fEvTrialsSuccess / nTrials * areaOfTrials / 100; //100 fm2 in 1 barn
         cout << " >>>>> crossSection (in barns?..)= " << crossSection << endl;
     }
+
+    cout << "########## End NucleiCollision::finalActions()" << endl;
 }
 
-double NucleusStructure::getNu()
+double NucleiCollision::getNu()
 {
     return (2.*fNcollisions ) / fNparticipants;
 }
 
 
-void NucleusStructure::drawEventStructure()
+void NucleiCollision::drawEventStructure()
 {
     if (!fCanvEventView)
     {
@@ -1410,7 +1431,7 @@ void NucleusStructure::drawEventStructure()
     //    fCanvEventView->SaveAs( Form( "eventViews/eventView_%d.eps", fEventId) );
 }
 
-void NucleusStructure::drawPartons()
+void NucleiCollision::drawPartons()
 {
     fCanvEventView->cd();
     //TF1 *f1 = new TF1( "ball", "4./3. * 3.1415926 * ( 1 - ( 1 - x*x )^(3./2.) )", 0, 1 );
@@ -1477,7 +1498,7 @@ void NucleusStructure::drawPartons()
     delete [] elPoints2;
 }
 
-void NucleusStructure::drawStrings()
+void NucleiCollision::drawStrings()
 {
     //visualize "strings"
     TEllipse **elPointsStrings = new TEllipse* [fNumberOfStrings];
@@ -1516,7 +1537,7 @@ void NucleusStructure::drawStrings()
     delete [] elPointsStrings;
 }
 
-void NucleusStructure::drawStringInteractions()
+void NucleiCollision::drawStringInteractions()
 {
     //visualize "string interactions"
     TLine **linesStringInteracions = new TLine* [fNumberOfStringInteractions];
@@ -1536,7 +1557,7 @@ void NucleusStructure::drawStringInteractions()
     delete [] linesStringInteracions;
 }
 
-void NucleusStructure::drawForcesInsideClusters()
+void NucleiCollision::drawForcesInsideClusters()
 {
     //find min and max forces
     float min_dr = 0;
@@ -1581,7 +1602,7 @@ void NucleusStructure::drawForcesInsideClusters()
                                                  0.025);
             arrowsStringBoosts[iP]->SetLineColor( kGreen + (int)fRand->Uniform(-9,4) );//kMagenta+2 );
             arrowsStringBoosts[iP]->SetLineWidth( 2 );
-            if( sqrt(Fx*Fx+Fy*Fy) > 0.33/*0.55*/*(max_dr-min_dr) ) //draw only long arrows
+            if( sqrt(Fx*Fx+Fy*Fy) > /*0.33*/0.55*(max_dr-min_dr) ) //draw only long arrows
                 arrowsStringBoosts[iP]->Draw();
         }
         delete [] arrowsStringBoosts;
@@ -1589,7 +1610,7 @@ void NucleusStructure::drawForcesInsideClusters()
 }
 
 
-void NucleusStructure::drawStringBoosts()
+void NucleiCollision::drawStringBoosts()
 {
     //arrows
     TArrow **arrowsStringBoosts = new TArrow* [fNumberOfStrings];

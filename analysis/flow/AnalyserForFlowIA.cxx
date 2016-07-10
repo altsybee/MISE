@@ -28,10 +28,10 @@
 #include "TRandom3.h"
 
 
-bool calc_qc_v2 = false;
-bool calc_qc_v3 = false;//true;
-bool calc_lyz = false;
-bool calc_sp = true;//true;
+bool calc_qc_v2 = 1;
+bool calc_qc_v3 = 0;//true;
+bool calc_lyz = 1;
+bool calc_sp = 1;
 
 // k) Define the ranges for two subevents separated with eta gap (needed only for SP method):
 Double_t etaMinA = -3; // minimum eta of subevent A
@@ -58,7 +58,8 @@ AnalyserForFlowIA::AnalyserForFlowIA()
       //  , fIsOnline( kFALSE )
       //  , fEventCount( 0 )
       fNtracks (0),
-      fPID(-1)
+      fPID(-1),
+      fNeventsQA(0)
 {
     fMiniEvent = new MiniEvent;
 
@@ -167,7 +168,7 @@ void AnalyserForFlowIA::StartEvent()
 
 void AnalyserForFlowIA::AddTrack(const SimpleTrack *track) //AddTrack( Double_t Eta , Double_t Phi, Double_t Pt )
 {
-//    if ( fPID == -1 || fPID == track->pid )
+    //    if ( fPID == -1 || fPID == track->pid )
     {
         Double_t Eta = track->eta;
         Double_t Phi = track->phi;
@@ -202,6 +203,11 @@ void AnalyserForFlowIA::FillAliFlowEvent()
     AliFlowEventSimple* flowEvent = new AliFlowEventSimple(nTracks);//,AliFlowEventSimple::kGenerate);
     //    AliFlowEventSimple* flowEventSP = new AliFlowEventSimple(nTracks);//,AliFlowEventSimple::kGenerate);
     //    flowEventSP->TagSubeventsInEta(-2,-1,1,2);
+//    cout << "FillAliFlowEvent: nEvents = " << fNeventsQA << endl;
+    fNeventsQA++;
+
+    // "event plane"
+    double phiEP = 0;//gRandom->Uniform( 0, TMath::TwoPi() );
 
     SimpleTrack *tracks = fMiniEvent->tracks;
     for ( Int_t i = 0; i < nTracks; i++ )
@@ -214,8 +220,14 @@ void AnalyserForFlowIA::FillAliFlowEvent()
                         << ", pid=" << tracks[i].pid
                         << endl;
 
+        double lPhi = tracks[i].phi + phiEP;
+        if ( lPhi > 2 * TMath::Pi() )
+            lPhi -= 2 * TMath::Pi();
+        else if ( lPhi < 0 )
+            lPhi += 2 * TMath::Pi();
+
         AliFlowTrackSimple* flowtrack = new AliFlowTrackSimple();
-        flowtrack->SetPhi(tracks[i].phi);
+        flowtrack->SetPhi(lPhi);//tracks[i].phi);
         flowtrack->SetEta(tracks[i].eta);
         flowtrack->SetPt(tracks[i].pt);
         flowtrack->SetCharge(tracks[i].charge);
@@ -230,13 +242,13 @@ void AnalyserForFlowIA::FillAliFlowEvent()
             flowtrack->TagPOI( isPOI && isPID_we_want); //tag POIs
         }
 
-//        if (calc_sp)
-//        {
-//            if( flowtrack->Eta() >= etaMinA && flowtrack->Eta() < etaMaxA )
-//                flowtrack->SetForSubevent(0);
-//            if( flowtrack->Eta() >= etaMinB && flowtrack->Eta() < etaMaxB )
-//                flowtrack->SetForSubevent(1);
-//        }
+        //        if (calc_sp)
+        //        {
+        //            if( flowtrack->Eta() >= etaMinA && flowtrack->Eta() < etaMaxA )
+        //                flowtrack->SetForSubevent(0);
+        //            if( flowtrack->Eta() >= etaMinB && flowtrack->Eta() < etaMaxB )
+        //                flowtrack->SetForSubevent(1);
+        //        }
         flowEvent->AddTrack(flowtrack);
 
         //for SP
@@ -244,14 +256,17 @@ void AnalyserForFlowIA::FillAliFlowEvent()
         //            flowtrack->TagPOI(cutsPOI_forSP->PassesCuts(flowtrack)); //tag POIs
         //        flowEventSP->AddTrack(flowtrack);
     }
-    flowEvent->TagSubeventsInEta(etaMinA,etaMaxA,etaMinB,etaMaxB);
 
     //    mcep->Make(flowEvent);
     if ( calc_qc_v2 )   qc_v2->Make(flowEvent);
     if ( calc_qc_v3 )   qc_v3->Make(flowEvent);
     if ( calc_lyz )     lyz->Make(flowEvent);
 
-    if ( calc_sp )     sp->Make(flowEvent);
+    if ( calc_sp )
+    {
+        flowEvent->TagSubeventsInEta(etaMinA,etaMaxA,etaMinB,etaMaxB);
+        sp->Make(flowEvent);
+    }
     //        cout <<"Event: " << i+1 << "\r"; cout.flush();
     delete flowEvent;
     //    delete flowEventSP;
@@ -279,13 +294,16 @@ void AnalyserForFlowIA::FinishEvent()
 
 void AnalyserForFlowIA::Terminate()
 {
+    cout << "FillAliFlowEvent: nEvents = " << fNeventsQA << endl;
+
     // calculate the final results
     //    fOutputFileId = -1000;
     //    mcep->Finish();
     if ( calc_qc_v2 )
     {
         qc_v2->Finish();
-        qc_v2->WriteHistograms("outputCumulants_v2.root");
+//        qc_v2->WriteHistograms("outputCumulants_v2.root");
+        qc_v2->WriteHistograms("outputQC_100k_kaon_boltzmanPt_Schwinger_WITH_SMEARING.root");
     }
 
     if ( calc_qc_v3 )
@@ -297,13 +315,17 @@ void AnalyserForFlowIA::Terminate()
     if ( calc_lyz )
     {
         lyz->Finish();
-        lyz->WriteHistograms("outputLYZ.root");
+        lyz->WriteHistograms("outputLYZ_100k_kaon_boltzmanPt_Schwinger_WITH_SMEARING.root");
     }
 
     if ( calc_sp )
     {
         sp->Finish();
-        TFile* outFileSP = new TFile( "outputSP.root", "RECREATE" );
+//        TFile* outFileSP = new TFile( "outputSP_12k_kaons_boltzmanPt_strIntRad1.root", "RECREATE" );
+//        TFile* outFileSP = new TFile( "outputSP_11k_kaons_boltzmanPt_tryEP.root", "RECREATE" );
+//        TFile* outFileSP = new TFile( "outputSP_10k_protons_boltzmanPt_LOW_T.root", "RECREATE" );
+//        TFile* outFileSP = new TFile( "outputSP_6k_protons_boltzmanPt_Schwinger.root", "RECREATE" );
+        TFile* outFileSP = new TFile( "outputSP_100k_kaon_boltzmanPt_Schwinger_WITH_SMEARING.root", "RECREATE" );
         sp->WriteHistograms(outFileSP);
         outFileSP->Close();
     }

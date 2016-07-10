@@ -1,3 +1,4 @@
+#include <stdlib.h>     /* srand, rand */
 #include <iostream>
 #include "MinDistanceFinder.h"
 #include <time.h>

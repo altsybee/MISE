@@ -1,12 +1,12 @@
 /* 
- * File:   NucleusStructure.h
+ * File:   NucleiCollision.h
  * Author: altsybee
  *
  * Created on 25 Февраль 2012 г., 11:15
  */
 
-#ifndef NUCLEUSSTRUCTURE_H
-#define	NUCLEUSSTRUCTURE_H
+#ifndef NucleiCollision_H
+#define	NucleiCollision_H
 
 #include "TString.h"
 
@@ -147,11 +147,11 @@ struct StringCluster
 };
 
 
-class NucleusStructure {
+class NucleiCollision {
 public:
-    NucleusStructure();
-    NucleusStructure(const NucleusStructure&);
-    virtual ~NucleusStructure();
+    NucleiCollision();
+    NucleiCollision(const NucleiCollision&);
+    virtual ~NucleiCollision();
     
     void setRandomGenerator(TRandom* rand) { fRand = rand; }
     void setOutputDirectoryName(TString strDirName) { fOutDirName = strDirName; }
@@ -171,10 +171,11 @@ public:
 
     void setPartonInteractionDistance(float dist) { fPartonInteractionDistance = dist; }
     void setClusterFormationDistance(float dist) { fClusterFormationDist = dist; }
-    void setStringInteractionDistance(float dist) { fStringInteractionDistance = dist; }
+    void setStringInteractionRadius(float dist) { fStringInteractionRadius = dist; }
 //    void setStringInteractionParA(float parA) { fStringInteractionParA = parA; }
     void setStringOverlapEnergyDensity(float energy) { fStringOverlapEnergyDensity = energy; }
 
+    void setHardScatteringProbability(float prob) { fHardScatteringProbability = prob; }
 
 
 //    void setImpactParameterByHand_0_100(float bImpByHand) { fImpactParameterByHand_0_100 = bImpByHand; }
@@ -210,7 +211,12 @@ public:
 //    float*  getArrStringBoostAngle() const { return fStringBoostAngle; }
     float  getStringBoostMagn(int stringId) const { return fStringBoostMagn[stringId];   }
     float  getStringBoostAngle(int stringId) const { return fStringBoostAngle[stringId]; }
-//    bool*   isStringInInteractionArr() const { return fFlagStringInInteraction; }
+
+    float  getStringX(int stringId) const { return fXstring[stringId];   }
+    float  getStringY(int stringId) const { return fYstring[stringId];   }
+    float  getStringRadiusVectorAngle(int stringId) const { return fStringRadiusVectorAngle[stringId];   }
+
+    //    bool*   isStringInInteractionArr() const { return fFlagStringInInteraction; }
     bool isHardInteractionString(int stringId) const { return fFlagStringIsHardInteraction[stringId]; }
 
 
@@ -258,11 +264,13 @@ private:
 //    double fRadiusParton; //proton radius
     //    double fRstring; //string radius
     double fPartonInteractionDistance; //distanse when partons interact, fm
-    double fStringInteractionDistance; //distanse when strings interact, fm
+    double fStringInteractionRadius; //distanse when strings interact, fm
     double fStringOverlapEnergyDensity; //overlap energy density per fm2 of area
 //    double fStringInteractionParA;  //parameterization a-la Woods-Saxon, fm
     double fClusterFormationDist; //distance b/n strings to form a cluster, fm
     double fMeanNofPartonsInNucleon; //mean n of partons in nucleon
+
+    float fHardScatteringProbability; //probability for a string to be a hard partonic collision
 
     float fImpactParameter; //impact parameter, fm
 //    float fImpactParameterByHand_0_100; //impact parameter, 0-100
@@ -296,6 +304,8 @@ private:
     //##### calculated event properties
     float *fXstring; //strings position, x coord array
     float *fYstring; //strings position, y coord array
+    float *fStringRadiusVectorAngle; //remember strings radius vector angles wrt (0,0)
+
     float *fXstringInteraction; //strings interaction point, x coord array
     float *fYstringInteraction; //strings interaction point, y coord array
     float *fStringIntDist;      //distances btwn pairs of interacting strings
@@ -348,6 +358,8 @@ private:
     TH2D *fHist2DN2stringsXY; //2d plot n2 strings in xy
     TH2D *fHist2DSigmaNstringsXY; //2d plot sigma n strings in xy
 
+    TH1D *fHistStringRadiusVectorPhi; //radius-vectors phi-s of strings wrt (0,0)
+
     //string interactions QA plots
     TH1D *fHistStringInteractionsPhi; //phi directions of the interacting string pairs
     TH1D *fHistStringInteractionsDistance; //distances b/n string pairs
@@ -382,5 +394,5 @@ private:
 
 };
 
-#endif	/* NUCLEUSSTRUCTURE_H */
+#endif	/* NucleiCollision_H */
 

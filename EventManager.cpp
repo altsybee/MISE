@@ -3,7 +3,7 @@
 
 
 #include "EventManager.h"
-#include "StringGeneration/NucleusStructure.h"
+#include "StringGeneration/NucleiCollision.h"
 #include "StringDecayer/StringDescr.h"
 #include "/Users/macbook/alice/simpleAnalysis/simpleEventAnalyzer/AliSimpleEvent.h"    // "../../simpleEventAnalyzer/AliSimpleEvent.h"
 
@@ -14,16 +14,17 @@
 #include "TLegend.h"
 #include "TTree.h"
 
+#include "TRandom3.h"
+
 #include <fstream>
 #include <iostream>
 using namespace std;
 
 const float kEtaBoundForCountingParticles = 0.8;
-const Int_t nCentralityBins = 20;//10;
 
 
 const int nMaxPartForHist = 4000;
-const int nBinsForNparticlesHist = 500;
+const int nBinsForNparticlesHist = 4000;//500;//4000;//500;
 //const int nMaxPartForHist = 400;
 //const int nBinsForNparticlesHist = 400;
 
@@ -85,16 +86,26 @@ void getQuantiles(TH1D *h, const int nq, double *yq)
 EventManager::EventManager():
     fPtrNuclStruct(0x0)
   , fFillEventTree(false)
+  , fNumberOfCentralityBins(10)
   //    fFlagGenerateCentralEventByHand(false)
   //  , fFlagGenerateSemicentralEventByHand(false)
   //  , fImpactParameterByHand(-1)
+{
+    fOutputDirName = "outputs_EventManager";
+
+    fOutputFileName = "testOutput.root";
+    fOutputFile = 0x0;
+    fDrawHistos = true;
+}
+
+void EventManager::initOutputObjects()
 {
     int fLowMultHor = 0;
     int fHiMultHor = 150;//2000;
     int fMultBinsHor = fHiMultHor - fLowMultHor;
     double lowMultHor = fLowMultHor - 0.5;
     double hiMultHor = fHiMultHor - 0.5;
-    
+
     fHistSources = new TH1D("fHistSources", "N sources", fMultBinsHor, lowMultHor, hiMultHor);
     fHistSources->GetXaxis()->SetTitle("N_{sources}");
     fHistSources->GetYaxis()->SetTitle("N_{events}");
@@ -125,22 +136,22 @@ EventManager::EventManager():
     fHistParticlesInCutConditionInEvent->GetYaxis()->SetTitle("dN/dN_{tracks}" );
     fHistParticlesInCutConditionInEvent->SetMarkerStyle(kFullCircle);
 
-//    fHistParticlesInEventInEta = new TH1D("fHistParticlesInEventInEta", Form( "N particles in Event in |#eta|<%.2f", kEtaBoundForCountingParticles), fMultBinsHor, lowMultHor, hiMultHor);
-//    fHistParticlesInEventInEta->GetXaxis()->SetTitle("N_{particles}");
-//    fHistParticlesInEventInEta->GetYaxis()->SetTitle("dN/dN_{part}" );
-//    fHistParticlesInEventInEta->SetMarkerStyle(kFullCircle);
+    //    fHistParticlesInEventInEta = new TH1D("fHistParticlesInEventInEta", Form( "N particles in Event in |#eta|<%.2f", kEtaBoundForCountingParticles), fMultBinsHor, lowMultHor, hiMultHor);
+    //    fHistParticlesInEventInEta->GetXaxis()->SetTitle("N_{particles}");
+    //    fHistParticlesInEventInEta->GetYaxis()->SetTitle("dN/dN_{part}" );
+    //    fHistParticlesInEventInEta->SetMarkerStyle(kFullCircle);
 
-//    fHistParticlesInCutConditionInEventInEta = new TH1D("fHistParticlesInCutConditionInEventInEta", Form("N particles in cut conditions in Event in |#eta|<%.2f", kEtaBoundForCountingParticles), fMultBinsHor, lowMultHor, hiMultHor);
-//    fHistParticlesInCutConditionInEventInEta->GetXaxis()->SetTitle("N_{tracks}");
-//    fHistParticlesInCutConditionInEventInEta->GetYaxis()->SetTitle("dN/dN_{tracks}" );
-//    fHistParticlesInCutConditionInEventInEta->SetMarkerStyle(kFullCircle);
+    //    fHistParticlesInCutConditionInEventInEta = new TH1D("fHistParticlesInCutConditionInEventInEta", Form("N particles in cut conditions in Event in |#eta|<%.2f", kEtaBoundForCountingParticles), fMultBinsHor, lowMultHor, hiMultHor);
+    //    fHistParticlesInCutConditionInEventInEta->GetXaxis()->SetTitle("N_{tracks}");
+    //    fHistParticlesInCutConditionInEventInEta->GetYaxis()->SetTitle("dN/dN_{tracks}" );
+    //    fHistParticlesInCutConditionInEventInEta->SetMarkerStyle(kFullCircle);
 
 
     fHistParticlesInCutConditionVsNu = new TH2D("fHistParticlesInCutConditionVsNu", "N ch Vs #nu"
-           , nBinsForNparticlesHist, -0.5, nMaxPartForHist-0.5, 80, 1 , 7 );
+                                                , nBinsForNparticlesHist, -0.5, nMaxPartForHist-0.5, 80, 1 , 7 );
     fHistParticlesInCutConditionVsNu->GetXaxis()->SetTitle( "N_{tracks}");
     fHistParticlesInCutConditionVsNu->GetYaxis()->SetTitle( "#nu" );
-//    fHistParticlesInCutConditionVsNu->SetMarkerStyle(kFullCircle);
+    //    fHistParticlesInCutConditionVsNu->SetMarkerStyle(kFullCircle);
 
 
 
@@ -148,7 +159,12 @@ EventManager::EventManager():
     fHistPtAfterCuts = new TH1D("fHistPtAfterCuts", "p_{T} distribution;p_{T} (GeV/c);1/2#pi p_{T} dN/dp_{T} (GeV/c)^{-2}", 1000, 0.0, 20);
     fHistPtBeforeKick = new TH1D("fHistPtBeforeKick", "p_{T} distribution;p_{T} (GeV/c);1/2#pi p_{T} dN/dp_{T} (GeV/c)^{-2}", 1000, 0.0, 20);
 
-    fHistNeventsInCentralityClasses = new TH1D("fHistNeventsInCentralityClasses", "N particles in class;class;n events", nCentralityBins, -0.5, nCentralityBins-0.5 );
+    fHistPtAfterCutsPID[0] = new TH1D("fHistPtAfterCutsPID_pions", "p_{T} distribution;p_{T} (GeV/c);1/2#pi p_{T} dN/dp_{T} (GeV/c)^{-2}", 1000, 0.0, 20);
+    fHistPtAfterCutsPID[1] = new TH1D("fHistPtAfterCutsPID_kaons", "p_{T} distribution;p_{T} (GeV/c);1/2#pi p_{T} dN/dp_{T} (GeV/c)^{-2}", 1000, 0.0, 20);
+    fHistPtAfterCutsPID[2] = new TH1D("fHistPtAfterCutsPID_protons", "p_{T} distribution;p_{T} (GeV/c);1/2#pi p_{T} dN/dp_{T} (GeV/c)^{-2}", 1000, 0.0, 20);
+
+
+    fHistNeventsInCentralityClasses = new TH1D("fHistNeventsInCentralityClasses", "N particles in class;class;n events", fNumberOfCentralityBins, -0.5, fNumberOfCentralityBins-0.5 );
     //    fHistNeventsInCentralityClasses->SetMarkerStyle(kFullCircle);
 
     fHistEta = new TH1D("fEta", "#eta distribution;#eta;dN/d#eta", 100, -4, 4);
@@ -167,13 +183,6 @@ EventManager::EventManager():
     fHist2DEtaPhi->GetZaxis()->SetTitle("dN/(d#eta,d#phi");
 
 
-
-    fOutputDirName = "outputs_EventManager";
-
-    fOutputFileName = "testOutput.root";
-    fOutputFile = 0x0;
-    fDrawHistos = true;
-
     //    fPtCutMin = 0.;
     //    fPtCutMax = 100.;
 }
@@ -183,7 +192,7 @@ EventManager::EventManager(const EventManager& ) {}
 EventManager::~EventManager() {}
 
 
-void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *strDescr, int nEvents )
+void EventManager::generateEvents( NucleiCollision *nuclStruct, StringDescr *strDescr, int nEvents )
 {
     cout << "generating events..." << endl;
     
@@ -193,6 +202,8 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
     fHistParticlesInEvent->Reset();
     fHistPt->Reset();
     fHistPtAfterCuts->Reset();
+    for ( int i = 0; i < 3; i++)
+        fHistPtAfterCutsPID[i]->Reset();
     fHistPtBeforeKick->Reset();
     fHistEta->Reset();
     for ( int iPtBin = 0; iPtBin < 5; iPtBin++)
@@ -201,7 +212,7 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
 
     fPtrNuclStruct = nuclStruct;
     
-//    SimpleTrack *fSimpleTrack = new SimpleTrack;
+    //    SimpleTrack *fSimpleTrack = new SimpleTrack;
 
     //output file for the events
     fOutputFileName = Form( "%s/eventTree_nEv%d.root", fOutputDirName.Data(), nEvents );
@@ -229,12 +240,16 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
     if( split >= 0 )
         fEventTree->BranchRef();
 
+    int nParticlesPID[3];
+    for ( int i = 0; i < 3; i++)
+        nParticlesPID[i] = 0;
 
     // ##### event loop
     for ( int iEvent = 0; iEvent < nEvents; iEvent++)
     {
-        if ( iEvent % 100 == 0 )
-            printf("generating %d event...\n",(int)iEvent );
+        if ( iEvent % 1 == 0 )
+            cout <<"generating " << (int)iEvent << "\r"; cout.flush();
+        //            printf("generating %d event...\n",(int)iEvent );
 
         //building event, spec impact parameter if requested:
         fPtrNuclStruct->setEventId( iEvent ); //to be used in fPtrNuclStruct for output files (tmp?)
@@ -263,7 +278,7 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
             }
 
             // ##### loop over strings: hadronized and count multiplicity in VZERO
-            const double cutEtaWithinDetectorAcceptance = 2;
+            const double cutEtaWithinDetectorAcceptance = 3;
             int nParticles = 0;
             int nParticlesWithinEtaPtCuts = 0;
             for ( int iString = 0; iString < fPtrNuclStruct->getNstrings(); iString++)
@@ -280,35 +295,64 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
                     nParticlesInString = strDescr->getNparticles();
                 }
 
+                //for "rescattering by hand" below
+                double stringRadiusVectorAngle = fPtrNuclStruct->getStringRadiusVectorAngle(iString);
+
                 for ( int iP = 0; iP < nParticlesInString; iP++ )
                 {
                     ParticleDescr *p = strDescr->getParticle(iP);
+                    double phi = p->phi;
+
+                    // 20.05.2016 - try to do "rescattering" of particles which are emitted "inside the medium" (to probably get right mass ordering!)
+                    if(0)
+                    {
+                        double phi_wrt_plane = phi - stringRadiusVectorAngle;
+
+                        if ( phi_wrt_plane > TMath::Pi() )
+                            phi_wrt_plane = phi_wrt_plane - TMath::TwoPi();
+                        else if ( phi_wrt_plane < -TMath::Pi() )
+                            phi_wrt_plane = phi_wrt_plane + TMath::TwoPi();
+
+                        //                    cout << "phi_wrt_plane = " << phi_wrt_plane << endl;
+                        //if ( phi_wrt_plane > TMath::PiOver2() || phi_wrt_plane < -TMath::PiOver2() )
+                        if ( fabs(phi_wrt_plane > TMath::PiOver2()) )
+                        {
+                            //                        cout << " >> passed " << endl;
+                            // particle flies inside the "medium" - do "smearing"!
+                            phi = gRandom->Uniform( 0, 2*TMath::Pi() );
+                        }
+                    }
+
                     //rotate all tracks in phi by event plane phi-angle
-                    float phiMod = phiEP + p->phi;
+                    float phiMod = phiEP + phi;
                     FixAngleInTwoPi(phiMod);
 
                     //spec counting to compare with publications
                     //                    if ( fabs(p->eta) < 0.3 && ( p->pt > 0.15 && p->pt < 10 ) )
-//                    if ( p->eta < -3.7 || p->eta > 1. )//fabs(p->eta) > 3.7 ) // out of our intresting range
-//                        continue;
-                    double weightForPt = 1./ ( 2*TMath::Pi()*p->pt );
+                    //                    if ( p->eta < -3.7 || p->eta > 1. )//fabs(p->eta) > 3.7 ) // out of our intresting range
+                    //                        continue;
+                    double weightForPt = 1;
+                    //                    double weightForPt = 1./ ( 2*TMath::Pi()*p->pt );
                     fHistPt->Fill(p->pt, weightForPt );
 
                     if ( fabs(p->eta) > cutEtaWithinDetectorAcceptance )//fabs(p->eta) > 3.7 ) // out of our intresting range
                         continue;
 
-//                    if ( p->eta > -3.7 && p->eta < -1.7 )  //VZERO-C
-                   // if ( fabs(p->eta) < 1. )  //STAR TPC
+                    //                    if ( p->eta > -3.7 && p->eta < -1.7 )  //VZERO-C
+                    // if ( fabs(p->eta) < 1. )  //STAR TPC
 
-//                    if ( fabs(p->eta) < 0.5 )
+                    //                    if ( fabs(p->eta) < 0.5 )
 
 
                     if ( fabs(p->eta) < cutEtaWithinDetectorAcceptance )//0.5 )//&& ( p->pt > 0. && p->pt < 1000 ) )
                     {
                         nParticlesWithinEtaPtCuts++;
 
-//                        if ( p->pt > 0.05 )
+                        //                        if ( p->pt > 0.05 )
                         fHistPtAfterCuts->Fill(p->pt, weightForPt );
+                        if ( p->pid == 0 ) { fHistPtAfterCutsPID[0]->Fill(p->pt, weightForPt ); nParticlesPID[0]++; }
+                        if ( p->pid == 1 ) { fHistPtAfterCutsPID[1]->Fill(p->pt, weightForPt ); nParticlesPID[1]++; }
+                        if ( p->pid == 2 ) { fHistPtAfterCutsPID[2]->Fill(p->pt, weightForPt ); nParticlesPID[2]++; }
 
                         if ( 0 )//not used... ( p->ptBeforeKick > 0.0 )
                         {
@@ -327,29 +371,30 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
                     fHist2DEtaPhi->Fill( p->eta, phiMod );
 
                     // ##### add particle to analysers
-//                    fSimpleTrack->id = nParticles;
-//                    fSimpleTrack->eta = p->eta;
-//                    fSimpleTrack->phi = phiMod;
-//                    fSimpleTrack->pt = p->pt;
-//                    fSimpleTrack->charge = 0;//charge;
+                    //                    fSimpleTrack->id = nParticles;
+                    //                    fSimpleTrack->eta = p->eta;
+                    //                    fSimpleTrack->phi = phiMod;
+                    //                    fSimpleTrack->pt = p->pt;
+                    //                    fSimpleTrack->pt = p->pid;
+                    //                    fSimpleTrack->charge = 0;//charge;
+
+                    //                    cout << "pid = " << p->pid << endl;
 
                     nParticles++;
 
                     if ( fFillEventTree )
-                        fSimpleEvent->AddTrack(  p->pt,  p->eta, phiMod, p->charge, -1. );//random,ptmin);
+                        fSimpleEvent->AddTrack(  p->pt,  p->eta, phiMod, p->charge, p->pid );//random,ptmin);
                 }
             }
             fHistParticlesInEvent->Fill(nParticles);
-            //Aug15 (IA): why was /2 ?..
-//            fHistParticlesInCutConditionInEvent->Fill(nParticlesWithinEtaPtCuts/2/cutEtaWithinDetectorAcceptance); // !
-//            fHistParticlesInCutConditionVsNu->Fill(nParticlesWithinEtaPtCuts/2/cutEtaWithinDetectorAcceptance, fPtrNuclStruct->getNu() );
-            fHistParticlesInCutConditionInEvent->Fill(nParticlesWithinEtaPtCuts/cutEtaWithinDetectorAcceptance); // !
-            fHistParticlesInCutConditionVsNu->Fill(nParticlesWithinEtaPtCuts/cutEtaWithinDetectorAcceptance, fPtrNuclStruct->getNu() );
+
+            fHistParticlesInCutConditionInEvent->Fill( (double)nParticlesWithinEtaPtCuts/(2*cutEtaWithinDetectorAcceptance ) ); // !
+            fHistParticlesInCutConditionVsNu->Fill( (double)nParticlesWithinEtaPtCuts/(2*cutEtaWithinDetectorAcceptance ), fPtrNuclStruct->getNu() );
 
             if ( fFillEventTree )
             {
                 //Aug15 (IA): why was /2 ?..
-//                fSimpleEvent->GetHeader()->SetCentrality(nParticlesWithinEtaPtCuts/2/cutEtaWithinDetectorAcceptance);
+                //                fSimpleEvent->GetHeader()->SetCentrality(nParticlesWithinEtaPtCuts/2/cutEtaWithinDetectorAcceptance);
                 fSimpleEvent->GetHeader()->SetCentrality(nParticlesWithinEtaPtCuts/cutEtaWithinDetectorAcceptance);
                 fSimpleEvent->FinishEventFilling();
             }
@@ -357,6 +402,14 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
         }
 
     } // end of the event loop
+
+    // ##### print particle ratios
+    int nParticlesPID_All = 0;
+    for ( int i = 0; i < 3; i++)
+        nParticlesPID_All += nParticlesPID[i];
+    cout << ">> pions/all = " << (double)nParticlesPID[0]/nParticlesPID_All<< endl;
+    cout << ">> kaons/all = " << (double)nParticlesPID[1]/nParticlesPID_All<< endl;
+    cout << ">> protons/all = " << (double)nParticlesPID[2]/nParticlesPID_All<< endl;
 
 
     //fill centralities
@@ -392,7 +445,8 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
 
     // ##### multiplicity quantiles
     //prepare quantiles
-    Double_t centrMultBounds[nCentralityBins];  // array to contain the quantiles
+    Double_t *centrMultBounds = new Double_t[fNumberOfCentralityBins]; // array to contain the quantiles
+
     //    bool flagHaveQuantiles = false; //flag that we have calculated multiplicity quantiles
 
     TCanvas *fCanvMultClasses = new TCanvas("canvMultClasses","multiplicity classes",50,50,800,600);
@@ -400,7 +454,10 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
 
     fHistParticlesInCutConditionInEvent->SetLineColor(kRed);
     fHistParticlesInCutConditionInEvent->DrawCopy();
-    fHistParticlesInCutConditionInEvent->SaveAs(Form( "%s/histParticlesInCutCondition.root", fOutputDirName.Data() ) );
+    fCanvMultClasses->SaveAs(Form( "%s/histParticlesInCutCondition.root", fOutputDirName.Data() ) );
+    fCanvMultClasses->SaveAs(Form( "%s/histParticlesInCutCondition.png", fOutputDirName.Data() ) );
+    fCanvMultClasses->SaveAs(Form( "%s/histParticlesInCutCondition.eps", fOutputDirName.Data() ) );
+    fCanvMultClasses->SaveAs(Form( "%s/histParticlesInCutCondition.C", fOutputDirName.Data() ) );
     //    fHistParticlesInCutConditionInEvent->GetQuantiles();
 
     cout << ">>> Mean Nch overall = " << fHistParticlesInCutConditionInEvent->GetMean() << endl;
@@ -409,23 +466,23 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
     if ( fHistParticlesInCutConditionInEvent->GetBinContent(1) > 0 )
         fHistParticlesInCutConditionInEvent->SetBinContent(1, 0);
     // get quantiles
-    getQuantiles( fHistParticlesInCutConditionInEvent, nCentralityBins, centrMultBounds );
+    getQuantiles( fHistParticlesInCutConditionInEvent, fNumberOfCentralityBins, centrMultBounds );
     //    flagHaveQuantiles = true;
 
     //fill multiplicity boundaries for each centrality class
     TH1D *fHistMultClassBoundaries = new TH1D( "fHistMultiplicityBoundaries", "fHistMultClassBoundaries"
-                                               , nCentralityBins, -0.5, nCentralityBins-0.5 );
+                                               , fNumberOfCentralityBins, -0.5, fNumberOfCentralityBins-0.5 );
     TH1D *fHistMultClassMeanNch = new TH1D( "fHistMultClassMeanNch", "fHistMultClassMeanNch"
-                                               , nCentralityBins, -0.5, nCentralityBins-0.5 );
-    for ( int iBin = 0; iBin < nCentralityBins; iBin++ )
+                                            , fNumberOfCentralityBins, -0.5, fNumberOfCentralityBins-0.5 );
+    for ( int iBin = 0; iBin < fNumberOfCentralityBins; iBin++ )
     {
         fHistMultClassBoundaries->SetBinContent( iBin+1, centrMultBounds[iBin] );
     }
 
     //draw centrality classes on mult hist
-//    int nBinsForClassHists = fHistParticlesInCutConditionInEvent->GetNbinsX();
-    TH1D *fHistCentrClass[nCentralityBins];
-    for ( int iCentrClass = 0; iCentrClass < nCentralityBins; iCentrClass++ )
+    //    int nBinsForClassHists = fHistParticlesInCutConditionInEvent->GetNbinsX();
+    TH1D **fHistCentrClass = new TH1D*[fNumberOfCentralityBins];
+    for ( int iCentrClass = 0; iCentrClass < fNumberOfCentralityBins; iCentrClass++ )
         fHistCentrClass[iCentrClass] = new TH1D( Form("fHistCentrClass%d", iCentrClass), Form("iCentrClass%d", iCentrClass), nBinsForNparticlesHist, -0.5, nMaxPartForHist-0.5);
 
     int centrClassId = 0;
@@ -434,12 +491,12 @@ void EventManager::generateEvents( NucleusStructure *nuclStruct, StringDescr *st
         //        cout << fHistParticlesInCutConditionInEvent->GetBinCenter(iBin+1) << " " << centrMultBounds[centrClassId] << endl;
         if ( fHistParticlesInCutConditionInEvent->GetBinCenter(iBin+1) > centrMultBounds[centrClassId] )
             centrClassId++;
-        if ( centrClassId >= nCentralityBins )
+        if ( centrClassId >= fNumberOfCentralityBins )
             break;
         double binContent = fHistParticlesInCutConditionInEvent->GetBinContent( iBin+1 );
         fHistCentrClass[centrClassId]->SetBinContent( iBin+1, binContent );
     }
-    for ( int iCentrClass = 0; iCentrClass < nCentralityBins; iCentrClass++ )
+    for ( int iCentrClass = 0; iCentrClass < fNumberOfCentralityBins; iCentrClass++ )
     {
         fHistCentrClass[iCentrClass]->SetFillColor( kOrange - 5 + iCentrClass );
         fHistCentrClass[iCentrClass]->DrawCopy( "same" );
@@ -481,12 +538,12 @@ void EventManager::drawStatHists()
     //    fHistParticlesInCutConditionInEvent->DrawCopy("same");
     //    //    fHistParticlesInCutConditionInEvent->GetQuantiles();
     //    //quantiles
-    //    const Int_t nCentralityBins = 10;
-    //    Double_t centrMultBounds[nCentralityBins];  // array to contain the quantiles
-    //    getQuantiles( fHistParticlesInCutConditionInEvent, nCentralityBins, centrMultBounds );
+    //    const Int_t fNumberOfCentralityBins = 10;
+    //    Double_t centrMultBounds[fNumberOfCentralityBins];  // array to contain the quantiles
+    //    getQuantiles( fHistParticlesInCutConditionInEvent, fNumberOfCentralityBins, centrMultBounds );
     //    //draw centrality classes on mult hist
-    //    TH1D *fHistCentrClass[nCentralityBins];
-    //    for ( int iCentrClass = 0; iCentrClass < nCentralityBins; iCentrClass++ )
+    //    TH1D *fHistCentrClass[fNumberOfCentralityBins];
+    //    for ( int iCentrClass = 0; iCentrClass < fNumberOfCentralityBins; iCentrClass++ )
     //        fHistCentrClass[iCentrClass] = new TH1D( Form("fHistCentrClass%d", iCentrClass), Form("iCentrClass%d", iCentrClass), fHistParticlesInCutConditionInEvent->GetNbinsX(), 0, 8000);
 
     //    int centrClassId = 0;
@@ -495,12 +552,12 @@ void EventManager::drawStatHists()
     //        cout << fHistParticlesInCutConditionInEvent->GetBinCenter(iBin+1) << " " << centrMultBounds[centrClassId] << endl;
     //        if ( fHistParticlesInCutConditionInEvent->GetBinCenter(iBin+1) > centrMultBounds[centrClassId] )
     //            centrClassId++;
-    //        if ( centrClassId >= nCentralityBins )
+    //        if ( centrClassId >= fNumberOfCentralityBins )
     //            break;
     //        double binContent = fHistParticlesInCutConditionInEvent->GetBinContent( iBin+1 );
     //        fHistCentrClass[centrClassId]->SetBinContent( iBin+1, binContent );
     //    }
-    //    for ( int iCentrClass = 0; iCentrClass < nCentralityBins; iCentrClass++ )
+    //    for ( int iCentrClass = 0; iCentrClass < fNumberOfCentralityBins; iCentrClass++ )
     //    {
     //        fHistCentrClass[iCentrClass]->SetFillColor( kOrange - 5 + iCentrClass );
     //        fHistCentrClass[iCentrClass]->DrawCopy( "same" );
@@ -511,18 +568,34 @@ void EventManager::drawStatHists()
     fCanv->cd(2)->SetLogy();
     fHistPtAfterCuts->SetLineColor(kRed);
     fHistPtBeforeKick->SetLineColor(kGreen);
-//    fHistPt->DrawNormalized();
-//    fHistPtAfterCuts->DrawNormalized("same");
-//    fHistPtBeforeKick->DrawNormalized("same");
-    fHistPt->Draw();
-    fHistPtAfterCuts->Draw("same");
-//    fHistPtBeforeKick->Draw("same");
+    //    fHistPt->DrawNormalized();
+    //    fHistPtAfterCuts->DrawNormalized("same");
+    //    fHistPtBeforeKick->DrawNormalized("same");
+    fHistPt->DrawNormalized();
+    fHistPtAfterCuts->DrawNormalized("same");
+    //    fHistPtBeforeKick->Draw("same");
+
+    fHistPtAfterCutsPID[0]->SetLineColor(kGreen);
+    fHistPtAfterCutsPID[1]->SetLineColor(kOrange+1);
+    fHistPtAfterCutsPID[2]->SetLineColor(kMagenta);
+    fHistPtAfterCutsPID[0]->DrawNormalized("same");
+    fHistPtAfterCutsPID[1]->DrawNormalized("same");
+    fHistPtAfterCutsPID[2]->DrawNormalized("same");
+
+    cout << ">> <pT> pions = " <<       fHistPtAfterCutsPID[0]->GetMean()<< endl;
+    cout << ">> <pT> kaons = " <<       fHistPtAfterCutsPID[1]->GetMean()<< endl;
+    cout << ">> <pT> protons = " <<     fHistPtAfterCutsPID[2]->GetMean()<< endl;
+
+
     TLegend *legPt = new TLegend(0.65,0.5,0.95,0.8);
     legPt->SetFillStyle(0);
     legPt->SetBorderSize(0);
     legPt->AddEntry(fHistPt,  "no #eta cut",  "l");
     legPt->AddEntry(fHistPtAfterCuts,  "after #eta cut",  "l");
-//    legPt->AddEntry(fHistPtBeforeKick,  "after #eta cut, before kick",  "l");
+    //    legPt->AddEntry(fHistPtBeforeKick,  "after #eta cut, before kick",  "l");
+    legPt->AddEntry(fHistPtAfterCutsPID[0],  "pions in #eta cut",  "l");
+    legPt->AddEntry(fHistPtAfterCutsPID[1],  "kaons in #eta cut",  "l");
+    legPt->AddEntry(fHistPtAfterCutsPID[2],  "protons in #eta cut",  "l");
     legPt->Draw();
 
 
@@ -565,6 +638,7 @@ void EventManager::drawStatHists()
     fCanv->SaveAs(Form( "%s/canvEvManagerStats.root", fOutputDirName.Data() ) );
     fCanv->SaveAs(Form( "%s/canvEvManagerStats.eps", fOutputDirName.Data() ));
     fCanv->SaveAs(Form( "%s/canvEvManagerStats.png", fOutputDirName.Data() ));
+    fCanv->SaveAs(Form( "%s/canvEvManagerStats.C", fOutputDirName.Data() ));
 
 
     //write stats to file
@@ -573,7 +647,10 @@ void EventManager::drawStatHists()
     fHistParticlesInCutConditionInEvent->Write();
     fHistPt->Write();
     fHistPtAfterCuts->Write();
-//    fHistPtBeforeKick->Write();
+    fHistPtAfterCutsPID[0]->Write();
+    fHistPtAfterCutsPID[1]->Write();
+    fHistPtAfterCutsPID[2]->Write();
+    //    fHistPtBeforeKick->Write();
     fHistEta->Write();
     fHistPhi->Write();
     fileEvManagerStats->Close();

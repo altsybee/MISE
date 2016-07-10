@@ -4,7 +4,7 @@
 //#define MAX_PARTICLES   10000
 
 #define MAX_NJETS   1000
-#define N_STRING_CUTS 1000
+#define N_LORENTZ_VECTORS_FROM_STRING 1000
 
 #include "TLorentzVector.h"
 #include "TVector3.h"
@@ -84,7 +84,7 @@ private:
     TLorentzVector *vMother;
     TLorentzVector *vMothers;
     TLorentzVector v1, v2;
-    double etaArrTmp[N_STRING_CUTS];
+    double etaArrTmp[N_LORENTZ_VECTORS_FROM_STRING];
 
     TVector3 stringBoostT;
     TVector3 stringBoostZ;

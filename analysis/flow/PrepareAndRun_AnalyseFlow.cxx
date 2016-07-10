@@ -35,7 +35,8 @@ AnalyserForFlowIA ** PrepareAnalyzers()
 
         analyser->SetShortDef( Form( "list%d", anId ));
         // !!! PID!
-        analyser->SetPID(-1);
+//        analyser->SetPID(-1);
+        analyser->SetPID(1);
         analyser->InitDataMembers();
 //        analyser->SetMeanPt(0.438); //tmp for checks?
 

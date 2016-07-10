@@ -1,6 +1,6 @@
 void launchMISE( int nEvents = 100, int flagMBorFixedB = 0, float bImpact=0
         , double partonInteractionDist = 0.25
-        , double stringInteractionDist = 0.4
+        , double stringInteractionRadius = 0.4
 //        , double strIntDistFractionParA = 10.
         , double meanPartonsInNucleon = 6
         , double stringOverlapEnergyDensity = 0.1
@@ -13,7 +13,7 @@ void launchMISE( int nEvents = 100, int flagMBorFixedB = 0, float bImpact=0
     //nuclei generation routine
     gROOT->ProcessLine(".L StringGeneration/DistanceEntry.cpp+");
     gROOT->ProcessLine(".L StringGeneration/MinDistanceFinder.cpp+");
-    gROOT->ProcessLine(".L StringGeneration/NucleusStructure.cpp+");
+    gROOT->ProcessLine(".L StringGeneration/NucleiCollision.cpp+");
 
     //string fragmentation and particle decays
     gROOT->ProcessLine(".L StringDecayer/ParticleDescr.cpp+");
@@ -49,31 +49,37 @@ void launchMISE( int nEvents = 100, int flagMBorFixedB = 0, float bImpact=0
 
     if(1)
     {
-        NucleusStructure *d = new NucleusStructure;
+        NucleiCollision *d = new NucleiCollision;
         d->setRandomGenerator(gRandom);
         d->setOutputDirectoryName( strOutputDirName_NucleiCollision );
 
         // set nuclei type
-//          d->setNucleusType( nucleus_Pb );
-          d->setNucleusType( nucleus_Au );
+          d->setNucleusType( nucleus_Pb );
+//          d->setNucleusType( nucleus_Au );
 //        d->setNucleusType( nucleus_proton );
 
         // tune impact parameter
         d->setImpactParSpecification( flagMBorFixedB ); //0,1,2 - MB event, precise b, b in range
         d->setImpactParameterByHand( bImpact );
 //        d->setImpactParameterRange( 0, 15 );
-//        d->setImpactParameterRange( 0.0, 0.5 );
-        d->setImpactParameterRange( 0, 13.5 );
+//        d->setImpactParameterRange( 0.0, 0.01 );
+//        d->setImpactParameterRange( 0.8, 1.4 );
+//        d->setImpactParameterRange( 0, 13.5 );
+        d->setImpactParameterRange( 4.5, 5 );
+//        d->setImpactParameterRange( 0, 0.01 );
+//        d->setImpactParameterRange( 7, 7.2 );
 
         //tune model parameters
         d->setPartonInteractionDistance( partonInteractionDist );
         //        d->setMaxNumberOfPartons( 4000 );
         d->setClusterFormationDistance( clusterFormDist );
-        d->setStringInteractionDistance( stringInteractionDist );
+        d->setStringInteractionRadius( stringInteractionRadius );  //setStringInteractionDistance( stringInteractionDist );
 //        float const parAf_forStringInteractionDist = stringInteractionDist / strIntDistFractionParA;
 //        d->setStringInteractionParA( parAf_forStringInteractionDist );
         d->setMeanNofPartonsInNucleon( meanPartonsInNucleon );
         d->setStringOverlapEnergyDensity(stringOverlapEnergyDensity);
+
+        d->setHardScatteringProbability(0);//0.03);
 
         d->setComputeStringRepulsion(1);
 
@@ -82,8 +88,12 @@ void launchMISE( int nEvents = 100, int flagMBorFixedB = 0, float bImpact=0
         strDescr->setRandomGenerator(gRandom);
 //        strDescr->setCoeffPtKickPerUnitMagn( coeffPtKickPerUnitMagn ); //kick in GeV per unit magnitude of string "boost"
 
+        // ########## Event Manager";
 
         EventManager evMan;
+        evMan.setNumberOfCentralityBins(10);
+        evMan.initOutputObjects();
+
         evMan.setFillEventTree( true );
         evMan.setOutputDirectoryName( strOutputDirName_EventManager );
 

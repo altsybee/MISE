@@ -12,7 +12,9 @@ class TF1;
 
 const double mRho = 0.775;// fRand->Gaus(0.77,0.05);
 const double mRhoWidth = 0.16;
-const double mPion = 0.14;
+const double mPion = 0.1395;
+const double mKaon = 0.494;
+const double mProton = 0.938;
 
 class StringFragmentation
 {
@@ -23,10 +25,14 @@ public:
 
     int decayStringIntoParticles( TLorentzVector *vArr, double fictionRhoPt );
     int probabilityChargePlusMinusNeutral();
+    int probabilityChargePlusMinus();
 
 private:
     TF1 *funcStringDecay;
     TF1 *funcPt;
+    TF1 *funcPtBoltzmanLikePion; // from OnTheFlyDoc.pdf
+    TF1 *funcPtBoltzmanLikeKaon; // from OnTheFlyDoc.pdf
+    TF1 *funcPtBoltzmanLikeProton; // from OnTheFlyDoc.pdf
 //    double stringDecay(Double_t *x, Double_t *par);
     TRandom *fRand;
 
@@ -36,12 +42,12 @@ private:
     double fStringShiftSigma;
 
     //string cuts arrays
-    double yCutPoints[N_STRING_CUTS];
-    double yCutPointsSorted[N_STRING_CUTS];
+    double yBreakPoints[N_STRING_CUTS];
+    double yBreakPointsSorted[N_STRING_CUTS];
     int indecesCutsSorted[N_STRING_CUTS];
 
-    double cutPointPt[N_STRING_CUTS];
-    double cutPointPhi[N_STRING_CUTS];
+    double breakPointPt[N_STRING_CUTS];
+    double breakPointPhi[N_STRING_CUTS];
 
     inline void FixAngleInTwoPi( double &lPhi )
     {
