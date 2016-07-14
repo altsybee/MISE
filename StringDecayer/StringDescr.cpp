@@ -249,9 +249,19 @@ void StringDescr::hadronizeString( double stringBeta, double boostPhiDir )
                 charge  = strFr->probabilityChargePlusMinus();
                 pid  = kPid_proton;
             }
+            else if ( fabs( vMother->M() - mPhi ) < 0.01 ) // phi
+            {
+                charge  = 0;
+                pid  = kPid_phi;
+            }
+            else if ( fabs( vMother->M() - mLambda ) < 0.01 ) // lambda
+            {
+                charge  = 0;//strFr->probabilityChargePlusMinus();
+                pid  = kPid_Lambda;
+            }
 
             // fill array with particle
-            if ( charge != 0 )
+            if ( charge != 0 || pid  == kPid_Lambda || pid  == kPid_phi )
             {
                 fParticles[nP].eta = vMother->Eta();
                 fParticles[nP].phi = vMother->Phi();

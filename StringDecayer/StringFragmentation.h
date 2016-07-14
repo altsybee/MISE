@@ -16,6 +16,10 @@ const double mPion = 0.1395;
 const double mKaon = 0.494;
 const double mProton = 0.938;
 
+const double mPhi = 1.020;
+const double mLambda = 1.115;
+
+
 class StringFragmentation
 {
 public:
@@ -48,6 +52,7 @@ private:
 
     double breakPointPt[N_STRING_CUTS];
     double breakPointPhi[N_STRING_CUTS];
+    double breakPointType[N_STRING_CUTS]; //u,d,s,diquark?
 
     inline void FixAngleInTwoPi( double &lPhi )
     {

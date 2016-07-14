@@ -306,7 +306,7 @@ void NucleiCollision::initDataMembers()
     fHistBusyPartonsR = new TH1D("fHistBusyPartonsR","busy partons r position;r, rm;entries",100,0, fNucleusRadius*3 );
     fHistPartonsValenceR = new TH1D("fHistPartonsValenceR","parton r position;r, rm;entries",100,0, fNucleusRadius*3 );
     fHistBusyPartonsValenceR = new TH1D("fHistBusyPartonsValenceR","busy partons r position;r, rm;entries",100,0, fNucleusRadius*3 );
-    fHistNstrings = new TH1D("fHistNstrings", "n strings;N;entries", 5*2*fNumberOfNucleons+1, -0.5, 5*2*fNumberOfNucleons+0.5 );
+    fHistNstrings = new TH1D("fHistNstrings", "n strings;N;entries", 5*2*fNumberOfNucleons+1+20, -0.5, 5*2*fNumberOfNucleons+0.5+20 );
     fHistStringInteractions = new TH1D("fHistStringInteractions", "n string intersections", fMaxPartons+1, -0.5, fMaxPartons+0.5 );
     fHistStringPositionRadius = new TH1D("fHistStringPositionRadius", "string r position/R", 50, 0, 2.5 );
     fHistImpactParameter = new TH1D("fHistImpactParameter", "impact parameter", 50, 0, fNucleusRadius*4 );
@@ -1535,6 +1535,18 @@ void NucleiCollision::drawStrings()
         elPointsStrings[iP]->Draw();
     }
     delete [] elPointsStrings;
+
+    // draw string interaction radius (July 2016)
+    double visStringIntRad = fVisNucleusRadiusNucleus * fStringInteractionRadius / fNucleusRadius;
+    TEllipse *elStringInteractionRadius = new TEllipse( 0.12, 0.88
+                                                        , visStringIntRad, visStringIntRad );
+    elStringInteractionRadius->SetLineColor( kOrange+1 );
+    elStringInteractionRadius->SetFillColor( kOrange+1 );
+    elStringInteractionRadius->SetFillStyle( 3013 );
+    elStringInteractionRadius->SetLineStyle( 9 );
+    elStringInteractionRadius->SetLineWidth( 2 );
+    elStringInteractionRadius->Draw();
+//    delete elStringInteractionRadius;
 }
 
 void NucleiCollision::drawStringInteractions()

@@ -31,8 +31,8 @@ StringFragmentation::StringFragmentation() :
         funcPtBoltzmanLikePion = new TF1( "funcPtBoltzmanLikePion", "[0]*x*TMath::Exp(-sqrt([1]*[1]+x*x)/[2])", 0, 10 );
         funcPtBoltzmanLikePion->SetParameter( 0, 1 );
         funcPtBoltzmanLikePion->SetParameter( 1, mPion );
-    //    funcPtBoltzmanLikePion->SetParameter( 2, 0.01 );//0.3 );
-    //    funcPtBoltzmanLikePion->SetParameter( 2, 0.14 );//0.3 );
+        //    funcPtBoltzmanLikePion->SetParameter( 2, 0.01 );//0.3 );
+        //    funcPtBoltzmanLikePion->SetParameter( 2, 0.14 );//0.3 );
         funcPtBoltzmanLikePion->SetParameter( 2, 0.1 );//0.3 );
 
         funcPtBoltzmanLikeKaon = new TF1( "funcPtBoltzmanLikeKaon", "[0]*x*TMath::Exp(-sqrt([1]*[1]+x*x)/[2])", 0, 10 );
@@ -45,23 +45,62 @@ StringFragmentation::StringFragmentation() :
         funcPtBoltzmanLikeProton->SetParameter( 1, mProton );
         funcPtBoltzmanLikeProton->SetParameter( 2, 0.1 );//0.3 );
     }
-    else //Schwinger-like fragmentation into hadrons! (from Grigory&Co paper)
+    else if(0) //from Grigory&Co paper
     {
+//        funcPtBoltzmanLikePion = new TF1( "funcPtBoltzmanLikePion", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
+//        funcPtBoltzmanLikePion->SetParameter( 0, 1 );
+//        funcPtBoltzmanLikePion->SetParameter( 1, mPion );
+//        funcPtBoltzmanLikePion->SetParameter( 2, 0.568 ); // t = 0.568 ± 0.001 GeV2
+
+//        funcPtBoltzmanLikeKaon = new TF1( "funcPtBoltzmanLikeKaon", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
+//        funcPtBoltzmanLikeKaon->SetParameter( 0, 1 );
+//        funcPtBoltzmanLikeKaon->SetParameter( 1, mKaon );
+//        funcPtBoltzmanLikeKaon->SetParameter( 2, 0.568 );
+
+//        funcPtBoltzmanLikeProton = new TF1( "funcPtBoltzmanLikeProton", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
+//        funcPtBoltzmanLikeProton->SetParameter( 0, 1 );
+//        funcPtBoltzmanLikeProton->SetParameter( 1, mProton );
+//        funcPtBoltzmanLikeProton->SetParameter( 2, 0.568 );
+
         funcPtBoltzmanLikePion = new TF1( "funcPtBoltzmanLikePion", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
+    //    TF1 *funcPtBoltzmanLikePion = new TF1( "funcPtBoltzmanLikePion", funcPt, 0, 5, 3 );
+        funcPtBoltzmanLikePion->SetNpx(1000);
         funcPtBoltzmanLikePion->SetParameter( 0, 1 );
         funcPtBoltzmanLikePion->SetParameter( 1, mPion );
-        funcPtBoltzmanLikePion->SetParameter( 2, 0.568 ); // t = 0.568 ± 0.001 GeV2
+        funcPtBoltzmanLikePion->SetParameter( 2, 0.45 ); // t = 0.568 ± 0.001 GeV2
 
         funcPtBoltzmanLikeKaon = new TF1( "funcPtBoltzmanLikeKaon", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
-        funcPtBoltzmanLikeKaon->SetParameter( 0, 1 );
+    //    TF1 *funcPtBoltzmanLikeKaon = new TF1( "funcPtBoltzmanLikeKaon", funcPt, 0, 5, 3 );
+        funcPtBoltzmanLikeKaon->SetParameter( 0, 5 );
         funcPtBoltzmanLikeKaon->SetParameter( 1, mKaon );
-        funcPtBoltzmanLikeKaon->SetParameter( 2, 0.568 );
+        funcPtBoltzmanLikeKaon->SetParameter( 2, 0.75 );//0.568 );
 
         funcPtBoltzmanLikeProton = new TF1( "funcPtBoltzmanLikeProton", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
-        funcPtBoltzmanLikeProton->SetParameter( 0, 1 );
+    //    TF1 *funcPtBoltzmanLikeProton = new TF1( "funcPtBoltzmanLikeProton", funcPt, 0, 5, 3 );
+        funcPtBoltzmanLikeProton->SetParameter( 0, 18 );
         funcPtBoltzmanLikeProton->SetParameter( 1, mProton );
-        funcPtBoltzmanLikeProton->SetParameter( 2, 0.568 );
+        funcPtBoltzmanLikeProton->SetParameter( 2, 1.2 );
 
+    }
+    else if (1) // Tsallis: tuned out to be GOOD for flow studies! July 2016
+    {
+        // Tsallis:
+        // (from http://www.nikhef.nl/pub/services/biblio/theses_pdf/thesis_M_Chojnacki.pdf
+        // and http://arxiv.org/pdf/1504.00024v2.pdf)
+        funcPtBoltzmanLikePion = new TF1( "funcPtBoltzmanLikePion", "[0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])", 0, 5 );
+        funcPtBoltzmanLikePion->SetParameter(0,5.7);
+        funcPtBoltzmanLikePion->SetParameter(1,0.12);
+        funcPtBoltzmanLikePion->SetParameter(2,mPion);
+
+        funcPtBoltzmanLikeKaon = new TF1( "funcPtBoltzmanLikeKaon", "[0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])", 0, 5 );
+        funcPtBoltzmanLikeKaon->SetParameter( 0, 6.7 );
+        funcPtBoltzmanLikeKaon->SetParameter( 1, 0.195 );
+        funcPtBoltzmanLikeKaon->SetParameter( 2, mKaon );//0.568 );
+
+        funcPtBoltzmanLikeProton = new TF1( "funcPtBoltzmanLikeProton", "[0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])", 0, 5 );
+        funcPtBoltzmanLikeProton->SetParameter( 0, 6.3 );
+        funcPtBoltzmanLikeProton->SetParameter( 1, 0.212 );
+        funcPtBoltzmanLikeProton->SetParameter( 2, mProton );
     }
 
 
@@ -174,13 +213,111 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
     //make pTs at string cuts
     for ( int iBreak = 0; iBreak < nCutPoints; iBreak++ )
     {
+
+        /*
+            https://arxiv.org/pdf/1101.2599v1.pdf :
+
+            page 86:
+            The transverse dimensions of the tube are of typical hadronic sizes, roughly 1 fm.
+
+            From hadron mass spectroscopy the string constant k, i.e. the amount of energy per unit length, is known to
+            be k ≈ 1 GeV/fm ≈ 0.2 GeV2.
+
+            page 87:
+            ...The expression “massless” relativistic string is somewhat of a misnomer:
+            k effectively corresponds to a “mass density” along the string.
+
+            Typically, a break occurs when the q and the qbar
+            ends of a colour singlet system are 1–5 fm apart in the qqbar rest frame,
+            but note that the higher-momentum particles at the outskirts of the system are
+            appreciably Lorentz contracted.
+
+            At the end of the process, the string has broken by the creation of a set
+            of new qiqbari pairs, with i running from 1 to n − 1 for a system that fragments
+            into n primary hadrons (i.e. hadrons before secondary decays). Each hadron
+            is formed by the quark from one break (or an endpoint) and the antiquark
+            from an adjacent break: qqbar1, q1qbar2, q2qbar3, . . . , qn−1qbar.
+
+            page 90:
+            The factorization of the transverse-momentum and the mass terms leads
+            to a flavour-independent Gaussian spectrum for the q'qbar' pairs.
+             Since the
+            string is assumed to have no transverse excitations, this p⊥ is locally compensated
+            between the quark and the antiquark of the pair, and <pT_q^2> = sigma^2 = κ/π ≈ (250 MeV)2.
+
+             Experimentally a number closer to σ2 ≈ (350 MeV)2 is required,
+             which could be explained as the additional effect of soft-gluon
+            radiation below the shower cutoff scale. That radiation would have a nonGaussian
+            shape but, when combined with the ordinary fragmentation p⊥, the
+            overall shape is close to Gaussian, and is parameterized correspondingly in
+            the program. Hadrons receive p⊥ contributions from two q'qbar' pairs and have
+            <pT_hadron^2> = sigma^2 2σ^2.
+
+            The formula also implies a suppression of heavy quark production,
+            u : d : s : c ≈ 1 : 1 : 0.3 : 10−11.
+
+            The simplest scheme for baryon production is that, in addition to quark–
+            antiquark pairs, also antidiquark–diquark pairs are occasionally produced in
+            the field, in a triplet–antitriplet representation.
+
+             */
+
+
         // !!! use some numerical factor to MATCH MEAN PT when later merge two quarks of string fragments
         //        if ( particleMass == mPion )
         //            breakPointPt[iBreak] = fRand->Exp( 0.25 ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
         //        else //rho
-        breakPointPt[iBreak] = fRand->Exp( 0.25 ); //0.75 );//fictionRhoPt ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
+        //        breakPointPt[iBreak] = fRand->Exp( 0.25 ); //0.75 );//fictionRhoPt ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
+        //            breakPointPt[iBreak] = fRand->Exp( 0.25 ); //0.75 );//fictionRhoPt ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
+        // GOOD: breakPointPt[iBreak] = fabs(fRand->Gaus( 0, 0.35 )); //0.75 );//fictionRhoPt ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
         //        breakPointPt[iBreak] = funcPt->GetRandom( /*fictionRhoPt*/ ); //0.3); //funcPt->GetRandom();//fRand->Exp(pTtau);
 
+
+
+        //        const double kPtFor_u_d_quarks = 0.35;
+
+        // ##### July 2016: NEW STRING DECAY INTO QUARKS:
+        bool flagFineQuarkConfig = false;
+
+        while ( !flagFineQuarkConfig )
+        {
+            double probQuarkType = fRand->Uniform( 0, 2.3); // u:d:s = 1:1:0.3 from Generators overview paper
+            if ( probQuarkType < 0.2 ) //0.3 )
+            {
+                breakPointType[iBreak] = 1; // s - quark
+//                breakPointPt[iBreak] = fabs(fRand->Gaus( 0, 0.47 )); //0.45 ));
+//                breakPointPt[iBreak] = fabs(fRand->Gaus( 0.1, 0.35 )); //0.45 ));
+                breakPointPt[iBreak] = fabs(fRand->Exp( 0.35 )); //0.45 ));
+            }
+            else //if ( probQuarkType < 0.05 )
+            {
+                double probQuarkDiquark = fRand->Uniform( 0, 1 );
+                if ( probQuarkDiquark < 0.04 )
+                {
+                    breakPointType[iBreak] = 2; // diquark
+//                    breakPointPt[iBreak] = fabs(fRand->Gaus( 0, 0.56 )); //0.55 ));
+//                    breakPointPt[iBreak] = fabs(fRand->Gaus( 0.3, 0.35 )); //0.55 ));
+                    breakPointPt[iBreak] = fabs(fRand->Exp( 0.48 ));
+                }
+                else
+                {
+                    breakPointType[iBreak] = 0; // u and d quarks
+//                    breakPointPt[iBreak] = fabs(fRand->Gaus( 0, 0.28 ) ); //0.28 ));// 0.35 ));
+                    breakPointPt[iBreak] = fabs(fRand->Exp( 0.2 )); //0.45 ));
+                }
+            }
+            if ( iBreak == 0 ) // first break: always allowed
+                flagFineQuarkConfig = true;
+            else
+            {
+                if ( breakPointType[iBreak-1] == 2 && breakPointType[iBreak] == 2 ) // NOT ALLOWED CONFIG! ("pentaquark? :) )
+                    continue;
+                else
+                    flagFineQuarkConfig = true;
+            }
+        }
+
+        //                ...
 
         //        if ( fictionRhoPt == 0 )
         //            breakPointPt[iBreak] = 0;
@@ -269,27 +406,54 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
             while ( fabs(particleMass-mRho) > mRhoWidth/2 )
                 particleMass = fRand->Gaus(mRho,mRhoWidth/2);//( fRand->Uniform(0,1) > 0.5 ? fRand->Gaus(mRho,mRhoWidth/2) : mPion );
         }
-        else //if (0)
+        //        else //if (0)
+        //        {
+        //            double probPID = fRand->Uniform(0,1);
+        //            if ( probPID < 0.0 )
+        //                particleMass = fRand->Gaus(mRho,mRhoWidth/2);//( fRand->Uniform(0,1) > 0.5 ? fRand->Gaus(mRho,mRhoWidth/2) : mPion );
+        //            else if ( probPID < 0.75 )
+        //                particleMass = mPion;
+        //            else //kaon or proton (13% and 4%)
+        //            {
+        //                if ( fRand->Uniform(0,1) < 13./(13+4) )
+        //                    particleMass = mKaon;
+        //                else
+        //                    particleMass = mProton;
+        //            }
+        //        }
+        else
         {
-            double probPID = fRand->Uniform(0,1);
-            if ( probPID < 0.0 )
-                particleMass = fRand->Gaus(mRho,mRhoWidth/2);//( fRand->Uniform(0,1) > 0.5 ? fRand->Gaus(mRho,mRhoWidth/2) : mPion );
-            else if ( probPID < 0.75 )
+            short q1 = breakPointType[iBreak];
+            short q2 = breakPointType[iBreak+1];
+            if ( q1 == 0 && q2 == 0 ) // u/d quarks => pions
                 particleMass = mPion;
-            else //kaon or proton (13% and 4%)
+            else if ( (q1 == 0 && q2 == 1)
+                      || (q1 == 1 && q2 == 0) ) // u/d and s quarks => kaons
+                particleMass = mKaon;
+            else if ( q1 == 1 && q2 == 1 ) // two s quarks => phi
+                particleMass = mPhi;
+            else if ( (q1 == 0 && q2 == 2)
+                      || (q1 == 2 && q2 == 0) ) // u/d quarks and diquark  => protons/neutrons (!!! also neutrons!)
+                particleMass = mProton;
+            else if ( (q1 == 1 && q2 == 2)
+                      || (q1 == 2 && q2 == 1) ) // s quark and diquark  => Lambda
+                particleMass = mLambda;
+            else
             {
-                if ( fRand->Uniform(0,1) < 13./(13+4) )
-                    particleMass = mKaon;
-                else
-                    particleMass = mProton;
+                cout << "breakPointTypes: impossible configuration! "
+                     << q1 << " and " <<  q2 << endl;
+                particleMass = mLambda;
             }
         }
+
+
+
         //        cout << particleMass << endl;
 
         //        ptParticle = fRand->Exp(0.45);
 
         // prepare lorentz vector
-        if (0) //use direct sampling of pt "boltzman" distr
+        if (1) //use direct sampling of pt "boltzman" distr
         {
             if ( fabs( particleMass-mPion) < 0.001 )
                 ptParticle = funcPtBoltzmanLikePion->GetRandom();

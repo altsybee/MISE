@@ -9,6 +9,9 @@ enum MISE_pids
     kPid_kaon = 1,
     kPid_proton = 2,
 
+    kPid_phi = 3,
+    kPid_Lambda = 4,
+
 //    pid_rho = 3,
 };
 

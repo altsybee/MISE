@@ -196,6 +196,7 @@ public:
 
     //Getters
     float getImpactParameterByHand() { return fImpactParameterByHand; }
+    float getImpactParameter() { return fImpactParameter; }
     int getMaxNpartons() { return fMaxPartons; }
     int getNstrings() { return fNumberOfStrings; }
     double getNu();
@@ -212,7 +213,7 @@ public:
     float  getStringBoostMagn(int stringId) const { return fStringBoostMagn[stringId];   }
     float  getStringBoostAngle(int stringId) const { return fStringBoostAngle[stringId]; }
 
-    float  getStringX(int stringId) const { return fXstring[stringId];   }
+    float  getStringXminusBover2(int stringId) const { return fXstring[stringId]-fImpactParameter/2;   }
     float  getStringY(int stringId) const { return fYstring[stringId];   }
     float  getStringRadiusVectorAngle(int stringId) const { return fStringRadiusVectorAngle[stringId];   }
 
