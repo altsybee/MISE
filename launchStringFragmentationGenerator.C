@@ -1,4 +1,4 @@
-void launchStringFragmentationGenerator( int nEvents = 100, int flagMBorFixedB = 0, float bImpact=0
+void launchStringFragmentationGenerator( TString inputFileName, int nEvents = 100, int flagMBorFixedB = 0, float bImpact=0
         , int bMode = 0 )
 {
     //string fragmentation and particle decays
@@ -38,6 +38,7 @@ void launchStringFragmentationGenerator( int nEvents = 100, int flagMBorFixedB =
         evMan.setOutputDirectoryName( strOutputDirName_ManagerStringFragmentation );
 
         // ##### take nuclei collisions and generate tracks
+        evMan.setInputFileName( inputFileName );
         evMan.setCutMinNumberOfParticles(20);
         evMan.applyFragmentationToEvents( strDescr, nEvents ); //, analysersArray, 0);//nAnalysers );
 

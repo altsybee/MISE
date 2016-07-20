@@ -94,6 +94,7 @@ ManagerStringFragmentation::ManagerStringFragmentation():
 {
     fOutputDirName = "outputs_ManagerStringFragmentation";
 
+    fInputFileName = "input.root";
     fOutputFileName = "testOutput.root";
     fOutputFile = 0x0;
     fDrawHistos = true;
@@ -225,8 +226,11 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
 
     // ##### 10.07.2016 - attempt to save NucleiCollision info into the tree
     TFile* inputFileNuclColTree = 0x0;
-    inputFileNuclColTree = new TFile( Form( "%s/nuclCollisionsTree_nEv%d.root"
-                                            , "outputs_NucleiCollision" /*fOutputDirName.Data()*/, 1000000/*nEvents*/ ) );
+    inputFileNuclColTree = new TFile( Form( "%s/%s"
+                   , "outputs_NucleiCollision", fInputFileName.Data() ) );
+                //fInputFileName );
+                //Form( "%s/nuclCollisionsTree_nEv%d.root"
+                //                            , "outputs_NucleiCollision" /*fOutputDirName.Data()*/, 1000000/*nEvents*/ ) );
 
     if ( !inputFileNuclColTree )
     {
@@ -258,7 +262,8 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
 
     //output file for the events
 //    fOutputFileName = Form( "%s/eventTree_nEv%d_try13_TSALLIS_r2fm.root", fOutputDirName.Data(), nEvents );
-    fOutputFileName = Form( "%s/eventTree_nEv%d_PP_TRY3_TSALLIS_r2fm.root", fOutputDirName.Data(), nEvents );
+    fOutputFileName = Form( "%s/%s_StringFragm_nEv%d_TSALLIS_try1.root", fOutputDirName.Data(), fInputFileName.Data(), nEvents );
+            //Form( "%s/eventTree_nEv%d_PP_TRY3_TSALLIS_r2fm.root", fOutputDirName.Data(), nEvents );
     TFile* outFile = new TFile( fOutputFileName, "RECREATE" );
 
 

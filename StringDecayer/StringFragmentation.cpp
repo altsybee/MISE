@@ -88,16 +88,22 @@ StringFragmentation::StringFragmentation() :
         // (from http://www.nikhef.nl/pub/services/biblio/theses_pdf/thesis_M_Chojnacki.pdf
         // and http://arxiv.org/pdf/1504.00024v2.pdf)
         funcPtBoltzmanLikePion = new TF1( "funcPtBoltzmanLikePion", "[0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])", 0, 5 );
-        funcPtBoltzmanLikePion->SetParameter(0,5.7);
-        funcPtBoltzmanLikePion->SetParameter(1,0.12);
+//        funcPtBoltzmanLikePion->SetParameter(0, 7 ); //5.7);
+//        funcPtBoltzmanLikePion->SetParameter(1, 0.14 ); //0.12);
+        funcPtBoltzmanLikePion->SetParameter(0, 5.7);
+        funcPtBoltzmanLikePion->SetParameter(1, 0.12);
         funcPtBoltzmanLikePion->SetParameter(2,mPion);
 
         funcPtBoltzmanLikeKaon = new TF1( "funcPtBoltzmanLikeKaon", "[0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])", 0, 5 );
+//        funcPtBoltzmanLikeKaon->SetParameter( 0, 7 );//6.7 );
+//        funcPtBoltzmanLikeKaon->SetParameter( 1, 0.155 ); //0.195 );
         funcPtBoltzmanLikeKaon->SetParameter( 0, 6.7 );
         funcPtBoltzmanLikeKaon->SetParameter( 1, 0.195 );
         funcPtBoltzmanLikeKaon->SetParameter( 2, mKaon );//0.568 );
 
         funcPtBoltzmanLikeProton = new TF1( "funcPtBoltzmanLikeProton", "[0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])", 0, 5 );
+//        funcPtBoltzmanLikeProton->SetParameter( 0, 7 ); //6.3 );
+//        funcPtBoltzmanLikeProton->SetParameter( 1, 0.155 ); //0.212 );
         funcPtBoltzmanLikeProton->SetParameter( 0, 6.3 );
         funcPtBoltzmanLikeProton->SetParameter( 1, 0.212 );
         funcPtBoltzmanLikeProton->SetParameter( 2, mProton );

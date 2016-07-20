@@ -75,24 +75,23 @@ void flowToy()
     const double mKaon = 0.494;
     const double mProton = 0.938;
 
-    TF1 *funcPtBoltzmanLikePion = new TF1( "funcPtBoltzmanLikePion", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
+    TF1 *funcPtBoltzmanLikePion;// = new TF1( "funcPtBoltzmanLikePion", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
 //    TF1 *funcPtBoltzmanLikePion = new TF1( "funcPtBoltzmanLikePion", funcPt, 0, 5, 3 );
-    funcPtBoltzmanLikePion->SetNpx(1000);
-    funcPtBoltzmanLikePion->SetParameter( 0, 1 );
-    funcPtBoltzmanLikePion->SetParameter( 1, mPion );
-    funcPtBoltzmanLikePion->SetParameter( 2, 0.07 ); // t = 0.568 ± 0.001 GeV2
+//    funcPtBoltzmanLikePion->SetParameter( 0, 1 );
+//    funcPtBoltzmanLikePion->SetParameter( 1, mPion );
+//    funcPtBoltzmanLikePion->SetParameter( 2, 0.07 ); // t = 0.568 ± 0.001 GeV2
 
-    TF1 *funcPtBoltzmanLikeKaon = new TF1( "funcPtBoltzmanLikeKaon", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
+    TF1 *funcPtBoltzmanLikeKaon;// = new TF1( "funcPtBoltzmanLikeKaon", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
 //    TF1 *funcPtBoltzmanLikeKaon = new TF1( "funcPtBoltzmanLikeKaon", funcPt, 0, 5, 3 );
-    funcPtBoltzmanLikeKaon->SetParameter( 0, 5 );
-    funcPtBoltzmanLikeKaon->SetParameter( 1, mKaon );
-    funcPtBoltzmanLikeKaon->SetParameter( 2, 0.25 );//0.568 );
+//    funcPtBoltzmanLikeKaon->SetParameter( 0, 5 );
+//    funcPtBoltzmanLikeKaon->SetParameter( 1, mKaon );
+//    funcPtBoltzmanLikeKaon->SetParameter( 2, 0.25 );//0.568 );
 
-    TF1 *funcPtBoltzmanLikeProton = new TF1( "funcPtBoltzmanLikeProton", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
+    TF1 *funcPtBoltzmanLikeProton;// = new TF1( "funcPtBoltzmanLikeProton", "[0]*x*TMath::Exp(-TMath::Pi()*([1]*[1]+x*x)/[2])", 0, 10 );
 //    TF1 *funcPtBoltzmanLikeProton = new TF1( "funcPtBoltzmanLikeProton", funcPt, 0, 5, 3 );
-    funcPtBoltzmanLikeProton->SetParameter( 0, 18 );
-    funcPtBoltzmanLikeProton->SetParameter( 1, mProton );
-    funcPtBoltzmanLikeProton->SetParameter( 2, 0.568 );
+//    funcPtBoltzmanLikeProton->SetParameter( 0, 18 );
+//    funcPtBoltzmanLikeProton->SetParameter( 1, mProton );
+//    funcPtBoltzmanLikeProton->SetParameter( 2, 0.568 );
 
 
     // Tsallis:
@@ -113,9 +112,12 @@ void flowToy()
     funcPtBoltzmanLikeProton->SetParameter( 1, 0.212 );
     funcPtBoltzmanLikeProton->SetParameter( 2, mProton );
 
+    funcPtBoltzmanLikePion->SetNpx(1000);
+    funcPtBoltzmanLikeKaon->SetNpx(1000);
+    funcPtBoltzmanLikeProton->SetNpx(1000);
 
 
-    if(1)
+    if(0)
     {
         funcPtBoltzmanLikePion->SetLineColor( kBlue );
         funcPtBoltzmanLikePion->Draw();
@@ -130,7 +132,7 @@ void flowToy()
 
 
 
-    int nEvents = 1;
+    int nEvents = 10000;
     for ( int ev = 0; ev < nEvents; ev++)
     {
         if ( ev % 10 == 0 )
@@ -139,7 +141,7 @@ void flowToy()
         //random "reaction plane"
         double phiRP = gRandom->Uniform(0, TMath::TwoPi() );
 
-        fNumberOfTracks = 50;//500;
+        fNumberOfTracks = 1000;//500;
 //        double fluctPt = gRandom->Uniform( 0., 1 );
         double fluctPt = gRandom->Gaus(1,0.1); //1.;//gRandom->Exp( 0.8 );
         for( int tr = 0; tr < fNumberOfTracks; tr++ )
@@ -218,7 +220,7 @@ void flowToy()
 //                arrowsP[tr]->Draw();
 
 
-                if(1)
+                if(0)
                 {
                     for( int i = 0; i < 20; i++ )
                     {

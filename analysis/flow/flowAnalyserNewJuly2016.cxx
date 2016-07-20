@@ -31,7 +31,7 @@
 #include "TRandom3.h"
 
 
-bool calc_qc_v2 = 1;
+bool calc_qc_v2 = 0;
 bool calc_qc_v3 = 0;//true;
 bool calc_lyz = 0;
 bool calc_sp = 1;
@@ -73,10 +73,10 @@ void ConnectTreeToVars(TTree* tree)
     tree->SetBranchAddress("fTrackPID",fTrackPID);
 }
 
-void flowAnalyserNewJuly2016( TString fileName, Int_t fPID = -1 )
+void flowAnalyserNewJuly2016( TString fileDir, TString fileName, Int_t fPID = -1 )
 {
     TFile* inputFile = 0x0;
-    inputFile = new TFile( fileName );
+    inputFile = new TFile( Form( "%s/%s", fileDir.Data(), fileName.Data() ) );
 
     if ( !inputFile )
     {
@@ -300,7 +300,11 @@ void flowAnalyserNewJuly2016( TString fileName, Int_t fPID = -1 )
 //        TFile* outFileSP = new TFile( Form( "outputSP_TEST_10k_pid%d_GaussianMeanPtFromString_NEW_PIDS_try6_ExpPt.root", fPID) , "RECREATE" );
 //        TFile* outFileSP = new TFile( "outputSP_TEST_10k_TOY.root", "RECREATE" );
 //        TFile* outFileSP = new TFile( Form( "outputSP_TEST_11k_pid%d_try13_TSALLIS_r2fm.root", fPID) , "RECREATE" );
-        TFile* outFileSP = new TFile( Form( "outputSP_100k_pid%d_PP_TRY1_TSALLIS_r2fm.root", fPID) , "RECREATE" );
+//        TFile* outFileSP = new TFile( Form( "outputSP_100k_pid%d_PP_TRY1_TSALLIS_r2fm.root", fPID) , "RECREATE" );
+
+        TFile* outFileSP = new TFile( Form( "outputSP_pid%d_%s", fPID, fileName.Data() ) , "RECREATE" );
+
+
 
         sp->WriteHistograms(outFileSP);
 

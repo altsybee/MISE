@@ -54,9 +54,9 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         d->setOutputDirectoryName( strOutputDirName_NucleiCollision );
 
         // set nuclei type
-//          d->setNucleusType( nucleus_Pb );
+          d->setNucleusType( nucleus_Pb );
 //          d->setNucleusType( nucleus_Au );
-        d->setNucleusType( nucleus_proton );
+//        d->setNucleusType( nucleus_proton );
 
         // tune impact parameter
         d->setImpactParSpecification( flagMBorFixedB ); //0,1,2 - MB event, precise b, b in range
@@ -68,13 +68,21 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
 //        d->setImpactParameterRange( 4.5, 5 );
         // from https://twiki.cern.ch/twiki/bin/viewauth/ALICE/CentralityCodeSnippets:
         // 10 - 20 %	4.96	7.01
-        d->setImpactParameterRange( 5, 7);
+//        d->setImpactParameterRange( 5, 7);
+        // 0 - 5 %
+        d->setImpactParameterRange( 0, 3.5 );
+        // 40 - 50 %
+//        d->setImpactParameterRange( 9.92, 11.1 );
+
+
+
+
 //        d->setImpactParameterRange( 0, 0.01 );
 //        d->setImpactParameterRange( 7, 7.2 );
 //        d->setImpactParameterRange( 10, 11 );
 
         //used for "central" PP events!
-        d->setImpactParameterRange( 0.0, 0.7 );
+//        d->setImpactParameterRange( 0.0, 0.7 );
 
         //tune model parameters
         d->setPartonInteractionDistance( partonInteractionDist );

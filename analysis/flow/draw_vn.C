@@ -47,123 +47,148 @@ void draw_vn()
 //    strFile[2] = Form("outputCumulants_v2_5k_protons.root");
 //    strFile[3] = Form("outputCumulants_v2_5k_allSpecies.root");
 
-//    strFile[0] = Form("outputSP_15k_pions_boltzmanPt.root");
-//    strFile[1] = Form("outputSP_15k_kaons_boltzmanPt.root");
-//    strFile[2] = Form("outputSP_15k_protons_boltzmanPt.root");
+//    strFile[0] = Form("output_to_draw/outputSP_15k_pions_boltzmanPt.root");
+//    strFile[1] = Form("output_to_draw/outputSP_15k_kaons_boltzmanPt.root");
+//    strFile[2] = Form("output_to_draw/outputSP_15k_protons_boltzmanPt.root");
 
-//    strFile[0] = Form("outputSP_10k_pions_boltzmanPt_LOW_T.root");
-//    strFile[1] = Form("outputSP_10k_kaons_boltzmanPt_LOW_T.root");
-//    strFile[2] = Form("outputSP_10k_protons_boltzmanPt_LOW_T.root");
+//    strFile[0] = Form("output_to_draw/outputSP_10k_pions_boltzmanPt_LOW_T.root");
+//    strFile[1] = Form("output_to_draw/outputSP_10k_kaons_boltzmanPt_LOW_T.root");
+//    strFile[2] = Form("output_to_draw/outputSP_10k_protons_boltzmanPt_LOW_T.root");
 
-//    strFile[0] = Form("outputSP_7k_pions_boltzmanPt_T_014.root");
-//    strFile[1] = Form("outputSP_7k_kaons_boltzmanPt_T_014.root");
-//    strFile[2] = Form("outputSP_7k_protons_boltzmanPt_T_014.root");
+//    strFile[0] = Form("output_to_draw/outputSP_7k_pions_boltzmanPt_T_014.root");
+//    strFile[1] = Form("output_to_draw/outputSP_7k_kaons_boltzmanPt_T_014.root");
+//    strFile[2] = Form("output_to_draw/outputSP_7k_protons_boltzmanPt_T_014.root");
 
-//    strFile[0] = Form("outputSP_8k_pions_boltzmanPt_T_014_highRepulsion.root");
-//    strFile[1] = Form("outputSP_8k_kaons_boltzmanPt_T_014_highRepulsion.root");
-//    strFile[2] = Form("outputSP_8k_protons_boltzmanPt_T_014_highRepulsion.root");
+//    strFile[0] = Form("output_to_draw/outputSP_8k_pions_boltzmanPt_T_014_highRepulsion.root");
+//    strFile[1] = Form("output_to_draw/outputSP_8k_kaons_boltzmanPt_T_014_highRepulsion.root");
+//    strFile[2] = Form("output_to_draw/outputSP_8k_protons_boltzmanPt_T_014_highRepulsion.root");
 
-//    strFile[0] = Form("outputSP_15k_pions_boltzmanPt_Schwinger.root");
-//    strFile[1] = Form("outputSP_15k_kaons_boltzmanPt_Schwinger.root");
-//    strFile[2] = Form("outputSP_15k_protons_boltzmanPt_Schwinger.root");
+//    strFile[0] = Form("output_to_draw/outputSP_15k_pions_boltzmanPt_Schwinger.root");
+//    strFile[1] = Form("output_to_draw/outputSP_15k_kaons_boltzmanPt_Schwinger.root");
+//    strFile[2] = Form("output_to_draw/outputSP_15k_protons_boltzmanPt_Schwinger.root");
 
-//    strFile[0] = Form("outputSP_5k_pions_boltzmanPt_Schwinger_WITH_SMEARING.root");
-//    strFile[1] = Form("outputSP_5k_kaons_boltzmanPt_Schwinger_WITH_SMEARING.root");
-//    strFile[2] = Form("outputSP_5k_protons_boltzmanPt_Schwinger_WITH_SMEARING.root");
+//    strFile[0] = Form("output_to_draw/outputSP_5k_pions_boltzmanPt_Schwinger_WITH_SMEARING.root");
+//    strFile[1] = Form("output_to_draw/outputSP_5k_kaons_boltzmanPt_Schwinger_WITH_SMEARING.root");
+//    strFile[2] = Form("output_to_draw/outputSP_5k_protons_boltzmanPt_Schwinger_WITH_SMEARING.root");
 
     // #### LARGE STAT! May 2016
-//    strFile[0] = Form("outputSP_100k_pions_boltzmanPt_Schwinger_WITH_SMEARING.root");
-//    strFile[1] = Form("outputSP_100k_kaons_boltzmanPt_Schwinger_WITH_SMEARING.root");
-//    strFile[2] = Form("outputSP_100k_protons_boltzmanPt_Schwinger_WITH_SMEARING.root");
+//    strFile[0] = Form("output_to_draw/outputSP_100k_pions_boltzmanPt_Schwinger_WITH_SMEARING.root");
+//    strFile[1] = Form("output_to_draw/outputSP_100k_kaons_boltzmanPt_Schwinger_WITH_SMEARING.root");
+//    strFile[2] = Form("output_to_draw/outputSP_100k_protons_boltzmanPt_Schwinger_WITH_SMEARING.root");
 
     // #### New attempts: July 2016
-//    strFile[0] = Form("outputSP_TEST_10k_pid0.root");
-//    strFile[1] = Form("outputSP_TEST_10k_pid1.root");
-//    strFile[2] = Form("outputSP_TEST_10k_pid2.root");
+//    strFile[0] = Form("output_to_draw/outputSP_TEST_10k_pid0.root");
+//    strFile[1] = Form("output_to_draw/outputSP_TEST_10k_pid1.root");
+//    strFile[2] = Form("output_to_draw/outputSP_TEST_10k_pid2.root");
 
-//    strFile[3] = Form("outputSP_TEST_10k_pid0_fromRho.root");
+//    strFile[3] = Form("output_to_draw/outputSP_TEST_10k_pid0_fromRho.root");
 
-//    strFile[0] = Form("outputSP_TEST_10k_pid0_lowPtFromString.root");
-//    strFile[1] = Form("outputSP_TEST_10k_pid1_lowPtFromString.root");
-//    strFile[2] = Form("outputSP_TEST_10k_pid2_lowPtFromString.root");
+//    strFile[0] = Form("output_to_draw/outputSP_TEST_10k_pid0_lowPtFromString.root");
+//    strFile[1] = Form("output_to_draw/outputSP_TEST_10k_pid1_lowPtFromString.root");
+//    strFile[2] = Form("output_to_draw/outputSP_TEST_10k_pid2_lowPtFromString.root");
 
-//    strFile[0] = Form("outputSP_TEST_10k_pid0_GaussianMeanPtFromString025.root");
-//    strFile[1] = Form("outputSP_TEST_10k_pid1_GaussianMeanPtFromString025.root");
-//    strFile[2] = Form("outputSP_TEST_10k_pid2_GaussianMeanPtFromString025.root");
+//    strFile[0] = Form("output_to_draw/outputSP_TEST_10k_pid0_GaussianMeanPtFromString025.root");
+//    strFile[1] = Form("output_to_draw/outputSP_TEST_10k_pid1_GaussianMeanPtFromString025.root");
+//    strFile[2] = Form("output_to_draw/outputSP_TEST_10k_pid2_GaussianMeanPtFromString025.root");
 
-//    strFile[3] = Form("outputSP_TEST_10k_pid0_GaussianMeanPtFromString035.root");
-//    strFile[4] = Form("outputSP_TEST_10k_pid1_GaussianMeanPtFromString035.root");
-//    strFile[5] = Form("outputSP_TEST_10k_pid2_GaussianMeanPtFromString035.root");
+//    strFile[3] = Form("output_to_draw/outputSP_TEST_10k_pid0_GaussianMeanPtFromString035.root");
+//    strFile[4] = Form("output_to_draw/outputSP_TEST_10k_pid1_GaussianMeanPtFromString035.root");
+//    strFile[5] = Form("output_to_draw/outputSP_TEST_10k_pid2_GaussianMeanPtFromString035.root");
 
-//    strFile[3] = Form("outputSP_TEST_10k_pid0_GaussianMeanPtFromString035.root");
-//    strFile[4] = Form("outputSP_TEST_10k_pid1_GaussianMeanPtFromString035.root");
-//    strFile[5] = Form("outputSP_TEST_10k_pid2_GaussianMeanPtFromString035.root");
-
-
-//    strFile[0] = Form("outputSP_TEST_10k_pid0_GaussianMeanPtFromString_NEW_PIDS_try6_ExpPt.root");
-//    strFile[1] = Form("outputSP_TEST_10k_pid1_GaussianMeanPtFromString_NEW_PIDS_try6_ExpPt.root");
-//    strFile[2] = Form("outputSP_TEST_10k_pid2_GaussianMeanPtFromString_NEW_PIDS_try6_ExpPt.root");
-
-//    strFile[0] = Form("outputSP_TEST_10k_TOY_GF_pions.root");
-//    strFile[1] = Form("outputSP_TEST_10k_TOY_GF_kaons.root");
-//    strFile[2] = Form("outputSP_TEST_10k_TOY_GF_protons.root");
-
-//    strFile[3] = Form("outputSP_TEST_10k_pid0_GaussianMeanPtFromString_NEW_PIDS_try7_GF_pT.root");
-//    strFile[4] = Form("outputSP_TEST_10k_pid1_GaussianMeanPtFromString_NEW_PIDS_try7_GF_pT.root");
-//    strFile[5] = Form("outputSP_TEST_10k_pid2_GaussianMeanPtFromString_NEW_PIDS_try7_GF_pT.root");
+//    strFile[3] = Form("output_to_draw/outputSP_TEST_10k_pid0_GaussianMeanPtFromString035.root");
+//    strFile[4] = Form("output_to_draw/outputSP_TEST_10k_pid1_GaussianMeanPtFromString035.root");
+//    strFile[5] = Form("output_to_draw/outputSP_TEST_10k_pid2_GaussianMeanPtFromString035.root");
 
 
+//    strFile[0] = Form("output_to_draw/outputSP_TEST_10k_pid0_GaussianMeanPtFromString_NEW_PIDS_try6_ExpPt.root");
+//    strFile[1] = Form("output_to_draw/outputSP_TEST_10k_pid1_GaussianMeanPtFromString_NEW_PIDS_try6_ExpPt.root");
+//    strFile[2] = Form("output_to_draw/outputSP_TEST_10k_pid2_GaussianMeanPtFromString_NEW_PIDS_try6_ExpPt.root");
 
-//    strFile[3] = Form("outputSP_TEST_10k_pid0_try8_GF_pT_QUENCH_PARTICLES.root");
-//    strFile[4] = Form("outputSP_TEST_10k_pid1_try8_GF_pT_QUENCH_PARTICLES.root");
-//    strFile[5] = Form("outputSP_TEST_10k_pid2_try8_GF_pT_QUENCH_PARTICLES.root");
+//    strFile[0] = Form("output_to_draw/outputSP_TEST_10k_TOY_GF_pions.root");
+//    strFile[1] = Form("output_to_draw/outputSP_TEST_10k_TOY_GF_kaons.root");
+//    strFile[2] = Form("output_to_draw/outputSP_TEST_10k_TOY_GF_protons.root");
 
-//    strFile[3] = Form("outputSP_TEST_10k_pid0_try9_GF_pT_CUT_BOOST_MAG_05.root");
-//    strFile[4] = Form("outputSP_TEST_10k_pid1_try9_GF_pT_CUT_BOOST_MAG_05.root");
-//    strFile[5] = Form("outputSP_TEST_10k_pid2_try9_GF_pT_CUT_BOOST_MAG_05.root");
-
-//    strFile[0] = Form("outputSP_TEST_11k_pid0_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG.root");
-//    strFile[1] = Form("outputSP_TEST_11k_pid1_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG.root");
-//    strFile[2] = Form("outputSP_TEST_11k_pid2_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG.root");
-
-//    strFile[0] = Form("outputSP_TEST_11k_pid0_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG_GAUS.root");
-//    strFile[1] = Form("outputSP_TEST_11k_pid1_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG_GAUS.root");
-//    strFile[2] = Form("outputSP_TEST_11k_pid2_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG_GAUS.root");
-
-    strFile[3] = Form("outputSP_TEST_11k_pid0_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters.root");
-    strFile[4] = Form("outputSP_TEST_11k_pid1_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters.root");
-    strFile[5] = Form("outputSP_TEST_11k_pid2_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters.root");
+//    strFile[3] = Form("output_to_draw/outputSP_TEST_10k_pid0_GaussianMeanPtFromString_NEW_PIDS_try7_GF_pT.root");
+//    strFile[4] = Form("output_to_draw/outputSP_TEST_10k_pid1_GaussianMeanPtFromString_NEW_PIDS_try7_GF_pT.root");
+//    strFile[5] = Form("output_to_draw/outputSP_TEST_10k_pid2_GaussianMeanPtFromString_NEW_PIDS_try7_GF_pT.root");
 
 
-//    strFile[0] = Form("outputSP_TEST_11k_pid0_try11_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_TSALLIS.root");
-//    strFile[1] = Form("outputSP_TEST_11k_pid1_try11_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_TSALLIS.root");
-//    strFile[2] = Form("outputSP_TEST_11k_pid2_try11_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_TSALLIS.root");
 
-    strFile[0] = Form("outputSP_30k_pid0_TSALLIS.root");
-    strFile[1] = Form("outputSP_30k_pid1_TSALLIS.root");
-    strFile[2] = Form("outputSP_30k_pid2_TSALLIS.root");
+//    strFile[3] = Form("output_to_draw/outputSP_TEST_10k_pid0_try8_GF_pT_QUENCH_PARTICLES.root");
+//    strFile[4] = Form("output_to_draw/outputSP_TEST_10k_pid1_try8_GF_pT_QUENCH_PARTICLES.root");
+//    strFile[5] = Form("output_to_draw/outputSP_TEST_10k_pid2_try8_GF_pT_QUENCH_PARTICLES.root");
 
-//    strFile[0] = Form("outputSP_TEST_11k_pid0_try13_TSALLIS_r2fm.root");
-//    strFile[1] = Form("outputSP_TEST_11k_pid1_try13_TSALLIS_r2fm.root");
-//    strFile[2] = Form("outputSP_TEST_11k_pid2_try13_TSALLIS_r2fm.root");
+//    strFile[3] = Form("output_to_draw/outputSP_TEST_10k_pid0_try9_GF_pT_CUT_BOOST_MAG_05.root");
+//    strFile[4] = Form("output_to_draw/outputSP_TEST_10k_pid1_try9_GF_pT_CUT_BOOST_MAG_05.root");
+//    strFile[5] = Form("output_to_draw/outputSP_TEST_10k_pid2_try9_GF_pT_CUT_BOOST_MAG_05.root");
 
-//    strFile[3] = Form("outputSP_TEST_10k_pid0_GaussianMeanPtFromString_NEW_PIDS_try2_tryMinusPI.root");
+//    strFile[0] = Form("output_to_draw/outputSP_TEST_11k_pid0_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG.root");
+//    strFile[1] = Form("output_to_draw/outputSP_TEST_11k_pid1_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG.root");
+//    strFile[2] = Form("output_to_draw/outputSP_TEST_11k_pid2_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG.root");
 
-//    strFile[3] = Form("outputSP_TEST_10k_pid3_GaussianMeanPtFromString_NEW_PIDS_try5_ExpPt.root");
-//    strFile[4] = Form("outputSP_TEST_10k_pid4_GaussianMeanPtFromString_NEW_PIDS_try5_ExpPt.root");
+//    strFile[0] = Form("output_to_draw/outputSP_TEST_11k_pid0_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG_GAUS.root");
+//    strFile[1] = Form("output_to_draw/outputSP_TEST_11k_pid1_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG_GAUS.root");
+//    strFile[2] = Form("output_to_draw/outputSP_TEST_11k_pid2_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_BACK_TO_NICE_FRAG_GAUS.root");
+
+    strFile[3] = Form("output_to_draw/outputSP_TEST_11k_pid0_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters.root");
+    strFile[4] = Form("output_to_draw/outputSP_TEST_11k_pid1_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters.root");
+    strFile[5] = Form("output_to_draw/outputSP_TEST_11k_pid2_try10_GF_pT_NEW_IMPPAR_5_7_and_another_parameters.root");
 
 
-//    strFile[0] = Form("outputSP_10k_pions_boltzmanPt.root");
-//    strFile[1] = Form("outputSP_10k_kaons_boltzmanPt.root");
-//    strFile[2] = Form("outputSP_10k_protons_boltzmanPt.root");
+//    strFile[0] = Form("output_to_draw/outputSP_TEST_11k_pid0_try11_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_TSALLIS.root");
+//    strFile[1] = Form("output_to_draw/outputSP_TEST_11k_pid1_try11_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_TSALLIS.root");
+//    strFile[2] = Form("output_to_draw/outputSP_TEST_11k_pid2_try11_GF_pT_NEW_IMPPAR_5_7_and_another_parameters_TSALLIS.root");
 
-//    strFile[0] = Form("outputSP_11k_pions_boltzmanPt_tryEP.root");
-//    strFile[1] = Form("outputSP_11k_kaons_boltzmanPt_tryEP.root");
-//    strFile[2] = Form("outputSP_11k_protons_boltzmanPt_tryEP.root");
+//    strFile[0] = Form("output_to_draw/outputSP_30k_pid0_TSALLIS.root");
+//    strFile[1] = Form("output_to_draw/outputSP_30k_pid1_TSALLIS.root");
+//    strFile[2] = Form("output_to_draw/outputSP_30k_pid2_TSALLIS.root");
 
-//    strFile[0] = Form("outputSP_12k_pions_boltzmanPt_strIntRad1.root");
-//    strFile[1] = Form("outputSP_12k_kaons_boltzmanPt_strIntRad1.root");
-//    strFile[2] = Form("outputSP_12k_protons_boltzmanPt_strIntRad1.root");
+//    strFile[0] = Form("output_to_draw/outputSP_pid0_nuclCollisionsTree_nEv20000_cImpPar5_7.root_StringFragm_nEv20000_TSALLIS_try1.root");
+//    strFile[1] = Form("output_to_draw/outputSP_pid1_nuclCollisionsTree_nEv20000_cImpPar5_7.root_StringFragm_nEv20000_TSALLIS_try1.root");
+//    strFile[2] = Form("output_to_draw/outputSP_pid2_nuclCollisionsTree_nEv20000_cImpPar5_7.root_StringFragm_nEv20000_TSALLIS_try1.root");
+
+//    strFile[0] = Form("output_to_draw/outputSP_pid0_nuclCollisionsTree_nEv20000_cImpPar5_7_r3fm.root_StringFragm_nEv20000_TSALLIS_try1.root");
+//    strFile[1] = Form("output_to_draw/outputSP_pid1_nuclCollisionsTree_nEv20000_cImpPar5_7_r3fm.root_StringFragm_nEv20000_TSALLIS_try1.root");
+//    strFile[2] = Form("output_to_draw/outputSP_pid2_nuclCollisionsTree_nEv20000_cImpPar5_7_r3fm.root_StringFragm_nEv20000_TSALLIS_try1.root");
+
+//    strFile[0] = Form("output_to_draw/outputSP_pid0_nuclCollisionsTree_nEv10000_cImpPar0_3.5_r3fm.root_StringFragm_nEv10000_TSALLIS_try1.root");
+//    strFile[1] = Form("output_to_draw/outputSP_pid1_nuclCollisionsTree_nEv10000_cImpPar0_3.5_r3fm.root_StringFragm_nEv10000_TSALLIS_try1.root");
+//    strFile[2] = Form("output_to_draw/outputSP_pid2_nuclCollisionsTree_nEv10000_cImpPar0_3.5_r3fm.root_StringFragm_nEv10000_TSALLIS_try1.root");
+
+    strFile[0] = Form("output_to_draw/outputSP_pid0_nuclCollisionsTree_nEv40000_cImpPar9.92_11.1_r2fm.root_StringFragm_nEv40000_TSALLIS_try1.root");
+    strFile[1] = Form("output_to_draw/outputSP_pid1_nuclCollisionsTree_nEv40000_cImpPar9.92_11.1_r2fm.root_StringFragm_nEv40000_TSALLIS_try1.root");
+    strFile[2] = Form("output_to_draw/outputSP_pid2_nuclCollisionsTree_nEv40000_cImpPar9.92_11.1_r2fm.root_StringFragm_nEv40000_TSALLIS_try1.root");
+
+//    strFile[0] = Form("output_to_draw/outputSP_pid0_nuclCollisionsTree_nEv20000_cImpPar5_7_r2fm.root_StringFragm_nEv20000_TSALLIS_try1.root");
+//    strFile[1] = Form("output_to_draw/outputSP_pid1_nuclCollisionsTree_nEv20000_cImpPar5_7_r2fm.root_StringFragm_nEv20000_TSALLIS_try1.root");
+//    strFile[2] = Form("output_to_draw/outputSP_pid2_nuclCollisionsTree_nEv20000_cImpPar5_7_r2fm.root_StringFragm_nEv20000_TSALLIS_try1.root");
+
+//    strFile[0] = Form("output_to_draw/outputSP_pid0_nuclCollisionsTree_nEv10000_cImpPar0_3.5_r2fm.root_StringFragm_nEv10000_TSALLIS_try1.root");
+//    strFile[1] = Form("output_to_draw/outputSP_pid1_nuclCollisionsTree_nEv10000_cImpPar0_3.5_r2fm.root_StringFragm_nEv10000_TSALLIS_try1.root");
+//    strFile[2] = Form("output_to_draw/outputSP_pid2_nuclCollisionsTree_nEv10000_cImpPar0_3.5_r2fm.root_StringFragm_nEv10000_TSALLIS_try1.root");
+
+
+//    strFile[0] = Form("output_to_draw/outputSP_TEST_11k_pid0_try13_TSALLIS_r2fm.root");
+//    strFile[1] = Form("output_to_draw/outputSP_TEST_11k_pid1_try13_TSALLIS_r2fm.root");
+//    strFile[2] = Form("output_to_draw/outputSP_TEST_11k_pid2_try13_TSALLIS_r2fm.root");
+
+//    strFile[3] = Form("output_to_draw/outputSP_TEST_10k_pid0_GaussianMeanPtFromString_NEW_PIDS_try2_tryMinusPI.root");
+
+//    strFile[3] = Form("output_to_draw/outputSP_TEST_10k_pid3_GaussianMeanPtFromString_NEW_PIDS_try5_ExpPt.root");
+//    strFile[4] = Form("output_to_draw/outputSP_TEST_10k_pid4_GaussianMeanPtFromString_NEW_PIDS_try5_ExpPt.root");
+
+
+//    strFile[0] = Form("output_to_draw/outputSP_10k_pions_boltzmanPt.root");
+//    strFile[1] = Form("output_to_draw/outputSP_10k_kaons_boltzmanPt.root");
+//    strFile[2] = Form("output_to_draw/outputSP_10k_protons_boltzmanPt.root");
+
+//    strFile[0] = Form("output_to_draw/outputSP_11k_pions_boltzmanPt_tryEP.root");
+//    strFile[1] = Form("output_to_draw/outputSP_11k_kaons_boltzmanPt_tryEP.root");
+//    strFile[2] = Form("output_to_draw/outputSP_11k_protons_boltzmanPt_tryEP.root");
+
+//    strFile[0] = Form("output_to_draw/outputSP_12k_pions_boltzmanPt_strIntRad1.root");
+//    strFile[1] = Form("output_to_draw/outputSP_12k_kaons_boltzmanPt_strIntRad1.root");
+//    strFile[2] = Form("output_to_draw/outputSP_12k_protons_boltzmanPt_strIntRad1.root");
 
     TCanvas *canv_v = new TCanvas( "canv_v", "canv_v", 100,150,800,600 );
     tuneCanvas(canv_v);

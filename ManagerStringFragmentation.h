@@ -22,6 +22,9 @@ public:
     ManagerStringFragmentation(const ManagerStringFragmentation&);
     virtual ~ManagerStringFragmentation();
     
+    // file name with NuclColl data
+    void setInputFileName(TString name) { fInputFileName = name; }
+
     void setOutputDirectoryName(TString strDirName) { fOutputDirName = strDirName; }
     void setOutputFileName(TString name) { fOutputFileName = name; }
     void setDrawHistos(bool flag) { fDrawHistos = flag; }
@@ -56,6 +59,9 @@ private:
     bool fPrintInfo;
     bool fDrawHistos;
     bool fFillEventTree;
+
+    TString fInputFileName;
+
     TString fOutputDirName;
     TString fOutputFileName;
     TString fOutputListName;
