@@ -13,7 +13,8 @@ void runNewJuly2016(int pid = -1)
     gSystem->Load("libPhysics");
     gSystem->Load("libPWGflowBase");
 
-    TString fileDir("../../outputs_ManagerStringFragmentation");
+//    TString fileDir("../../outputs_ManagerStringFragmentation");
+    TString fileDir("../flow_toy");
 
 //    int nEventsToProcess = 100000;//500000;//1000000;//20001;
 //    TString fileName("../../outputs_EventManager/eventTree_nEv100000.root");
@@ -32,7 +33,9 @@ void runNewJuly2016(int pid = -1)
 
 //    TString fileName( "nuclCollisionsTree_nEv40000_cImpPar9.92_11.1_r2fm.root_StringFragm_nEv40000_TSALLIS_try1.root" );
 //    TString fileName( "nuclCollisionsTree_nEv20000_cImpPar5_7_r2fm.root_StringFragm_nEv20000_TSALLIS_try1.root" );
-    TString fileName( "nuclCollisionsTree_nEv10000_cImpPar0_3.5_r2fm.root_StringFragm_nEv10000_TSALLIS_try1.root" );
+//    TString fileName( "nuclCollisionsTree_nEv10000_cImpPar0_3.5_r2fm.root_StringFragm_nEv10000_TSALLIS_try1.root" );
+
+    TString fileName("output_toy_100_particles_10k_events.root");
 
 
     // ##### prepare analysers and run

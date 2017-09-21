@@ -164,7 +164,7 @@ NucleiCollision::NucleiCollision(/*int seed*/) :
   , fFlagDataMembersInitialized(false)
   , fFlagHaveMBcollision(false)
   , fFlagWriteEventViewCanvases(false)
-  , fFlagComputeStringRepulsion(true)
+//  , fFlagComputeStringRepulsion(true)
   , fNucleusType(nucleus_Pb)
   , fNumberOfNucleons(208) //Pb nucleus
   , fMaxPartons(8000)
@@ -172,12 +172,12 @@ NucleiCollision::NucleiCollision(/*int seed*/) :
   , fNucleusWSa(1.)
   //  , fRadiusParton(0.1)    //radius "parton", fm
   , fPartonInteractionDistance(0.2)//0.2)
-  , fStringInteractionRadius(0.2)//2) //fm
-  , fStringOverlapEnergyDensity(0.1)
+//  , fStringInteractionRadius(0.2)//2) //fm
+//  , fStringOverlapEnergyDensity(0.1)
   //  , fStringInteractionParA(0.05)
-  , fClusterFormationDist(0.4)
+//  , fClusterFormationDist(0.4)
   , fMeanNofPartonsInNucleon(5)
-  , fHardScatteringProbability(0.03)
+//  , fHardScatteringProbability(0.03)
   
   , fImpactParameter(0.) //fm (is MC-played)
   //  , fImpactParameterByHand_0_100(0.)
@@ -209,7 +209,7 @@ void NucleiCollision::initDataMembers()
         kCoeffRadiusForMB = 2.1;
         break;
     case nucleus_Pb:
-        fNumberOfNucleons = 207;//8;
+        fNumberOfNucleons = 208; // !! Centrality p-Pb ALICE: arXiv:1412.6828       //207;//8;
         fNucleusRadius = 6.62;//6.413;
         fNucleusWSa = 0.546; // from ASer
         //        cout << "Pb" << endl;
@@ -252,9 +252,9 @@ void NucleiCollision::initDataMembers()
     fB = new Nucleus( fNumberOfNucleons, fMaxPartons);
     
     //init 2D array for clusterId->stringsIds
-    fStringClusters = new StringCluster*[fMaxPartons]; // CAN'T BE MORE THEN fMaxPartons/2 clusters
-    for( int i = 0; i < fMaxPartons; ++i )
-        fStringClusters[i] = new StringCluster( fMaxPartons ); // CAN'T BE MORE THEN fMaxPartons/2 strings in one cluster
+//    fStringClusters = new StringCluster*[fMaxPartons]; // CAN'T BE MORE THEN fMaxPartons/2 clusters
+//    for( int i = 0; i < fMaxPartons; ++i )
+//        fStringClusters[i] = new StringCluster( fMaxPartons ); // CAN'T BE MORE THEN fMaxPartons/2 strings in one cluster
 
     //init N coll matrix
     matrixNcoll = new bool*[fNumberOfNucleons];
@@ -285,13 +285,13 @@ void NucleiCollision::initDataMembers()
     fFlagStringInInteraction = new bool[fMaxPartons];
     fNStringsInCluster = new int[fMaxPartons];
     fClusterIdForString = new int[fMaxPartons];
-    fFlagStringIsHardInteraction = new bool[fMaxPartons];
+//    fFlagStringIsHardInteraction = new bool[fMaxPartons];
 
     fStringBoostMagn = new float[fMaxPartons];
     fStringBoostAngle = new float[fMaxPartons];
     
     fNumberOfStrings = 0;
-    fNumberOfClusters = 0;
+//    fNumberOfClusters = 0;
     fNumberOfStringInteractions = 0;
     fEccentricity = -1;
 
@@ -326,24 +326,24 @@ void NucleiCollision::initDataMembers()
 
     fHistStringRadiusVectorPhi = new TH1D("fHistStringRadiusVectorPhi", "string #phi angle wrt (0,0);#phi;n strings", 100, 0, 2*TMath::Pi() );
 
-    fHistStringInteractionsPhi = new TH1D("fHistStringInteractionsPhi", "string kick #phi;#phi;n strings", 100, 0, 2*TMath::Pi() );
-    fHistStringInteractionsDistance = new TH1D("fHistStringInteractionsDistance", "string pairs dist", 100, 0, fNucleusRadius );
+//    fHistStringInteractionsPhi = new TH1D("fHistStringInteractionsPhi", "string kick #phi;#phi;n strings", 100, 0, 2*TMath::Pi() );
+//    fHistStringInteractionsDistance = new TH1D("fHistStringInteractionsDistance", "string pairs dist", 100, 0, fNucleusRadius );
     // fHistStringInteractionsMagnitude = new TH1D("fHistStringInteractionsMagnitude", "string interaction magnitude; arb. units;n strings", 500, 0, 100 );
-    fHistStringInteractionsMagnitude = new TH1D("fHistStringInteractionsMagnitude", "beta of the strings; #beta;n strings", 220, 0, 1.1 );
+//    fHistStringInteractionsMagnitude = new TH1D("fHistStringInteractionsMagnitude", "beta of the strings; #beta;n strings", 220, 0, 1.1 );
     fHist2DNInteractionsVsNstrings = new TH2D("fHist2DNInteractionsVsNstrings", "n string interactions vs nstrings;n strings;n interactions", fMaxPartons+1, -0.5, fMaxPartons+0.5 , fMaxPartons+1, -0.5, fMaxPartons+0.5 );
     fHist2DNInteractionsVsImpactPar = new TH2D("fHist2DNInteractionsVsImpactPar", "n string interactions;b,fm;n interactions", 50, 0, 2*fNucleusRadius , fMaxPartons+1, -0.5, fMaxPartons+0.5 );
     
-    fHistForcesInClustersX = new TH1D("fHistForcesInClustersX", "forces acting on string, x; force x, arb units; entries", 200, -10, 10 );
-    fHistForcesInClustersY = new TH1D("fHistForcesInClustersY", "forces acting on string, y; force y, arb units; entries", 200, -10, 10 );
-    fHistForcesInClustersMagn = new TH1D("fHistForcesInClustersMagn", "forces acting on string, magnitude; force magn, arb units; entries", 200, -10, 10 );
+//    fHistForcesInClustersX = new TH1D("fHistForcesInClustersX", "forces acting on string, x; force x, arb units; entries", 200, -10, 10 );
+//    fHistForcesInClustersY = new TH1D("fHistForcesInClustersY", "forces acting on string, y; force y, arb units; entries", 200, -10, 10 );
+//    fHistForcesInClustersMagn = new TH1D("fHistForcesInClustersMagn", "forces acting on string, magnitude; force magn, arb units; entries", 200, -10, 10 );
 
-    fHistForcesInClustersAbsX = new TH1D("fHistForcesInClustersAbsX", "force abs(x); force abs(x), arb units; entries", 1000, 0, 100 );
-    fHistForcesInClustersAbsY = new TH1D("fHistForcesInClustersAbsY", "force abs(y); force abs(y), arb units; entries", 1000, 0, 100 );
+//    fHistForcesInClustersAbsX = new TH1D("fHistForcesInClustersAbsX", "force abs(x); force abs(x), arb units; entries", 1000, 0, 100 );
+//    fHistForcesInClustersAbsY = new TH1D("fHistForcesInClustersAbsY", "force abs(y); force abs(y), arb units; entries", 1000, 0, 100 );
     //    fHistForcesInClustersRatioAbsXY = new TH1D("fHistForcesInClustersRatioAbsXY", "force abs(x)/abs(y); force abs(x)/abs(y), arb units; entries", 50, 0, 5 );
 
 
-    fHistStringsInClusters = new TH1D("fHistStringsInClusters", "N strings in clusters", fMaxPartons, -0.5, fMaxPartons-0.5 );
-    fHist2DStringsInClustersVsB = new TH2D("fHist2DStringsInClustersVsB", "n 'large' clusters vs b;b,fm;n clusters", 50, 0, 2*fNucleusRadius , 41, -0.5, 40.5 );
+//    fHistStringsInClusters = new TH1D("fHistStringsInClusters", "N strings in clusters", fMaxPartons, -0.5, fMaxPartons-0.5 );
+//    fHist2DStringsInClustersVsB = new TH2D("fHist2DStringsInClustersVsB", "n 'large' clusters vs b;b,fm;n clusters", 50, 0, 2*fNucleusRadius , 41, -0.5, 40.5 );
     
 
     //    fHist2DStringsSVsImpactS= new TH2D("fHist2DStringsSVsImpactS", "n*s0/S;b/R;n*s0/S", 50, 0, 100 , 100, 0, 2 );
@@ -389,8 +389,8 @@ void NucleiCollision::buildEvent()
 
     fA->reset();
     fB->reset();
-    for( int i = 0; i < fNumberOfClusters; ++i )
-        fStringClusters[i]->reset();
+//    for( int i = 0; i < fNumberOfClusters; ++i )
+//        fStringClusters[i]->reset();
 
     //reset N coll matrix
     for( int i = 0; i < fNumberOfNucleons; ++i )
@@ -444,14 +444,14 @@ void NucleiCollision::buildEvent()
         //        fHist2DStringsSVsImpactS->Fill( fImpactParameter, fNumberOfStrings * S_string / S_impact );
         //            cout << fImpactParameter << " " <<  fNumberOfStrings * S_string / S_impact << endl;
         
-        if ( fFlagComputeStringRepulsion )
-        {
+//        if ( fFlagComputeStringRepulsion )
+//        {
             //find string clusters
-            startClusterSearch();
+            //startClusterSearch();
 
             //string repulsion
-            createStringRepulsion();
-        }
+            //createStringRepulsion();
+//        }
 
         //wounded nucleons
         int nWoundedA = fA->getNumberOfWoundedNucleons();
@@ -470,26 +470,26 @@ void NucleiCollision::buildEvent()
         fHistNcoll->Fill( fNcollisions );
 
         //print forces (for debug)
-        if(1)for( int i = 0; i < fNumberOfClusters; ++i )
-        {
-            StringCluster *cluster = fStringClusters[i];
-            int nStringsInCluster = cluster->nStrings;
-            for ( int iP = 0; iP < nStringsInCluster; iP++ )
-            {
-                double Fx = cluster->Fx[iP];
-                double Fy = cluster->Fy[iP];
-                fHistForcesInClustersX->Fill(Fx);
-                fHistForcesInClustersY->Fill(Fy);
-                fHistForcesInClustersMagn->Fill( sqrt(Fx*Fx+Fy*Fy) );
+//        if(1)for( int i = 0; i < fNumberOfClusters; ++i )
+//        {
+//            StringCluster *cluster = fStringClusters[i];
+//            int nStringsInCluster = cluster->nStrings;
+//            for ( int iP = 0; iP < nStringsInCluster; iP++ )
+//            {
+//                double Fx = cluster->Fx[iP];
+//                double Fy = cluster->Fy[iP];
+//                fHistForcesInClustersX->Fill(Fx);
+//                fHistForcesInClustersY->Fill(Fy);
+//                fHistForcesInClustersMagn->Fill( sqrt(Fx*Fx+Fy*Fy) );
 
-                fHistForcesInClustersAbsX->Fill(fabs(Fx));
-                fHistForcesInClustersAbsY->Fill(fabs(Fy));
-                //                if ( fabs(Fy) > 0 ) //tmp?
-                //                    fHistForcesInClustersRatioAbsXY->Fill( fabs(Fx)/fabs(Fy) );
-            }
-            //            cout << ">>>>>>>>>>>>> cluster id " << i << ": " << endl;
-            //            fStringClusters[i]->printForces();
-        }
+//                fHistForcesInClustersAbsX->Fill(fabs(Fx));
+//                fHistForcesInClustersAbsY->Fill(fabs(Fy));
+//                //                if ( fabs(Fy) > 0 ) //tmp?
+//                //                    fHistForcesInClustersRatioAbsXY->Fill( fabs(Fx)/fabs(Fy) );
+//            }
+//            //            cout << ">>>>>>>>>>>>> cluster id " << i << ": " << endl;
+//            //            fStringClusters[i]->printForces();
+//        }
 
         //spec draw for saving
         if ( fFlagWriteEventViewCanvases && fEventId < 10 )
@@ -715,7 +715,7 @@ void NucleiCollision::createStrings()
     int distArraySize = 0;
     DistanceEntry* arrDist = fPartonInteractionsFinder->GetMinDistanceArray( distArraySize );
     fNumberOfStrings = 0;
-    fNumberOfClusters = 0;
+//    fNumberOfClusters = 0;
     fHist2DNstringsXY_thisEvent->Reset();
     for ( int iP = 0; iP < distArraySize; iP++ )
     {
@@ -752,9 +752,9 @@ void NucleiCollision::createStrings()
         fFlagStringInInteraction[fNumberOfStrings] = 0;//false;
         fNStringsInCluster[fNumberOfStrings] = 0;//false;
         fClusterIdForString[fNumberOfStrings] = -1;
-        fFlagStringIsHardInteraction[fNumberOfStrings] = 0;//false;
+//        fFlagStringIsHardInteraction[fNumberOfStrings] = 0;//false;
 
-        fFlagStringIsHardInteraction[fNumberOfStrings] = ( fRand->Uniform() < fHardScatteringProbability ? 1 : 0 );
+//        fFlagStringIsHardInteraction[fNumberOfStrings] = ( fRand->Uniform() < fHardScatteringProbability ? 1 : 0 );
 
         // calc angle of the radius-vector of the string
         float middleX_shifted = middleX-fImpactParameter/2;
@@ -778,241 +778,6 @@ void NucleiCollision::createStrings()
 }
 
 
-void NucleiCollision::startClusterSearch()
-{
-    int nOfLargeClusters = 0;
-    int clusterId = 0;
-    for ( int i = 0; i < fNumberOfStrings; i++ )
-    {
-        if ( fClusterIdForString[i]>=0 ) //string is already in some cluster
-            continue;
-        if ( fFlagStringIsHardInteraction[i] != 0 ) // this string is for hard interaction
-            continue;
-        int nLinkedStrings = 0;
-        findStringClusters( i, nLinkedStrings, clusterId );
-        if ( nLinkedStrings > 0 )
-        {
-            fHistStringsInClusters->Fill( nLinkedStrings );
-            //loop again: bind number of strings in cluster to the special array
-            for ( int i2 = 0; i2 < fNumberOfStrings; i2++ )
-            {
-                if ( fClusterIdForString[i2] == clusterId )
-                    fNStringsInCluster[i2] = nLinkedStrings;
-            }
-            //calc forces inside cluster
-            createForcesInsideCluster(clusterId);
-            clusterId++;
-            //            cout << "string " << i << ": " << nLinkedStrings << endl;
-        }
-        if ( nLinkedStrings > kNstringsWhenClustersIsConsideredLarge )
-            nOfLargeClusters++;
-    }
-    fNumberOfClusters = clusterId;
-    fHist2DStringsInClustersVsB->Fill( fImpactParameter, nOfLargeClusters );
-    //    cout << "nOfLargeClusters=" << nOfLargeClusters << endl;
-    
-    int maxClusterSize = fNStringsInCluster[ maxElement(fNStringsInCluster,fNumberOfStrings) ];
-    //    cout << "max cluster size=" << maxClusterSize << endl;
-    fHistNStringsInLargestCluster->Fill(maxClusterSize);
-}
-
-void NucleiCollision::findStringClusters(int iString, int &nLinked, int clusterId)
-{
-    //    cout << "deep: string id=" << iString << endl;
-    const float rCluster2 = fClusterFormationDist*fClusterFormationDist;
-    
-    float x = fXstring[iString];
-    float y = fYstring[iString];
-    for ( int i1 = 0; i1 < fNumberOfStrings; i1++ )
-    {
-        if ( i1 == iString || fClusterIdForString[i1]>=0 )
-            continue;
-        if ( fFlagStringIsHardInteraction[i1] != 0 ) // this string is for hard interaction
-            continue;
-        float x1 = fXstring[i1];
-        float y1 = fYstring[i1];
-        float dx = x1-x;
-        float dy = y1-y;
-        float dr2 = dx*dx+dy*dy;
-        if ( dr2 < rCluster2 )
-        {
-            if ( nLinked == 0 ) //this is the first pair of linked strings
-                fStringClusters[clusterId]->addStringId(iString);
-
-            nLinked++;
-            //bind current stringId into the 2D array
-            fStringClusters[clusterId]->addStringId(i1);
-
-            //            cout << "  found neighbour with id=" << i1 << endl;
-            //            fNStringsInCluster[iString] = nLinked;//++;
-            //            fNStringsInCluster[i1] = nLinked;//++;
-            fClusterIdForString[iString] = clusterId;
-            fClusterIdForString[i1] = clusterId;
-
-            findStringClusters(i1, nLinked, clusterId);
-        }
-    }
-}
-
-
-void NucleiCollision::createForcesInsideCluster(int clusterId)
-{
-    float maxStringOverlapArea = TMath::Pi()*fStringInteractionRadius*fStringInteractionRadius; //circlesIntersectionArea(0, fStringInteractionRadius, fStringInteractionRadius);
-
-    // !!!!! playing with params!
-    // take DOUBLED parameter (distance) for cuts:
-    const float fInteractionDist = 2*fStringInteractionRadius; //3;//1.8; //4.*fClusterFormationDist;//3*fNucleusRadius; //10.*fClusterFormationDist;
-    const float rInteraction2 = fInteractionDist*fInteractionDist;
-
-    StringCluster *thisCluster = fStringClusters[clusterId];
-    for ( int i = 0; i < thisCluster->nStrings-1; i++ )
-    {
-        int strId = thisCluster->linkedStringIds[i];
-        float x = fXstring[strId];
-        float y = fYstring[strId];
-        for ( int i2 = i+1; i2 < thisCluster->nStrings; i2++ )
-        {
-            int strId2 = thisCluster->linkedStringIds[i2];
-            //            if ( strId2 == strId ) //it's the same string
-            //                continue;
-            // ##### create forces from nearby strings
-            //check x
-            float x2 = fXstring[strId2];
-            if ( fabs(x-x2) > fInteractionDist )
-                continue;
-            //check y
-            float y2 = fYstring[strId2];
-            if ( fabs(y-y2) > fInteractionDist )
-                continue;
-            //check r2
-            float dx = x2-x;
-            float dy = y2-y;
-            float dr2 = dx*dx+dy*dy;
-            if ( dr2 < rInteraction2 ) //strings are in interaction
-            {
-                float dr = sqrt(dr2);
-                // 29.11.2014 - old version: "non-relativistic" forces
-                if (0)
-                {
-                    //                    float forceCoeff = 0.05 * funcStringInteractionDist->Eval( dr );
-                    //                    //                if ( dr > fClusterFormationDist )
-                    //                    //                    forceCoeff = 1/dr;
-                    //                    thisCluster->Fx[i] += -dx/dr * forceCoeff;
-                    //                    thisCluster->Fy[i] += -dy/dr * forceCoeff;
-                    //                    thisCluster->Fx[i2] += dx/dr * forceCoeff;
-                    //                    thisCluster->Fy[i2] += dy/dr * forceCoeff;
-                }
-                float stringOverlapArea = circlesIntersectionArea(dr, fStringInteractionRadius, fStringInteractionRadius);
-                float U = stringOverlapArea/maxStringOverlapArea * fStringOverlapEnergyDensity;
-                //                cout << circlesIntersectionArea(0, fStringInteractionRadius, fStringInteractionRadius)/maxStringOverlapArea << endl;
-                float momAbs = sqrt( (Mstring+U)*(Mstring+U) - Mstring*Mstring ); //acquired momentum, see Abramovsky paper
-//                cout << "momString = " << momAbs << endl;
-                thisCluster->Fx[i] += -dx/dr * momAbs;
-                thisCluster->Fy[i] += -dy/dr * momAbs;
-                thisCluster->Fx[i2] += dx/dr * momAbs;
-                thisCluster->Fy[i2] += dy/dr * momAbs;
-            }
-        }
-    }
-}
-
-
-void NucleiCollision::createStringRepulsion()
-{
-    for ( int iCluster = 0; iCluster < fNumberOfClusters; iCluster++ )
-    {
-        StringCluster *cluster = fStringClusters[iCluster];
-        for ( int i = 0; i < cluster->nStrings; i++ )
-        {
-            int strId = cluster->linkedStringIds[i];
-
-            //            float Fx = cluster->Fx[i];
-            //            float Fy = cluster->Fy[i];
-            //            float absF = sqrt(Fx*Fx+Fy*Fy);
-            float Px = cluster->Fx[i];
-            float Py = cluster->Fy[i];
-            float absMom = sqrt(Px*Px+Py*Py);
-            float beta = absMom/sqrt( absMom*absMom + Mstring*Mstring );
-//            cout << "absMom = " << absMom << endl;
-//            cout << "beta = " << beta << endl;
-
-            double interactionAngle = asin( Py/absMom );
-            if ( Px < 0 )
-                interactionAngle = TMath::Pi()-interactionAngle;
-            FixAngleInTwoPi(interactionAngle);
-            FixAngleInTwoPi(interactionAngle);
-
-            fStringBoostMagn[strId] = beta;//absF;
-            fStringBoostAngle[strId] = interactionAngle;
-            fHistStringInteractionsMagnitude->Fill(beta); //absF);
-            fHistStringInteractionsPhi->Fill(interactionAngle);
-
-        }
-    }
-}
-
-
-void NucleiCollision::createStringRepulsionOld()
-{
-    //string interactions - find the closest string pairs
-    fStringInteractionsFinder->FindMinDistancesWithinArray(fXstring,fYstring,fNumberOfStrings);
-
-    //define "string interactions" as pairs of strings
-    //    cout << "fNumberOfStrings=" << fNumberOfStrings << endl;
-    int distBetweenStringsArraySize = 0;
-    DistanceEntry* arrDistBetweenStrings = fStringInteractionsFinder->GetMinDistanceArray( distBetweenStringsArraySize );
-    fNumberOfStringInteractions = 0;
-    for ( int iP = 0; iP < distBetweenStringsArraySize; iP++ )
-    {
-        if ( !arrDistBetweenStrings[iP].inInteraction )
-            continue;
-        int id1 = arrDistBetweenStrings[iP].x;
-        int id2 = arrDistBetweenStrings[iP].y;
-
-        double x1 = fXstring[id1];
-        double y1 = fYstring[id1];
-        double x2 = fXstring[id2];
-        double y2 = fYstring[id2];
-
-        fXstringInteraction[fNumberOfStringInteractions] = (x1+x2)/2;
-        fYstringInteraction[fNumberOfStringInteractions] = (y1+y2)/2;
-        double dx=x1-x2;
-        double dy=y1-y2;
-        double dist = sqrt(dx*dx+dy*dy);
-        fStringIntDist[fNumberOfStringInteractions] = dist;
-        double interactionAngle = asin(dy/dist);
-        if (dx<0)
-            interactionAngle = TMath::Pi()-interactionAngle;
-        FixAngleInTwoPi(interactionAngle);
-        FixAngleInTwoPi(interactionAngle);
-        fStringIntAngles[fNumberOfStringInteractions] = interactionAngle;
-
-        double interactionAngle2 = interactionAngle + TMath::Pi();
-        FixAngleInTwoPi(interactionAngle2);
-
-        //for each string write boost information: the magnitude and the angle
-        if(0) //OLD BOOSTS, new are in createStringRepulsion
-        {
-            const double coeffInteraction = 1.;
-            const double maxMagnitude = 0.1;
-            double interacitonMagnitude = coeffInteraction*( dist>0 ? 1./dist : maxMagnitude );  // dist;
-            fStringBoostMagn[id1] = interacitonMagnitude;
-            fStringBoostAngle[id1] = interactionAngle;
-            fStringBoostMagn[id2] = interacitonMagnitude;
-            fStringBoostAngle[id2] = interactionAngle2;
-            fHistStringInteractionsDistance->Fill(dist);
-            fHistStringInteractionsMagnitude->Fill(interacitonMagnitude);
-            //        fHistStringInteractionsPhi->Fill(interactionAngle);
-            fHistStringInteractionsPhi->Fill(interactionAngle2);
-        }
-
-        fFlagStringInInteraction[id1] = true;
-        fFlagStringInInteraction[id2] = true;
-
-        fNumberOfStringInteractions++;
-    }
-    fHistStringInteractions->Fill( fNumberOfStringInteractions );
-}
 
 void NucleiCollision::calcEccentricity()
 {
@@ -1116,15 +881,15 @@ void NucleiCollision::drawStatisticHists()
 
         //pad
         fCanvEventStatistics->cd(padId++);
-        fHistForcesInClustersX->SetLineColor(kGreen);
-        fHistForcesInClustersY->SetLineColor(kRed);
-        fHistForcesInClustersMagn->DrawCopy();
-        fHistForcesInClustersX->DrawCopy("same");
-        fHistForcesInClustersY->DrawCopy("same");
+//        fHistForcesInClustersX->SetLineColor(kGreen);
+//        fHistForcesInClustersY->SetLineColor(kRed);
+//        fHistForcesInClustersMagn->DrawCopy();
+//        fHistForcesInClustersX->DrawCopy("same");
+//        fHistForcesInClustersY->DrawCopy("same");
 
-        fHistForcesInClustersMagn->Write();
-        fHistForcesInClustersX->Write();
-        fHistForcesInClustersY->Write();
+//        fHistForcesInClustersMagn->Write();
+//        fHistForcesInClustersX->Write();
+//        fHistForcesInClustersY->Write();
 
         //pad 1
         fCanvEventStatistics->cd(padId++);
@@ -1148,8 +913,8 @@ void NucleiCollision::drawStatisticHists()
         fHistStringPositionRadius->Write();
         //pad 5
         fCanvEventStatistics->cd(padId++);
-        fHistStringInteractionsPhi->DrawCopy();
-        fHistStringInteractionsPhi->Write();
+//        fHistStringInteractionsPhi->DrawCopy();
+//        fHistStringInteractionsPhi->Write();
 
         fHistStringRadiusVectorPhi->SetLineColor(kRed);
         fHistStringRadiusVectorPhi->DrawCopy( "same" );
@@ -1158,9 +923,9 @@ void NucleiCollision::drawStatisticHists()
         //        fHistStringInteractionsDistance->DrawCopy();
         //pad 7
         fCanvEventStatistics->cd(padId++);//->SetLogy();
-        fHistStringInteractionsMagnitude->DrawCopy();
-        fHistStringInteractionsMagnitude->Write();
-        cout << ">> mean string boost (<beta>) = " << fHistStringInteractionsMagnitude->GetMean() << endl;
+//        fHistStringInteractionsMagnitude->DrawCopy();
+//        fHistStringInteractionsMagnitude->Write();
+//        cout << ">> mean string boost (<beta>) = " << fHistStringInteractionsMagnitude->GetMean() << endl;
         //pad 8
         fCanvEventStatistics->cd(padId++);
         fHistImpactParameter->DrawCopy();
@@ -1328,33 +1093,33 @@ void NucleiCollision::finalActions()
     }
     
     // print Fx, Fy results
-    float meanFx = fHistForcesInClustersAbsX->GetMean();
-    float meanFy = fHistForcesInClustersAbsY->GetMean();
-    double errFx = fHistForcesInClustersAbsX->GetMeanError();
-    double errFy = fHistForcesInClustersAbsY->GetMeanError();
-    double errNumDenom = errFx + errFy;
-    double errTotal = sqrt(errNumDenom*errNumDenom + errNumDenom*errNumDenom);
+//    float meanFx = fHistForcesInClustersAbsX->GetMean();
+//    float meanFy = fHistForcesInClustersAbsY->GetMean();
+//    double errFx = fHistForcesInClustersAbsX->GetMeanError();
+//    double errFy = fHistForcesInClustersAbsY->GetMeanError();
+//    double errNumDenom = errFx + errFy;
+//    double errTotal = sqrt(errNumDenom*errNumDenom + errNumDenom*errNumDenom);
 
-    float forceEccentricity = (meanFx-meanFy) / (meanFx+meanFy);
+//    float forceEccentricity = (meanFx-meanFy) / (meanFx+meanFy);
+//    if (1)
+//    {
+//        cout << "forceEccentricity = " << forceEccentricity << endl;
+//        ofstream fout( Form( "%s/tmpTextOutput4.txt", fOutDirName.Data() ), ios::out | ios::binary);
+//        fout << fImpactParameterByHand
+//             << " " << forceEccentricity
+//             << " " << errTotal
+//             << endl;
+//        fout.close();
+//    }
+
     if (1)
     {
-        cout << "forceEccentricity = " << forceEccentricity << endl;
-        ofstream fout( Form( "%s/tmpTextOutput4.txt", fOutDirName.Data() ), ios::out | ios::binary);
-        fout << fImpactParameterByHand
-             << " " << forceEccentricity
-             << " " << errTotal
-             << endl;
-        fout.close();
-    }
-
-    if (1)
-    {
-        ofstream fout( Form( "%s/tmpTextOutput5.txt", fOutDirName.Data() ), ios::out | ios::binary);
-        fout << fImpactParameterByHand
-             << " " << fHistStringInteractionsMagnitude->GetMean()
-             << " " << fHistStringInteractionsMagnitude->GetMeanError()
-             << endl;
-        fout.close();
+//        ofstream fout( Form( "%s/tmpTextOutput5.txt", fOutDirName.Data() ), ios::out | ios::binary);
+//        fout << fImpactParameterByHand
+//             << " " << fHistStringInteractionsMagnitude->GetMean()
+//             << " " << fHistStringInteractionsMagnitude->GetMeanError()
+//             << endl;
+//        fout.close();
     }
 
     // transverse density fluctuations
@@ -1386,8 +1151,8 @@ void NucleiCollision::finalActions()
 
 
     //print mean string boost
-    cout << "(b, mean string boost, err) = " << fImpactParameterByHand << " " << fHistStringInteractionsMagnitude->GetMean()
-    << " " << fHistStringInteractionsMagnitude->GetMeanError() << endl;
+//    cout << "(b, mean string boost, err) = " << fImpactParameterByHand << " " << fHistStringInteractionsMagnitude->GetMean()
+//    << " " << fHistStringInteractionsMagnitude->GetMeanError() << endl;
 
     //print cross section
     cout << " >>>>EvTrialsSuccess=" << fEvTrialsSuccess << endl;
@@ -1425,7 +1190,7 @@ void NucleiCollision::drawEventStructure()
     if ( fFlagHaveMBcollision )
     {
         //        drawStringInteractions();
-        drawForcesInsideClusters();
+//        drawForcesInsideClusters();
         //            drawStringBoosts();
     }
     //    fCanvEventView->SaveAs( Form( "eventViews/eventView_%d.eps", fEventId) );
@@ -1524,11 +1289,11 @@ void NucleiCollision::drawStrings()
 
         int colorWhenNotInCluster = kBlue;
         //mark hard interactions
-        if ( fFlagStringIsHardInteraction[iP] )
-        {
-//            cout << "string is hard: " << iP << endl;
-            colorWhenNotInCluster = kRed;
-        }
+//        if ( fFlagStringIsHardInteraction[iP] )
+//        {
+////            cout << "string is hard: " << iP << endl;
+//            colorWhenNotInCluster = kRed;
+//        }
 
         elPointsStrings[iP]->SetLineColor( clusterId>=0 ? clusterColor : colorWhenNotInCluster );
         elPointsStrings[iP]->SetFillColor( clusterId>=0 ? clusterColor : colorWhenNotInCluster );
@@ -1537,112 +1302,19 @@ void NucleiCollision::drawStrings()
     delete [] elPointsStrings;
 
     // draw string interaction radius (July 2016)
-    double visStringIntRad = fVisNucleusRadiusNucleus * fStringInteractionRadius / fNucleusRadius;
-    TEllipse *elStringInteractionRadius = new TEllipse( 0.12, 0.88
-                                                        , visStringIntRad, visStringIntRad );
-    elStringInteractionRadius->SetLineColor( kOrange+1 );
-    elStringInteractionRadius->SetFillColor( kOrange+1 );
-    elStringInteractionRadius->SetFillStyle( 3013 );
-    elStringInteractionRadius->SetLineStyle( 9 );
-    elStringInteractionRadius->SetLineWidth( 2 );
-    elStringInteractionRadius->Draw();
+//    double visStringIntRad = fVisNucleusRadiusNucleus * fStringInteractionRadius / fNucleusRadius;
+//    TEllipse *elStringInteractionRadius = new TEllipse( 0.12, 0.88
+//                                                        , visStringIntRad, visStringIntRad );
+//    elStringInteractionRadius->SetLineColor( kOrange+1 );
+//    elStringInteractionRadius->SetFillColor( kOrange+1 );
+//    elStringInteractionRadius->SetFillStyle( 3013 );
+//    elStringInteractionRadius->SetLineStyle( 9 );
+//    elStringInteractionRadius->SetLineWidth( 2 );
+//    elStringInteractionRadius->Draw();
 //    delete elStringInteractionRadius;
 }
 
-void NucleiCollision::drawStringInteractions()
-{
-    //visualize "string interactions"
-    TLine **linesStringInteracions = new TLine* [fNumberOfStringInteractions];
-    for ( int iP = 0; iP < fNumberOfStringInteractions; iP++ )
-    {
-        double x1 = fXstringInteraction[iP] - fStringIntDist[iP]/2 * cos(fStringIntAngles[iP]);
-        double y1 = fYstringInteraction[iP] - fStringIntDist[iP]/2 * sin(fStringIntAngles[iP]);
-        double x2 = fXstringInteraction[iP] + fStringIntDist[iP]/2 * cos(fStringIntAngles[iP]);
-        double y2 = fYstringInteraction[iP] + fStringIntDist[iP]/2 * sin(fStringIntAngles[iP]);
-        //lines
-        linesStringInteracions[iP] = new TLine( 0.5+fVisNucleusRadiusNucleus * x1/fNucleusRadius, 0.5+fVisNucleusRadiusNucleus * y1/fNucleusRadius,
-                                                0.5+fVisNucleusRadiusNucleus * x2/fNucleusRadius, 0.5+fVisNucleusRadiusNucleus * y2/fNucleusRadius );
-        linesStringInteracions[iP]->SetLineColor( kGreen+2 );
-        linesStringInteracions[iP]->SetLineWidth( 2 );
-        linesStringInteracions[iP]->Draw();
-    }
-    delete [] linesStringInteracions;
-}
-
-void NucleiCollision::drawForcesInsideClusters()
-{
-    //find min and max forces
-    float min_dr = 0;
-    float max_dr = 0;
-    for ( int i = 0; i < fNumberOfClusters; i++ )
-    {
-        StringCluster *cluster = fStringClusters[i];
-        int nStringsInCluster = cluster->nStrings;
-        //visualize "string interactions"
-        for ( int iP = 0; iP < nStringsInCluster; iP++ )
-        {
-            float Fx = cluster->Fx[iP];
-            float Fy = cluster->Fy[iP];
-            float dr = sqrt(Fx*Fx+Fy*Fy);
-
-            if( dr > max_dr )
-                max_dr = dr;
-            if( dr < min_dr )
-                min_dr = dr;
-        }
-    }
-    cout << "min,max dr: " << min_dr << " " << max_dr << endl;
-
-    //visualize "string interactions"
-    const float kVizForce = 1;
-    for ( int i = 0; i < fNumberOfClusters; i++ )
-    {
-        StringCluster *cluster = fStringClusters[i];
-        int nStringsInCluster = cluster->nStrings;
-        TArrow **arrowsStringBoosts = new TArrow* [nStringsInCluster];
-        for ( int iP = 0; iP < nStringsInCluster; iP++ )
-        {
-            float xString = fXstring[ cluster->linkedStringIds[iP] ];
-            float yString = fYstring[ cluster->linkedStringIds[iP] ];
-            float Fx = cluster->Fx[iP];
-            float Fy = cluster->Fy[iP];
-
-            float xStringBoost = xString + kVizForce*Fx/max_dr;
-            float yStringBoost = yString + kVizForce*Fy/max_dr;
-            arrowsStringBoosts[iP] = new TArrow( 0.5+fVisNucleusRadiusNucleus * xString/fNucleusRadius, 0.5+fVisNucleusRadiusNucleus * yString/fNucleusRadius,
-                                                 0.5+fVisNucleusRadiusNucleus * xStringBoost/fNucleusRadius, 0.5+fVisNucleusRadiusNucleus * yStringBoost/fNucleusRadius,
-                                                 0.025);
-            arrowsStringBoosts[iP]->SetLineColor( kGreen + (int)fRand->Uniform(-9,4) );//kMagenta+2 );
-            arrowsStringBoosts[iP]->SetLineWidth( 2 );
-            if( sqrt(Fx*Fx+Fy*Fy) > /*0.33*/0.55*(max_dr-min_dr) ) //draw only long arrows
-                arrowsStringBoosts[iP]->Draw();
-        }
-        delete [] arrowsStringBoosts;
-    }
-}
 
 
-void NucleiCollision::drawStringBoosts()
-{
-    //arrows
-    TArrow **arrowsStringBoosts = new TArrow* [fNumberOfStrings];
-    for ( int iP = 0; iP < fNumberOfStrings; iP++ )
-    {
-        if ( !fFlagStringInInteraction[iP] )
-            continue;
-        double xString = fXstring[iP];
-        double yString = fYstring[iP];
-        
-        double xStringBoost = xString + 0.01*fStringBoostMagn[iP] * cos(fStringBoostAngle[iP]);
-        double yStringBoost = yString + 0.01*fStringBoostMagn[iP] * sin(fStringBoostAngle[iP]);
-        arrowsStringBoosts[iP] = new TArrow( 0.5+fVisNucleusRadiusNucleus * xString/fNucleusRadius, 0.5+fVisNucleusRadiusNucleus * yString/fNucleusRadius,
-                                             0.5+fVisNucleusRadiusNucleus * xStringBoost/fNucleusRadius, 0.5+fVisNucleusRadiusNucleus * yStringBoost/fNucleusRadius,
-                                             0.025);
-        arrowsStringBoosts[iP]->SetLineColor( kMagenta+2 );
-        arrowsStringBoosts[iP]->SetLineWidth( 2 );
-        arrowsStringBoosts[iP]->Draw();
-    }
-    delete [] arrowsStringBoosts;
-    
-}
+
 

@@ -1,14 +1,14 @@
 void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, float bImpact=0
         , double partonInteractionDist = 0.25
-        , double stringInteractionRadius = 0.4
+//        , double stringInteractionRadius = 0.4
 //        , double strIntDistFractionParA = 10.
         , double meanPartonsInNucleon = 6
-        , double stringOverlapEnergyDensity = 0.1
+//        , double stringOverlapEnergyDensity = 0.1
 //        , double coeffPtKickPerUnitMagn = 0.1
         , int bMode = 0 )
 {
     // dist to form a cluster: now (from Aug 2014) we consider All strings to be in cluster
-    double clusterFormDist = 100; //0.4;
+//    double clusterFormDist = 100; //0.4;
 
     //nuclei generation routine
     gROOT->ProcessLine(".L StringGeneration/DistanceEntry.cpp+");
@@ -68,9 +68,9 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
 //        d->setImpactParameterRange( 4.5, 5 );
         // from https://twiki.cern.ch/twiki/bin/viewauth/ALICE/CentralityCodeSnippets:
         // 10 - 20 %	4.96	7.01
-//        d->setImpactParameterRange( 5, 7);
+        d->setImpactParameterRange( 5, 7);
         // 0 - 5 %
-        d->setImpactParameterRange( 0, 3.5 );
+//        d->setImpactParameterRange( 0, 3.5 );
         // 40 - 50 %
 //        d->setImpactParameterRange( 9.92, 11.1 );
 
@@ -87,16 +87,16 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         //tune model parameters
         d->setPartonInteractionDistance( partonInteractionDist );
         //        d->setMaxNumberOfPartons( 4000 );
-        d->setClusterFormationDistance( clusterFormDist );
-        d->setStringInteractionRadius( stringInteractionRadius );  //setStringInteractionDistance( stringInteractionDist );
+//        d->setClusterFormationDistance( clusterFormDist );
+//        d->setStringInteractionRadius( stringInteractionRadius );  //setStringInteractionDistance( stringInteractionDist );
 //        float const parAf_forStringInteractionDist = stringInteractionDist / strIntDistFractionParA;
 //        d->setStringInteractionParA( parAf_forStringInteractionDist );
         d->setMeanNofPartonsInNucleon( meanPartonsInNucleon );
-        d->setStringOverlapEnergyDensity(stringOverlapEnergyDensity);
+//        d->setStringOverlapEnergyDensity(stringOverlapEnergyDensity);
 
-        d->setHardScatteringProbability(0);//0.03);
+//        d->setHardScatteringProbability(0);//0.03);
 
-        d->setComputeStringRepulsion(1);
+        //d->setComputeStringRepulsion(1);
 
         //string decayer
 //        StringDescr *strDescr = new StringDescr();

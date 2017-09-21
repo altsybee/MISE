@@ -50,7 +50,7 @@ public:
 private:
     //TString fStrSpecTitle;
 
-    NucleiCollision *fPtrNuclStruct;
+//    NucleiCollision *fPtrNuclStruct;
 
     bool fPrintInfo;
     bool fDrawHistos;

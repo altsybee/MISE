@@ -1,4 +1,5 @@
-void launchStringFragmentationGenerator( TString inputFileName, int nEvents = 100, int flagMBorFixedB = 0, float bImpact=0
+void launchStringFragmentationGenerator( TString inputFileName, int nEvents = 100 //)
+//, int flagMBorFixedB = 0, float bImpact=0
         , int bMode = 0 )
 {
     //string fragmentation and particle decays

@@ -141,7 +141,7 @@ void flowToy()
         //random "reaction plane"
         double phiRP = gRandom->Uniform(0, TMath::TwoPi() );
 
-        fNumberOfTracks = 1000;//500;
+        fNumberOfTracks = 100;//500;
 //        double fluctPt = gRandom->Uniform( 0., 1 );
         double fluctPt = gRandom->Gaus(1,0.1); //1.;//gRandom->Exp( 0.8 );
         for( int tr = 0; tr < fNumberOfTracks; tr++ )

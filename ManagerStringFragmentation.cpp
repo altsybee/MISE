@@ -226,11 +226,8 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
 
     // ##### 10.07.2016 - attempt to save NucleiCollision info into the tree
     TFile* inputFileNuclColTree = 0x0;
-    inputFileNuclColTree = new TFile( Form( "%s/%s"
-                   , "outputs_NucleiCollision", fInputFileName.Data() ) );
-                //fInputFileName );
-                //Form( "%s/nuclCollisionsTree_nEv%d.root"
-                //                            , "outputs_NucleiCollision" /*fOutputDirName.Data()*/, 1000000/*nEvents*/ ) );
+    TString strInputFile = Form( "%s/%s", "outputs_NucleiCollision", fInputFileName.Data() );
+    inputFileNuclColTree = new TFile( strInputFile );
 
     if ( !inputFileNuclColTree )
     {
@@ -251,6 +248,10 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
     Float_t fNuclTreeNu = 0;
 
     fNucleiCollisionsTree->SetBranchAddress( "numberOfStrings", &fNuclTreeNumberOfStrings );
+
+    // ##### Friend tree
+    fNucleiCollisionsTree->AddFriend( "StringBoostsTree", Form( "%s_StringBoosts.root", strInputFile.Data() ) );
+
     fNucleiCollisionsTree->SetBranchAddress( "stringBoostAngle", fNuclTreeStringBoostAngle );
     fNucleiCollisionsTree->SetBranchAddress( "stringBoostMagn", fNuclTreeStringBoostMagn );
     fNucleiCollisionsTree->SetBranchAddress( "stringRadiusVectorAngle", fNuclTreeStringRadiusVectorAngle );
@@ -324,6 +325,8 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
                 // TMP CUT!!! July 2016 tests
 //                if ( fNuclTreeStringBoostMagn[iString] < 0.5 )
 //                    continue;
+
+                cout << " fNuclTreeStringBoostMagn[iString] = " << fNuclTreeStringBoostMagn[iString] << endl;
 
                 if ( !fNuclTreeIsHardInteractionString[iString] ) // this string is a soft interaction
                     strDescr->hadronizeString( fNuclTreeStringBoostMagn[iString], fNuclTreeStringBoostAngle[iString] );

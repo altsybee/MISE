@@ -23,8 +23,8 @@ inline void FixAngleInTwoPi( float &lPhi )
         lPhi += 2 * TMath::Pi();
 }
 
-ManagerNucleiCollisions::ManagerNucleiCollisions():
-    fPtrNuclStruct(0x0)
+ManagerNucleiCollisions::ManagerNucleiCollisions() //:
+//    fPtrNuclStruct(0x0)
   //  , fFillEventTree(false)
   //  , fNumberOfCentralityBins(10)
   //    fFlagGenerateCentralEventByHand(false)
@@ -77,24 +77,24 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
     Float_t fNuclTreeRandomEventPlanePhi = 0;
     Float_t fNuclTreeNu = 0;
     Int_t fNuclTreeNumberOfStrings = 0;
-    Float_t fNuclTreeStringBoostAngle[NMaxStrings];
-    Float_t fNuclTreeStringBoostMagn[NMaxStrings];
+//    Float_t fNuclTreeStringBoostAngle[NMaxStrings];
+//    Float_t fNuclTreeStringBoostMagn[NMaxStrings];
     Float_t fNuclTreeStringRadiusVectorAngle[NMaxStrings];
     Float_t fNuclTreeStringX[NMaxStrings];
     Float_t fNuclTreeStringY[NMaxStrings];
-    Bool_t fNuclTreeIsHardInteractionString[NMaxStrings];
+//    Bool_t fNuclTreeIsHardInteractionString[NMaxStrings];
 
     fNucleiCollisionsTree->Branch("impactParameter",&fImpactParameter,"fImpactParameter/F");
     fNucleiCollisionsTree->Branch("randomEventPlanePhi",&fNuclTreeRandomEventPlanePhi,"fNuclTreeRandomEventPlanePhi/F");
     fNucleiCollisionsTree->Branch("nu",&fNuclTreeNu,"fNuclTreeNu/F");
     fNucleiCollisionsTree->Branch("numberOfStrings",&fNuclTreeNumberOfStrings,"fNuclTreeNumberOfStrings/I");
 
-    fNucleiCollisionsTree->Branch("stringBoostAngle", fNuclTreeStringBoostAngle,"fNuclTreeStringBoostAngle[fNuclTreeNumberOfStrings]/F");
-    fNucleiCollisionsTree->Branch("stringBoostMagn", fNuclTreeStringBoostMagn,"fNuclTreeStringBoostMagn[fNuclTreeNumberOfStrings]/F");
+//    fNucleiCollisionsTree->Branch("stringBoostAngle", fNuclTreeStringBoostAngle,"fNuclTreeStringBoostAngle[fNuclTreeNumberOfStrings]/F");
+//    fNucleiCollisionsTree->Branch("stringBoostMagn", fNuclTreeStringBoostMagn,"fNuclTreeStringBoostMagn[fNuclTreeNumberOfStrings]/F");
     fNucleiCollisionsTree->Branch("stringRadiusVectorAngle", fNuclTreeStringRadiusVectorAngle,"fNuclTreeStringRadiusVectorAngle[fNuclTreeNumberOfStrings]/F");
     fNucleiCollisionsTree->Branch("stringX", fNuclTreeStringX,"fNuclTreeStringX[fNuclTreeNumberOfStrings]/F");
     fNucleiCollisionsTree->Branch("stringY", fNuclTreeStringY,"fNuclTreeStringY[fNuclTreeNumberOfStrings]/F");
-    fNucleiCollisionsTree->Branch("isHardInteraction",fNuclTreeIsHardInteractionString,"fNuclTreeIsHardInteractionString[fNuclTreeNumberOfStrings]/O");
+//    fNucleiCollisionsTree->Branch("isHardInteraction",fNuclTreeIsHardInteractionString,"fNuclTreeIsHardInteractionString[fNuclTreeNumberOfStrings]/O");
 
 
     // ##### event loop
@@ -129,12 +129,12 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
         // ##### loop over strings
         for ( int iString = 0; iString < fNuclTreeNumberOfStrings; iString++)
         {
-            fNuclTreeStringBoostAngle[iString] = fPtrNuclStruct->getStringBoostAngle(iString);
-            fNuclTreeStringBoostMagn[iString] = fPtrNuclStruct->getStringBoostMagn(iString);
+//            fNuclTreeStringBoostAngle[iString] = fPtrNuclStruct->getStringBoostAngle(iString);
+//            fNuclTreeStringBoostMagn[iString] = fPtrNuclStruct->getStringBoostMagn(iString);
             fNuclTreeStringRadiusVectorAngle[iString] = fPtrNuclStruct->getStringRadiusVectorAngle(iString);
             fNuclTreeStringX[iString] = fPtrNuclStruct->getStringXminusBover2(iString);
             fNuclTreeStringY[iString] = fPtrNuclStruct->getStringY(iString);
-            fNuclTreeIsHardInteractionString[iString] = fPtrNuclStruct->isHardInteractionString(iString);
+//            fNuclTreeIsHardInteractionString[iString] = fPtrNuclStruct->isHardInteractionString(iString);
         }
 
         fHist2D_impParVSnStrings->Fill( fImpactParameter, fNuclTreeNumberOfStrings );

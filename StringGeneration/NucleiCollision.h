@@ -94,59 +94,6 @@ struct Nucleus
     }
 };
 
-struct StringCluster
-{
-    int nStrings; //n of strings in current cluster
-    int maxNstrings; //to allocate arrays
-    int *linkedStringIds; // 2D array: 1-cluster id, 2- string ids in this cluster
-    float *Fx; // array of Fx acting on i-th string
-    float *Fy; // array of Fy acting on i-th string
-
-    StringCluster( int maxNstrings_ )
-    {
-        nStrings = 0;
-        maxNstrings = maxNstrings_;
-        //init 2D array for clusterId->stringsIds
-        linkedStringIds = new int[maxNstrings_]; // CAN'T BE MORE THEN fMaxPartons/2 strings in one cluster
-        Fx = new float[maxNstrings_];
-        Fy = new float[maxNstrings_];
-    }
-    virtual ~StringCluster()
-    {
-        delete [] linkedStringIds;
-        delete [] Fx;
-        delete [] Fy;
-    }
-    void addStringId(int stringId)
-    {
-        if ( nStrings >= maxNstrings )
-        {
-            printf( "addStringId(id): n=%d, MAX_N_STRINGS IN StringCluster IS REACHED !!!!! return...\n", nStrings );
-            return;
-        }
-        linkedStringIds[nStrings++] = stringId;
-    }
-    void reset()
-    {
-        //reset forces
-        for ( int i = 0; i < nStrings; i++ )
-        {
-            Fx[i] = 0;
-            Fy[i] = 0;
-        }
-        nStrings = 0;
-    }
-    void printForces()
-    {
-        printf( "##### cluster size = %d\n", nStrings );
-        for ( int i = 0; i < nStrings; i++ )
-        {
-            printf( "string id %d: Fx=%.2f, Fy=%.2f\n", linkedStringIds[i], Fx[i], Fy[i] );
-        }
-    }
-};
-
-
 class NucleiCollision {
 public:
     NucleiCollision();
@@ -170,12 +117,12 @@ public:
     float getRandomEventPlanePhi() { return fRandomEventPlane; }
 
     void setPartonInteractionDistance(float dist) { fPartonInteractionDistance = dist; }
-    void setClusterFormationDistance(float dist) { fClusterFormationDist = dist; }
-    void setStringInteractionRadius(float dist) { fStringInteractionRadius = dist; }
+//    void setClusterFormationDistance(float dist) { fClusterFormationDist = dist; }
+//    void setStringInteractionRadius(float dist) { fStringInteractionRadius = dist; }
 //    void setStringInteractionParA(float parA) { fStringInteractionParA = parA; }
-    void setStringOverlapEnergyDensity(float energy) { fStringOverlapEnergyDensity = energy; }
+//    void setStringOverlapEnergyDensity(float energy) { fStringOverlapEnergyDensity = energy; }
 
-    void setHardScatteringProbability(float prob) { fHardScatteringProbability = prob; }
+//    void setHardScatteringProbability(float prob) { fHardScatteringProbability = prob; }
 
 
 //    void setImpactParameterByHand_0_100(float bImpByHand) { fImpactParameterByHand_0_100 = bImpByHand; }
@@ -185,7 +132,7 @@ public:
     void setImpactParameterRange(float min, float max) { fImpactParameter_rangeMin = min; fImpactParameter_rangeMax = max; }
 
     void setWriteEventViewCanvas(int flag) { fFlagWriteEventViewCanvases = flag; }
-    void setComputeStringRepulsion(int flag) { fFlagComputeStringRepulsion = flag; }
+//    void setComputeStringRepulsion(int flag) { fFlagComputeStringRepulsion = flag; }
 
     void buildEvent(); //int flagSpecImpactPar=0);
     void finalActions();
@@ -218,7 +165,7 @@ public:
     float  getStringRadiusVectorAngle(int stringId) const { return fStringRadiusVectorAngle[stringId];   }
 
     //    bool*   isStringInInteractionArr() const { return fFlagStringInInteraction; }
-    bool isHardInteractionString(int stringId) const { return fFlagStringIsHardInteraction[stringId]; }
+//    bool isHardInteractionString(int stringId) const { return fFlagStringIsHardInteraction[stringId]; }
 
 
 private:
@@ -228,18 +175,18 @@ private:
     void createPartons( Nucleus *nucl, int nId ); //(float nucleonX, float nucleonY, float *x=0, float *y=0 ); //bx, by - used only for backward capability!
     void createNucleiPair();
     void createStrings();
-    void startClusterSearch();
-    void findStringClusters(int, int& nLinked, int clusterId);
-    void createForcesInsideCluster(int clusterId);
-    void createStringRepulsion();
-    void createStringRepulsionOld();
+//    void startClusterSearch();
+//    void findStringClusters(int, int& nLinked, int clusterId);
+//    void createForcesInsideCluster(int clusterId);
+//    void createStringRepulsion();
+//    void createStringRepulsionOld();
 
     //##### drawings
     void drawPartons();
     void drawStrings();
-    void drawStringInteractions();
-    void drawForcesInsideClusters();
-    void drawStringBoosts();
+//    void drawStringInteractions();
+//    void drawForcesInsideClusters();
+//    void drawStringBoosts();
 
     //##### event construction helpers
     MinDistanceFinder *fPartonInteractionsFinder;
@@ -252,7 +199,7 @@ private:
     bool fFlagDataMembersInitialized;
     bool fFlagHaveMBcollision;
     bool fFlagWriteEventViewCanvases;
-    bool fFlagComputeStringRepulsion; //if true - make clusters and repulsion
+//    bool fFlagComputeStringRepulsion; //if true - make clusters and repulsion
     int fEventId; // number of event, used for output file names
     float fRandomEventPlane; // to be used outsice
 
@@ -265,13 +212,13 @@ private:
 //    double fRadiusParton; //proton radius
     //    double fRstring; //string radius
     double fPartonInteractionDistance; //distanse when partons interact, fm
-    double fStringInteractionRadius; //distanse when strings interact, fm
-    double fStringOverlapEnergyDensity; //overlap energy density per fm2 of area
+//    double fStringInteractionRadius; //distanse when strings interact, fm
+//    double fStringOverlapEnergyDensity; //overlap energy density per fm2 of area
 //    double fStringInteractionParA;  //parameterization a-la Woods-Saxon, fm
-    double fClusterFormationDist; //distance b/n strings to form a cluster, fm
+//    double fClusterFormationDist; //distance b/n strings to form a cluster, fm
     double fMeanNofPartonsInNucleon; //mean n of partons in nucleon
 
-    float fHardScatteringProbability; //probability for a string to be a hard partonic collision
+//    float fHardScatteringProbability; //probability for a string to be a hard partonic collision
 
     float fImpactParameter; //impact parameter, fm
 //    float fImpactParameterByHand_0_100; //impact parameter, 0-100
@@ -285,7 +232,7 @@ private:
     Nucleus *fA; //nucleus A
     Nucleus *fB; //nucleus B
 
-    StringCluster **fStringClusters; // array of StringCluster struct
+//    StringCluster **fStringClusters; // array of StringCluster struct
 
     bool **matrixNcoll; //matrix of binary nucleon collisions
 
@@ -314,7 +261,7 @@ private:
     bool *fFlagStringInInteraction; //strings in interaction flag
     int *fNStringsInCluster; //number of strings in cluster, to which current string is linked
     int *fClusterIdForString; //if string in cluster -> bind cluster id
-    bool *fFlagStringIsHardInteraction; //strings is a hard interaction (for jet simulation)
+//    bool *fFlagStringIsHardInteraction; //strings is a hard interaction (for jet simulation)
 
 //    int **fClusterIdsWithLinkedStringIds; // 2D array: 1-cluster id, 2- string ids in this cluster
 
@@ -362,25 +309,25 @@ private:
     TH1D *fHistStringRadiusVectorPhi; //radius-vectors phi-s of strings wrt (0,0)
 
     //string interactions QA plots
-    TH1D *fHistStringInteractionsPhi; //phi directions of the interacting string pairs
-    TH1D *fHistStringInteractionsDistance; //distances b/n string pairs
-    TH1D *fHistStringInteractionsMagnitude; //distances b/n string pairs
+//    TH1D *fHistStringInteractionsPhi; //phi directions of the interacting string pairs
+//    TH1D *fHistStringInteractionsDistance; //distances b/n string pairs
+//    TH1D *fHistStringInteractionsMagnitude; //distances b/n string pairs
 
     TH2D *fHist2DNInteractionsVsNstrings; //2d plot n strings vs n interactions b/n them
     TH2D *fHist2DNInteractionsVsImpactPar; //2d plot impact par vs n interactions
 
     //force on strings
-    TH1D *fHistForcesInClustersX; // forces acting on string, x
-    TH1D *fHistForcesInClustersY; // forces acting on string, y
-    TH1D *fHistForcesInClustersMagn; // forces acting on string, magn
+//    TH1D *fHistForcesInClustersX; // forces acting on string, x
+//    TH1D *fHistForcesInClustersY; // forces acting on string, y
+//    TH1D *fHistForcesInClustersMagn; // forces acting on string, magn
 
-    TH1D *fHistForcesInClustersAbsX; // forces acting on string, abs x
-    TH1D *fHistForcesInClustersAbsY; // forces acting on string, abs y
+//    TH1D *fHistForcesInClustersAbsX; // forces acting on string, abs x
+//    TH1D *fHistForcesInClustersAbsY; // forces acting on string, abs y
 //    TH1D *fHistForcesInClustersRatioAbsXY; // forces acting on string, ratio absX/absY
 
     //string clusters
-    TH1D *fHistStringsInClusters; //number of strings in clusters
-    TH2D *fHist2DStringsInClustersVsB; //>=some number of strings in clusters vs impact par
+//    TH1D *fHistStringsInClusters; //number of strings in clusters
+//    TH2D *fHist2DStringsInClustersVsB; //>=some number of strings in clusters vs impact par
 
 
     TH2D *fHist2DStringsSVsImpactS; //Nstrings*S0/S_impact
