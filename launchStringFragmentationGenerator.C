@@ -1,6 +1,11 @@
-void launchStringFragmentationGenerator( TString inputFileName, int nEvents = 100 //)
+void launchStringFragmentationGenerator(
+        TString inputFileName_NucleiCollisions = "nuclCollisionsTree_nEv50000.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv50000.root_StringBoosts_Edensity_0_0001_pp.root"
+        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv50000.root_StringBoosts_Edensity_0_0001_pp_WITH_3perc_HARD_SCATTERING.root"
+        //"nuclCollisionsTree_nEv1000.root_StringBoosts_Edensity_0_00001.root"
+        , int nEvents = -1//100 //)
 //, int flagMBorFixedB = 0, float bImpact=0
-        , int bMode = 0 )
+        , int drawMode = 0 )
 {
     //string fragmentation and particle decays
     gROOT->ProcessLine(".L StringDecayer/ParticleDescr.cpp+");
@@ -39,19 +44,25 @@ void launchStringFragmentationGenerator( TString inputFileName, int nEvents = 10
         evMan.setOutputDirectoryName( strOutputDirName_ManagerStringFragmentation );
 
         // ##### take nuclei collisions and generate tracks
-        evMan.setInputFileName( inputFileName );
-        evMan.setCutMinNumberOfParticles(20);
+//        evMan.setInputFileName( inputFileName_NucleiCollisions );
+        evMan.setInputFileNameNucleiCollisions( inputFileName_NucleiCollisions );
+        evMan.setInputFileNameStringBoosts( inputFileName_StringBoosts );
+
+        evMan.setCutMinNumberOfParticles(2); //20 was used for 2016 studies of Pb-Pb!
+        // if have "hard scatterings":
+        evMan.setWhatToDoWithHardScattering(1); // 0 - makeTwoJets, 1 - particle pair with random pt from Power law
+
         evMan.applyFragmentationToEvents( strDescr, nEvents ); //, analysersArray, 0);//nAnalysers );
 
-        if (bMode==0)
+        if (drawMode==0)
         {
             //d->drawEventStructure(); //draw only last event
         }
-        else if (bMode==1) //batch mode - no histos
+        else if (drawMode==1) //batch mode - no histos
         {
             evMan.setDrawHistos(false);
         }
-        else if (bMode==2) //spec mode - draw last event and out
+        else if (drawMode==2) //spec mode - draw last event and out
         {
             //d->drawEventStructure();
             gROOT->ProcessLine(".q");

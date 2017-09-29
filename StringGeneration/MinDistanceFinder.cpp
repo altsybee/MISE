@@ -45,7 +45,8 @@ void MinDistanceFinder::quickSortR( DistanceEntry* a, long N )
 }
 
 
-void MinDistanceFinder::FindMinDistancesBetweenPairs( const float *x1, const float *y1, const float *x2, const float *y2, int Nrows, int Ncols )
+void MinDistanceFinder::FindMinDistancesBetweenPairs( const float *x1, const float *y1
+                                                      , const float *x2, const float *y2, int Nrows, int Ncols )
 {
     fNrows = Nrows;
     fNcols = Ncols;
@@ -58,7 +59,7 @@ void MinDistanceFinder::FindMinDistancesBetweenPairs( const float *x1, const flo
         occupiedY[i] = false;
 
     //calculate matrix of distances, write array of distances
-    int iArrDist = 0;
+    int nArrDist = 0;
     for ( int i = 0; i < Nrows; i++ )
     {
         for ( int j = 0; j < Ncols; j++ )
@@ -68,20 +69,20 @@ void MinDistanceFinder::FindMinDistancesBetweenPairs( const float *x1, const flo
             if ( fabs(dx) > fMinDistance || fabs(dy) > fMinDistance )
                 continue;
             fMatrix[i][j] = dx*dx + dy*dy;
-            d = &arrDist[iArrDist];
+            d = &arrDist[nArrDist];
             d->dist = fMatrix[i][j];
             d->x = i;
             d->y = j;
             d->inInteraction = false;
-            iArrDist++;
+            nArrDist++;
         }
     }
-    fSizeOfArrayWithMinimums = iArrDist;
+    fSizeOfArrayWithMinimums = nArrDist;
 
-    quickSortR( arrDist, iArrDist-1 ); //Nrows * Ncols-1);
+    quickSortR( arrDist, nArrDist-1 ); //Nrows * Ncols-1);
 
     //check sorting:
-    for ( int i = 0; i < iArrDist; i++ ) //Nrows * Ncols; i++ )
+    for ( int i = 0; i < nArrDist; i++ ) //Nrows * Ncols; i++ )
     {
         d = &arrDist[i];
         if (0)
@@ -95,15 +96,16 @@ void MinDistanceFinder::FindMinDistancesBetweenPairs( const float *x1, const flo
         if ( occupiedX[d->x] || occupiedY[d->y] )
             continue;
 
-        //check distance
+        //check distance (HERE DIST IS IN ^2!)
         if ( d->dist < fMinDistance*fMinDistance ) // !occupiedX[d->x] && !occupiedY[d->y] )
         {
+//            cout << d->dist << endl;
             occupiedX[d->x] = true;
             occupiedY[d->y] = true;
             d->inInteraction = true;
-            fNumberOfInteractions++;
+//            fNumberOfInteractions++;
 
-            for ( int j = 0; j < iArrDist; j++ ) //Nrows * Ncols; j++ )
+            for ( int j = 0; j < nArrDist; j++ ) //Nrows * Ncols; j++ )
             {
                 if ( i == j )
                     continue;
@@ -128,17 +130,20 @@ void MinDistanceFinder::FindMinDistancesBetweenPairs( const float *x1, const flo
             cout << occupiedY[i] << " ";
         cout << endl;
 
-        for ( int i = 0; i < Nrows*Ncols; i++ )
-            cout << arrDist[i].x << " ";
-        cout << endl;
+        if(0)
+        {
+            for ( int i = 0; i < Nrows*Ncols; i++ )
+                cout << arrDist[i].x << " ";
+            cout << endl;
 
-        for ( int i = 0; i < Nrows*Ncols; i++ )
-            cout << arrDist[i].y << " ";
-        cout << endl;
+            for ( int i = 0; i < Nrows*Ncols; i++ )
+                cout << arrDist[i].y << " ";
+            cout << endl;
 
-        for ( int i = 0; i < Nrows*Ncols; i++ )
-            cout << arrDist[i].inInteraction << " ";
-        cout << endl;
+            for ( int i = 0; i < Nrows*Ncols; i++ )
+                cout << arrDist[i].inInteraction << " ";
+            cout << endl;
+        }
 
         cout << "after taking minimums:" << endl;
     }
@@ -159,7 +164,7 @@ void MinDistanceFinder::FindMinDistancesWithinArray( const float *x, const float
         occupiedX[i] = false;
 
     //calculate matrix of distances, write array of distances
-    int iArrDist = 0;
+    int nArrDist = 0;
     for ( int i = 0; i < arrSize; i++ )
     {
         for ( int j = 0; j < arrSize; j++ )
@@ -171,20 +176,20 @@ void MinDistanceFinder::FindMinDistancesWithinArray( const float *x, const float
             if ( fabs(dx) > fMinDistance || fabs(dy) > fMinDistance )
                 continue;
             fMatrix[i][j] = dx*dx + dy*dy;
-            d = &arrDist[iArrDist];
+            d = &arrDist[nArrDist];
             d->dist = fMatrix[i][j];
             d->x = i;
             d->y = j;
             d->inInteraction = false;
-            iArrDist++;
+            nArrDist++;
         }
     }
-    fSizeOfArrayWithMinimums = iArrDist;
+    fSizeOfArrayWithMinimums = nArrDist;
 
-    quickSortR( arrDist, iArrDist-1 ); //Nrows * Ncols-1);
+    quickSortR( arrDist, nArrDist-1 ); //Nrows * Ncols-1);
 
     //check sorting:
-    for ( int i = 0; i < iArrDist; i++ ) //Nrows * Ncols; i++ )
+    for ( int i = 0; i < nArrDist; i++ ) //Nrows * Ncols; i++ )
     {
         d = &arrDist[i];
         if (0)
@@ -204,9 +209,9 @@ void MinDistanceFinder::FindMinDistancesWithinArray( const float *x, const float
             occupiedX[d->x] = true;
             occupiedX[d->y] = true;
             d->inInteraction = true;
-            fNumberOfInteractions++;
+//            fNumberOfInteractions++;
 
-            for ( int j = 0; j < iArrDist; j++ ) //Nrows * Ncols; j++ )
+            for ( int j = 0; j < nArrDist; j++ ) //Nrows * Ncols; j++ )
             {
                 if ( i == j )
                     continue;

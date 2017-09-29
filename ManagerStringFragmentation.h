@@ -23,7 +23,8 @@ public:
     virtual ~ManagerStringFragmentation();
     
     // file name with NuclColl data
-    void setInputFileName(TString name) { fInputFileName = name; }
+    void setInputFileNameNucleiCollisions(TString name) { fInputFileName_NucleiCollisions = name; }
+    void setInputFileNameStringBoosts(TString name) { fInputFileName_StringBoosts = name; }
 
     void setOutputDirectoryName(TString strDirName) { fOutputDirName = strDirName; }
     void setOutputFileName(TString name) { fOutputFileName = name; }
@@ -33,6 +34,8 @@ public:
 
     void setNumberOfCentralityBins(int nCentralityBins) { fNumberOfCentralityBins = nCentralityBins; }
     void setCutMinNumberOfParticles(int n) { fCutMinNumberOfParticles = n; }
+
+    void setWhatToDoWithHardScattering(int what) { whatToDoWithHardScattering = what; }
 
     //    Event *getEvent() /*const*/
 //    {
@@ -60,7 +63,10 @@ private:
     bool fDrawHistos;
     bool fFillEventTree;
 
-    TString fInputFileName;
+    int whatToDoWithHardScattering; // 0 - makeTwoJets, 1 - particle pair with random pt from Power law
+
+    TString fInputFileName_NucleiCollisions;
+    TString fInputFileName_StringBoosts;
 
     TString fOutputDirName;
     TString fOutputFileName;

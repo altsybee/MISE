@@ -79,9 +79,11 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
     Int_t fNuclTreeNumberOfStrings = 0;
 //    Float_t fNuclTreeStringBoostAngle[NMaxStrings];
 //    Float_t fNuclTreeStringBoostMagn[NMaxStrings];
+    Float_t fDistanceBetweenPartonsForString[NMaxStrings];
     Float_t fNuclTreeStringRadiusVectorAngle[NMaxStrings];
     Float_t fNuclTreeStringX[NMaxStrings];
     Float_t fNuclTreeStringY[NMaxStrings];
+    short fStringOrigin[NMaxStrings];
 //    Bool_t fNuclTreeIsHardInteractionString[NMaxStrings];
 
     fNucleiCollisionsTree->Branch("impactParameter",&fImpactParameter,"fImpactParameter/F");
@@ -91,9 +93,11 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
 
 //    fNucleiCollisionsTree->Branch("stringBoostAngle", fNuclTreeStringBoostAngle,"fNuclTreeStringBoostAngle[fNuclTreeNumberOfStrings]/F");
 //    fNucleiCollisionsTree->Branch("stringBoostMagn", fNuclTreeStringBoostMagn,"fNuclTreeStringBoostMagn[fNuclTreeNumberOfStrings]/F");
-    fNucleiCollisionsTree->Branch("stringRadiusVectorAngle", fNuclTreeStringRadiusVectorAngle,"fNuclTreeStringRadiusVectorAngle[fNuclTreeNumberOfStrings]/F");
     fNucleiCollisionsTree->Branch("stringX", fNuclTreeStringX,"fNuclTreeStringX[fNuclTreeNumberOfStrings]/F");
     fNucleiCollisionsTree->Branch("stringY", fNuclTreeStringY,"fNuclTreeStringY[fNuclTreeNumberOfStrings]/F");
+    fNucleiCollisionsTree->Branch("distanceBetweenPartonsForString", fDistanceBetweenPartonsForString,"fDistanceBetweenPartonsForString[fNuclTreeNumberOfStrings]/F");
+    fNucleiCollisionsTree->Branch("stringRadiusVectorAngle", fNuclTreeStringRadiusVectorAngle,"fNuclTreeStringRadiusVectorAngle[fNuclTreeNumberOfStrings]/F");
+    fNucleiCollisionsTree->Branch("stringOrigin", fStringOrigin,"fStringOrigin[fNuclTreeNumberOfStrings]/S");
 //    fNucleiCollisionsTree->Branch("isHardInteraction",fNuclTreeIsHardInteractionString,"fNuclTreeIsHardInteractionString[fNuclTreeNumberOfStrings]/O");
 
 
@@ -134,6 +138,8 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
             fNuclTreeStringRadiusVectorAngle[iString] = fPtrNuclStruct->getStringRadiusVectorAngle(iString);
             fNuclTreeStringX[iString] = fPtrNuclStruct->getStringXminusBover2(iString);
             fNuclTreeStringY[iString] = fPtrNuclStruct->getStringY(iString);
+            fStringOrigin[iString] = fPtrNuclStruct->getStringOrigin(iString);
+            fDistanceBetweenPartonsForString[iString] = fPtrNuclStruct->getDistanceBetweenPartonsForString(iString);
 //            fNuclTreeIsHardInteractionString[iString] = fPtrNuclStruct->isHardInteractionString(iString);
         }
 

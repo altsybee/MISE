@@ -5,7 +5,7 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         , double meanPartonsInNucleon = 6
 //        , double stringOverlapEnergyDensity = 0.1
 //        , double coeffPtKickPerUnitMagn = 0.1
-        , int bMode = 0 )
+        , int drawMode = 0 )
 {
     // dist to form a cluster: now (from Aug 2014) we consider All strings to be in cluster
 //    double clusterFormDist = 100; //0.4;
@@ -47,6 +47,17 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
     TStopwatch timer;
     timer.Start();
 
+    ManagerNucleiCollisions.cpp             \
+    ManagerStringFragmentation.cpp          \
+    ManagerStringFragmentation.h            \
+    StringDecayer/StringDescr.cpp           \
+    StringDecayer/StringDescr.h             \
+    StringGeneration/MinDistanceFinder.cpp  \
+    StringGeneration/MinDistanceFinder.h    \
+    StringGeneration/NucleiCollision.cpp    \
+    StringGeneration/NucleiCollision.h      \
+    launchNucleiCollisionGenerator.C        \
+    launchStringFragmentationGenerator.C
     if(1)
     {
         NucleiCollision *d = new NucleiCollision;
@@ -68,11 +79,13 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
 //        d->setImpactParameterRange( 4.5, 5 );
         // from https://twiki.cern.ch/twiki/bin/viewauth/ALICE/CentralityCodeSnippets:
         // 10 - 20 %	4.96	7.01
-        d->setImpactParameterRange( 5, 7);
+//        d->setImpactParameterRange( 5, 7);
         // 0 - 5 %
 //        d->setImpactParameterRange( 0, 3.5 );
         // 40 - 50 %
 //        d->setImpactParameterRange( 9.92, 11.1 );
+
+        d->setImpactParameterRange( 13, 18 );
 
 
 
@@ -113,7 +126,7 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         evMan.setOutputDirectoryName( strOutputDirName_NucleiCollision ); //strOutputDirName_EventManager );
 
         //draw (yes/no) event view canvases to .eps .png
-        if (bMode==0)
+        if (drawMode==0)
             d->setWriteEventViewCanvas(true);
         else
             d->setWriteEventViewCanvas(false);
@@ -125,15 +138,15 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         // ##### generate events
         evMan.generateEvents( d, nEvents ); //, analysersArray, 0);//nAnalysers );
 
-        if (bMode==0)
+        if (drawMode==0)
         {
             d->drawEventStructure(); //draw only last event
         }
-        else if (bMode==1) //batch mode - no histos
+        else if (drawMode==1) //batch mode - no histos
         {
             evMan.setDrawHistos(false);
         }
-        else if (bMode==2) //spec mode - draw last event and out
+        else if (drawMode==2) //spec mode - draw last event and out
         {
             d->drawEventStructure();
             gROOT->ProcessLine(".q");

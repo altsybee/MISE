@@ -36,6 +36,7 @@ public:
     virtual ~StringDescr();
     void hadronizeString(double stringBeta = 0, double boostPhi = 0 );
     void makeTwoJets();
+    void makeTwoParticlesWithRandomPtEtaPhi();
 //    int getNparticles() { return fNparticles; }
 
 //    void setState( short state ) { fStringState = state; }
@@ -62,6 +63,8 @@ private:
 //    TLorentzVector *fLorVect;
     TF1 *funcPt;
     TF1 *fFuncGausYBoost; //gaussian profile of the boost (set by hand)
+
+    TF1 *fFuncPowerLawPt;
 
     // ##### string cut generation
 //    double yCutPoints[N_STRING_CUTS];

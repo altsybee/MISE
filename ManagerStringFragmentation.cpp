@@ -88,13 +88,15 @@ ManagerStringFragmentation::ManagerStringFragmentation():
     fFillEventTree(false)
   , fNumberOfCentralityBins(10)
   , fCutMinNumberOfParticles(1)
+  , whatToDoWithHardScattering(0)
   //    fFlagGenerateCentralEventByHand(false)
   //  , fFlagGenerateSemicentralEventByHand(false)
   //  , fImpactParameterByHand(-1)
 {
     fOutputDirName = "outputs_ManagerStringFragmentation";
 
-    fInputFileName = "input.root";
+    fInputFileName_NucleiCollisions = "input.root";
+    fInputFileName_StringBoosts = "input.root";
     fOutputFileName = "testOutput.root";
     fOutputFile = 0x0;
     fDrawHistos = true;
@@ -198,7 +200,7 @@ ManagerStringFragmentation::~ManagerStringFragmentation() {}
 
 void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDescr, int nEvents )
 {
-    cout << "generating events..." << endl;
+    cout << "fragmentation of the strings: start looping over events..." << endl;
     
     //reset all hists
     fHistSources->Reset();
@@ -226,7 +228,8 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
 
     // ##### 10.07.2016 - attempt to save NucleiCollision info into the tree
     TFile* inputFileNuclColTree = 0x0;
-    TString strInputFile = Form( "%s/%s", "outputs_NucleiCollision", fInputFileName.Data() );
+    TString strInputFile = Form( "outputs_NucleiCollision/%s", fInputFileName_NucleiCollisions.Data() );
+//    TString strInputFile = fInputFileName_NucleiCollisions;//Form( "%s/%s", "outputs_NucleiCollision", fInputFileName.Data() );
     inputFileNuclColTree = new TFile( strInputFile );
 
     if ( !inputFileNuclColTree )
@@ -235,8 +238,17 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
         return;
     }
 
+    cout << "#### Input files:" << endl;
+    cout << fInputFileName_NucleiCollisions << endl;
+    cout << fInputFileName_StringBoosts << endl;
+
     TTree *fNucleiCollisionsTree = (TTree*) inputFileNuclColTree->Get("NucleiCollisionsTree");
     const int NMaxStrings = 5000;
+
+    // check number of events!
+    if ( nEvents < 0 || nEvents > fNucleiCollisionsTree->GetEntries() )
+        nEvents = fNucleiCollisionsTree->GetEntries();
+    cout << "nEvents=" << nEvents << endl;
 
     Int_t fNuclTreeNumberOfStrings = 0;
     Float_t fNuclTreeStringBoostAngle[NMaxStrings];
@@ -250,7 +262,8 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
     fNucleiCollisionsTree->SetBranchAddress( "numberOfStrings", &fNuclTreeNumberOfStrings );
 
     // ##### Friend tree
-    fNucleiCollisionsTree->AddFriend( "StringBoostsTree", Form( "%s_StringBoosts.root", strInputFile.Data() ) );
+//    fNucleiCollisionsTree->AddFriend( "StringBoostsTree", Form( "%s_StringBoosts.root", strInputFile.Data() ) );
+    fNucleiCollisionsTree->AddFriend( "StringBoostsTree", Form( "outputs_NucleiCollision/%s", fInputFileName_StringBoosts.Data() ) );
 
     fNucleiCollisionsTree->SetBranchAddress( "stringBoostAngle", fNuclTreeStringBoostAngle );
     fNucleiCollisionsTree->SetBranchAddress( "stringBoostMagn", fNuclTreeStringBoostMagn );
@@ -260,10 +273,11 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
     fNucleiCollisionsTree->SetBranchAddress( "randomEventPlanePhi", &fNuclTreeRandomEventPlanePhi );
     fNucleiCollisionsTree->SetBranchAddress( "nu", &fNuclTreeNu );
 
+//    return;
 
     //output file for the events
 //    fOutputFileName = Form( "%s/eventTree_nEv%d_try13_TSALLIS_r2fm.root", fOutputDirName.Data(), nEvents );
-    fOutputFileName = Form( "%s/%s_StringFragm_nEv%d_TSALLIS_try1.root", fOutputDirName.Data(), fInputFileName.Data(), nEvents );
+    fOutputFileName = Form( "%s/%s_StringFragm_nEv%d_TSALLIS_try1.root", fOutputDirName.Data(), fInputFileName_StringBoosts.Data(), nEvents );
             //Form( "%s/eventTree_nEv%d_PP_TRY3_TSALLIS_r2fm.root", fOutputDirName.Data(), nEvents );
     TFile* outFile = new TFile( fOutputFileName, "RECREATE" );
 
@@ -326,12 +340,18 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
 //                if ( fNuclTreeStringBoostMagn[iString] < 0.5 )
 //                    continue;
 
-                cout << " fNuclTreeStringBoostMagn[iString] = " << fNuclTreeStringBoostMagn[iString] << endl;
+                if (iString==0) //QA plotting
+                    cout << " fNuclTreeStringBoostMagn[iString] = " << fNuclTreeStringBoostMagn[iString] << endl;
 
                 if ( !fNuclTreeIsHardInteractionString[iString] ) // this string is a soft interaction
                     strDescr->hadronizeString( fNuclTreeStringBoostMagn[iString], fNuclTreeStringBoostAngle[iString] );
-                else //hard interaction - create two jets
-                    strDescr->makeTwoJets();
+                else //hard interaction
+                {
+                    if (whatToDoWithHardScattering==0) // create two jets
+                        strDescr->makeTwoJets();
+                    else if (whatToDoWithHardScattering==1) // particle pair with random pt from Power law
+                        strDescr->makeTwoParticlesWithRandomPtEtaPhi();
+                }
 
                 int nParticlesInString = strDescr->getNparticles();
 

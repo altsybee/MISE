@@ -14,7 +14,7 @@ class MinDistanceFinder
 
     DistanceEntry arrDist[NMAX*NMAX];
     int fSizeOfArrayWithMinimums;
-    int fNumberOfInteractions;
+//    int fNumberOfInteractions;
     float fMinDistance;
 
     //occupying particles flags
@@ -28,7 +28,7 @@ public:
     void FindMinDistancesBetweenPairs( const float *x1, const float *y1, const float *x2, const float *y2, int Nrows, int Ncols );
     void FindMinDistancesWithinArray( const float *x, const float *y, int arrSize );
     DistanceEntry* GetMinDistanceArray( int &arraySize ) { arraySize = fSizeOfArrayWithMinimums; return arrDist; }
-    int GetNumberOfInteractions() { return fNumberOfInteractions; }
+//    int GetNumberOfInteractions() { return fNumberOfInteractions; }
     void PrintMinDistanceMatrix();
 
 };

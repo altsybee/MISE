@@ -47,7 +47,7 @@ struct Nucleus
     float *pX; // x array partons in nucleus
     float *pY; // y array partons in nucleus
     int *pNid; // which nucleon each parton is assigned to
-    int *pBusy; // (TMP?) 1.12.2014: array of flags for partons which are in interactino with other nucleus
+    int *pBusy; // (TMP?) 1.12.2014: array of flags for partons which are in interactioт with other nucleus
     Nucleus(int nNucleons_, int maxNofPartons_)
     {
         bx = 0;
@@ -157,12 +157,14 @@ public:
 //    float*  getArrStringY() const { return fYstring; }
 //    float*  getArrStringBoostMagn() const { return fStringBoostMagn;   }
 //    float*  getArrStringBoostAngle() const { return fStringBoostAngle; }
-    float  getStringBoostMagn(int stringId) const { return fStringBoostMagn[stringId];   }
-    float  getStringBoostAngle(int stringId) const { return fStringBoostAngle[stringId]; }
+//    float  getStringBoostMagn(int stringId) const { return fStringBoostMagn[stringId];   }
+//    float  getStringBoostAngle(int stringId) const { return fStringBoostAngle[stringId]; }
 
     float  getStringXminusBover2(int stringId) const { return fXstring[stringId]-fImpactParameter/2;   }
     float  getStringY(int stringId) const { return fYstring[stringId];   }
+    float  getDistanceBetweenPartonsForString(int stringId) const { return fDistanceBetweenPartonsForString[stringId];   }
     float  getStringRadiusVectorAngle(int stringId) const { return fStringRadiusVectorAngle[stringId];   }
+    float  getStringOrigin(int stringId) const { return fStringOrigin[stringId];   }
 
     //    bool*   isStringInInteractionArr() const { return fFlagStringInInteraction; }
 //    bool isHardInteractionString(int stringId) const { return fFlagStringIsHardInteraction[stringId]; }
@@ -252,24 +254,26 @@ private:
     //##### calculated event properties
     float *fXstring; //strings position, x coord array
     float *fYstring; //strings position, y coord array
+    float *fDistanceBetweenPartonsForString; //what was the distance between partons which give this string
     float *fStringRadiusVectorAngle; //remember strings radius vector angles wrt (0,0)
+    short *fStringOrigin; //from valence quarks? sea quarks/gluons?..
 
-    float *fXstringInteraction; //strings interaction point, x coord array
-    float *fYstringInteraction; //strings interaction point, y coord array
-    float *fStringIntDist;      //distances btwn pairs of interacting strings
-    float *fStringIntAngles;    //angles of string pairs (phi), in radians
-    bool *fFlagStringInInteraction; //strings in interaction flag
-    int *fNStringsInCluster; //number of strings in cluster, to which current string is linked
-    int *fClusterIdForString; //if string in cluster -> bind cluster id
+//    float *fXstringInteraction; //strings interaction point, x coord array
+//    float *fYstringInteraction; //strings interaction point, y coord array
+//    float *fStringIntDist;      //distances btwn pairs of interacting strings
+//    float *fStringIntAngles;    //angles of string pairs (phi), in radians
+//    bool *fFlagStringInInteraction; //strings in interaction flag
+//    int *fNStringsInCluster; //number of strings in cluster, to which current string is linked
+//    int *fClusterIdForString; //if string in cluster -> bind cluster id
 //    bool *fFlagStringIsHardInteraction; //strings is a hard interaction (for jet simulation)
 
 //    int **fClusterIdsWithLinkedStringIds; // 2D array: 1-cluster id, 2- string ids in this cluster
 
-    float *fStringBoostMagn;
-    float *fStringBoostAngle;
+//    float *fStringBoostMagn;
+//    float *fStringBoostAngle;
 
     int fNumberOfStrings;   //n of strings in the event
-    int fNumberOfClusters;   //n of clusters in the event
+//    int fNumberOfClusters;   //n of clusters in the event
     int fNumberOfStringInteractions;    //n of interacting string pairs in the event
 
     float fEccentricity;
@@ -286,6 +290,7 @@ private:
     //##### histos
     TCanvas *fCanvEventView;
     TCanvas *fCanvEventStatistics;
+
     TH1D *fHistNstrings; // n of strings distribution
     TH1D *fHistStringInteractions; // n of string intersections distribution
     TH1D *fHistNucleonsR; // nucleon r pos distribution
@@ -293,6 +298,10 @@ private:
     TH1D *fHistBusyPartonsR; // test how many partons become busy after interaction as function of radius
     TH1D *fHistPartonsValenceR; // "valence partons" radius
     TH1D *fHistBusyPartonsValenceR; // test how many valence partons become busy after interaction as function of radius
+
+    TH1D *fHistMinDistBetweenInteractingPartons; // (min) distances b/n interecting partons // ADDED: Sept 2017
+    TH1D *fHistMinDistBetweenInteractingPartonsSoft; // (min) distances b/n interecting partons // ADDED: Sept 2017
+    TH1D *fHistMinDistBetweenInteractingPartonsValence; // (min) distances b/n interecting partons // ADDED: Sept 2017
 
     TH1D *fHistStringPositionRadius; // position of the string: radius
     TH1D *fHistImpactParameter; // impact parameter distribution

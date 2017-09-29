@@ -80,7 +80,8 @@ StringDescr::StringDescr() //: //ParticleArr(fNparticles)
     //    TLorentzVector vMother;
     vMothers = new TLorentzVector[N_LORENTZ_VECTORS_FROM_STRING];
 
-
+    fFuncPowerLawPt = new TF1( "funcPowerLawPt", "[0]+[1]*TMath::Power(x,[2])", 1.0, 50);
+    fFuncPowerLawPt->SetParameters( 0, 1, -4.9 ); // from CMS paper https://arxiv.org/pdf/1104.3547.pdf
 }
 
 StringDescr::~StringDescr() {}
@@ -348,4 +349,49 @@ void StringDescr::makeTwoJets()
 
 }
 
+void StringDescr::makeTwoParticlesWithRandomPtEtaPhi()
+{
+    int nP = 0;
 
+    double phiJet = fRand->Uniform( 0, 2*TMath::Pi() );
+    int nJets = 2;//( fRand->Uniform() > 0.5 ? 2 : 1 ); // quenching of some fraction of jets
+
+    for ( int iJet = 0; iJet < nJets; iJet++ )
+    {
+        int nParticlesInJet = 1; //TMath::Max(2,TMath::Nint( fRand->Gaus(4.,0.5) ));
+        if (iJet == 1 )
+        {
+            phiJet += TMath::Pi() + fRand->Gaus(0,0.05);
+            FixAngleInTwoPi(phiJet);
+            FixAngleInTwoPi(phiJet);
+            nParticlesInJet = 1;//TMath::Max(1,TMath::Nint( fRand->Gaus(1.5,0.5) )); //fewer particles due to quenching
+        }
+        double etaJet = fRand->Uniform( -2.5,2.5); //kMinEta,kMaxEta);
+
+        for ( int iP = 0; iP < nParticlesInJet; iP++ )
+        {
+//            vMother->SetPtEtaPhiM( motherPt, motherEta, motherPhi, mPions );
+            //        fParticles[nP].eta = vMother->Eta();
+            //        fParticles[nP].phi = vMother->Phi();
+            //        fParticles[nP].pt  = vMother->Pt();
+            fParticles[nP].eta = etaJet + fRand->Gaus(0,0.15);//0.2);
+            double phi = phiJet;// + fRand->Gaus(0,0.12);//15);
+            //FixAngleInTwoPi(phi);
+            double pt = fFuncPowerLawPt->GetRandom(); //fRand->Exp(2.);
+            cout << "pt = " << pt << endl;
+            fParticles[nP].phi = phi;
+            fParticles[nP].pt  = pt;
+            fParticles[nP].charge  = ( fRand->Uniform() > 0.5 ? 1 : -1 );
+//            cout << "phi=" << phi << ", eta=" << fParticles[nP].eta
+//                 << ", pt=" << fParticles[nP].pt << endl;
+            nP++;
+
+        }
+    }
+
+    //total number of charged particles
+    fNparticles = nP;
+//        cout << "fNparticles=" << fNparticles << endl;
+
+
+}

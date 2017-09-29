@@ -172,10 +172,6 @@ NucleiCollision::NucleiCollision(/*int seed*/) :
   , fNucleusWSa(1.)
   //  , fRadiusParton(0.1)    //radius "parton", fm
   , fPartonInteractionDistance(0.2)//0.2)
-//  , fStringInteractionRadius(0.2)//2) //fm
-//  , fStringOverlapEnergyDensity(0.1)
-  //  , fStringInteractionParA(0.05)
-//  , fClusterFormationDist(0.4)
   , fMeanNofPartonsInNucleon(5)
 //  , fHardScatteringProbability(0.03)
   
@@ -238,15 +234,7 @@ void NucleiCollision::initDataMembers()
     funcPartonDensity->SetParameter(0, kNucleonSize);//parameter R
     funcPartonDensity->SetParameter(1, kNucleonParA); //parameter a
     
-    //    funcStringInteractionDist = new TF1( "funcStringInteractionDist"
-    //                                         , "1. / (1 + TMath::Exp( (x-[0]) / [1] ))", 0, fStringInteractionRadius*2 );
-    //    funcStringInteractionDist->SetParameter(0, fStringInteractionRadius);//parameter R
-    //    funcStringInteractionDist->SetParameter(1, fStringInteractionParA ); //parameter a
-
-
     funcImpactPar1D = new TF1( "funcImpactPar1D", "x", 0, 2*fNucleusRadius*kCoeffRadiusForMB ); // !!! tmp!!! make wider!
-    //    funcImpactPar1D->SetParameter(0, fStringInteractionRadius);//parameter R
-    //    funcImpactPar1D->SetParameter(1, fStringInteractionParA ); //parameter a
 
     fA = new Nucleus( fNumberOfNucleons, fMaxPartons);
     fB = new Nucleus( fNumberOfNucleons, fMaxPartons);
@@ -261,34 +249,25 @@ void NucleiCollision::initDataMembers()
     for( int i = 0; i < fNumberOfNucleons; ++i )
         matrixNcoll[i] = new bool[fNumberOfNucleons];
 
-
-
-
-    
-    //    fX1 = new float[fMaxPartons];
-    //    fY1 = new float[fMaxPartons];
-    //    //    fParton1Participated = new bool[fMaxPartons];
-    
-    //    fX2 = new float[fMaxPartons];
-    //    fY2 = new float[fMaxPartons];
-    //    fParton2Participated = new bool[fMaxPartons];
     
     fXstring = new float[fMaxPartons];
     fYstring = new float[fMaxPartons];
+    fDistanceBetweenPartonsForString = new float[fMaxPartons];
     fStringRadiusVectorAngle = new float[fMaxPartons];
+    fStringOrigin = new short[fMaxPartons];
 
-    fXstringInteraction = new float[fMaxPartons];
-    fYstringInteraction = new float[fMaxPartons];
-    fStringIntDist = new float[fMaxPartons];
-    fStringIntAngles = new float[fMaxPartons];
+//    fXstringInteraction = new float[fMaxPartons];
+//    fYstringInteraction = new float[fMaxPartons];
+//    fStringIntDist = new float[fMaxPartons];
+//    fStringIntAngles = new float[fMaxPartons];
     
-    fFlagStringInInteraction = new bool[fMaxPartons];
-    fNStringsInCluster = new int[fMaxPartons];
-    fClusterIdForString = new int[fMaxPartons];
+//    fFlagStringInInteraction = new bool[fMaxPartons];
+//    fNStringsInCluster = new int[fMaxPartons];
+//    fClusterIdForString = new int[fMaxPartons];
 //    fFlagStringIsHardInteraction = new bool[fMaxPartons];
 
-    fStringBoostMagn = new float[fMaxPartons];
-    fStringBoostAngle = new float[fMaxPartons];
+//    fStringBoostMagn = new float[fMaxPartons];
+//    fStringBoostAngle = new float[fMaxPartons];
     
     fNumberOfStrings = 0;
 //    fNumberOfClusters = 0;
@@ -302,10 +281,15 @@ void NucleiCollision::initDataMembers()
     fNcollisions = 0;
     
     fHistNucleonsR = new TH1D("fHistNucleonsR","nucleon r position;r, fm;entries",100,0, fNucleusRadius*3 );
-    fHistPartonsR = new TH1D("fHistPartonsR","parton r position;r, rm;entries",100,0, fNucleusRadius*3 );
-    fHistBusyPartonsR = new TH1D("fHistBusyPartonsR","busy partons r position;r, rm;entries",100,0, fNucleusRadius*3 );
-    fHistPartonsValenceR = new TH1D("fHistPartonsValenceR","parton r position;r, rm;entries",100,0, fNucleusRadius*3 );
-    fHistBusyPartonsValenceR = new TH1D("fHistBusyPartonsValenceR","busy partons r position;r, rm;entries",100,0, fNucleusRadius*3 );
+    fHistPartonsR = new TH1D("fHistPartonsR","parton r position;r, fm;entries",100,0, fNucleusRadius*3 );
+    fHistBusyPartonsR = new TH1D("fHistBusyPartonsR","busy partons r position;r, fm;entries",100,0, fNucleusRadius*3 );
+    fHistPartonsValenceR = new TH1D("fHistPartonsValenceR","parton r position;r, fm;entries",100,0, fNucleusRadius*3 );
+    fHistBusyPartonsValenceR = new TH1D("fHistBusyPartonsValenceR","busy partons r position;r, fm;entries",100,0, fNucleusRadius*3 );
+
+    fHistMinDistBetweenInteractingPartons = new TH1D("fHistMinDistBetweenInteractingPartons","min distances between interacting partons;r, fm;n entries",400,0, fPartonInteractionDistance*1.2 );
+    fHistMinDistBetweenInteractingPartonsSoft = new TH1D("fHistMinDistBetweenInteractingPartonsSoft","min distances b/n interacting partons - SOFT INTERACTION;r, fm;n entries",400,0, fPartonInteractionDistance*1.2 );
+    fHistMinDistBetweenInteractingPartonsValence = new TH1D("fHistMinDistBetweenInteractingPartonsValence","min distances b/n interacting VALENCE QUARKS;r, fm;n entries",400,0, fPartonInteractionDistance*1.2 );
+
     fHistNstrings = new TH1D("fHistNstrings", "n strings;N;entries", 5*2*fNumberOfNucleons+1+20, -0.5, 5*2*fNumberOfNucleons+0.5+20 );
     fHistStringInteractions = new TH1D("fHistStringInteractions", "n string intersections", fMaxPartons+1, -0.5, fMaxPartons+0.5 );
     fHistStringPositionRadius = new TH1D("fHistStringPositionRadius", "string r position/R", 50, 0, 2.5 );
@@ -326,26 +310,9 @@ void NucleiCollision::initDataMembers()
 
     fHistStringRadiusVectorPhi = new TH1D("fHistStringRadiusVectorPhi", "string #phi angle wrt (0,0);#phi;n strings", 100, 0, 2*TMath::Pi() );
 
-//    fHistStringInteractionsPhi = new TH1D("fHistStringInteractionsPhi", "string kick #phi;#phi;n strings", 100, 0, 2*TMath::Pi() );
-//    fHistStringInteractionsDistance = new TH1D("fHistStringInteractionsDistance", "string pairs dist", 100, 0, fNucleusRadius );
-    // fHistStringInteractionsMagnitude = new TH1D("fHistStringInteractionsMagnitude", "string interaction magnitude; arb. units;n strings", 500, 0, 100 );
-//    fHistStringInteractionsMagnitude = new TH1D("fHistStringInteractionsMagnitude", "beta of the strings; #beta;n strings", 220, 0, 1.1 );
     fHist2DNInteractionsVsNstrings = new TH2D("fHist2DNInteractionsVsNstrings", "n string interactions vs nstrings;n strings;n interactions", fMaxPartons+1, -0.5, fMaxPartons+0.5 , fMaxPartons+1, -0.5, fMaxPartons+0.5 );
     fHist2DNInteractionsVsImpactPar = new TH2D("fHist2DNInteractionsVsImpactPar", "n string interactions;b,fm;n interactions", 50, 0, 2*fNucleusRadius , fMaxPartons+1, -0.5, fMaxPartons+0.5 );
-    
-//    fHistForcesInClustersX = new TH1D("fHistForcesInClustersX", "forces acting on string, x; force x, arb units; entries", 200, -10, 10 );
-//    fHistForcesInClustersY = new TH1D("fHistForcesInClustersY", "forces acting on string, y; force y, arb units; entries", 200, -10, 10 );
-//    fHistForcesInClustersMagn = new TH1D("fHistForcesInClustersMagn", "forces acting on string, magnitude; force magn, arb units; entries", 200, -10, 10 );
-
-//    fHistForcesInClustersAbsX = new TH1D("fHistForcesInClustersAbsX", "force abs(x); force abs(x), arb units; entries", 1000, 0, 100 );
-//    fHistForcesInClustersAbsY = new TH1D("fHistForcesInClustersAbsY", "force abs(y); force abs(y), arb units; entries", 1000, 0, 100 );
-    //    fHistForcesInClustersRatioAbsXY = new TH1D("fHistForcesInClustersRatioAbsXY", "force abs(x)/abs(y); force abs(x)/abs(y), arb units; entries", 50, 0, 5 );
-
-
-//    fHistStringsInClusters = new TH1D("fHistStringsInClusters", "N strings in clusters", fMaxPartons, -0.5, fMaxPartons-0.5 );
-//    fHist2DStringsInClustersVsB = new TH2D("fHist2DStringsInClustersVsB", "n 'large' clusters vs b;b,fm;n clusters", 50, 0, 2*fNucleusRadius , 41, -0.5, 40.5 );
-    
-
+        
     //    fHist2DStringsSVsImpactS= new TH2D("fHist2DStringsSVsImpactS", "n*s0/S;b/R;n*s0/S", 50, 0, 100 , 100, 0, 2 );
     fHist2DStringsSVsImpactS= new TH2D("fHist2DStringsSVsImpactS", "n*s0/S;b;n*s0/S", 50, 0, 2*fNucleusRadius , 100, 0, 10 );
     
@@ -438,21 +405,6 @@ void NucleiCollision::buildEvent()
         fHist2DNInteractionsVsNstrings->Fill( fNumberOfStrings, fNumberOfStringInteractions );
         fHist2DNInteractionsVsImpactPar->Fill( fImpactParameter, fNumberOfStringInteractions );
         
-        //        double S_impact = circlesIntersectionArea(fImpactParameter,fNucleusRadius,fNucleusRadius);
-        //        const double S_string = TMath::Pi() * 0.25*0.25;//fPartonInteractionDistance*fPartonInteractionDistance;
-        //        //    fHist2DStringsSVsImpactS->Fill( S_impact/*fImpactParameter/fNucleusRadius*/, fNumberOfStrings * S_string / S_impact );
-        //        fHist2DStringsSVsImpactS->Fill( fImpactParameter, fNumberOfStrings * S_string / S_impact );
-        //            cout << fImpactParameter << " " <<  fNumberOfStrings * S_string / S_impact << endl;
-        
-//        if ( fFlagComputeStringRepulsion )
-//        {
-            //find string clusters
-            //startClusterSearch();
-
-            //string repulsion
-            //createStringRepulsion();
-//        }
-
         //wounded nucleons
         int nWoundedA = fA->getNumberOfWoundedNucleons();
         int nWoundedB = fB->getNumberOfWoundedNucleons();
@@ -468,28 +420,6 @@ void NucleiCollision::buildEvent()
                     nColl++;
         fNcollisions = nColl;
         fHistNcoll->Fill( fNcollisions );
-
-        //print forces (for debug)
-//        if(1)for( int i = 0; i < fNumberOfClusters; ++i )
-//        {
-//            StringCluster *cluster = fStringClusters[i];
-//            int nStringsInCluster = cluster->nStrings;
-//            for ( int iP = 0; iP < nStringsInCluster; iP++ )
-//            {
-//                double Fx = cluster->Fx[iP];
-//                double Fy = cluster->Fy[iP];
-//                fHistForcesInClustersX->Fill(Fx);
-//                fHistForcesInClustersY->Fill(Fy);
-//                fHistForcesInClustersMagn->Fill( sqrt(Fx*Fx+Fy*Fy) );
-
-//                fHistForcesInClustersAbsX->Fill(fabs(Fx));
-//                fHistForcesInClustersAbsY->Fill(fabs(Fy));
-//                //                if ( fabs(Fy) > 0 ) //tmp?
-//                //                    fHistForcesInClustersRatioAbsXY->Fill( fabs(Fx)/fabs(Fy) );
-//            }
-//            //            cout << ">>>>>>>>>>>>> cluster id " << i << ": " << endl;
-//            //            fStringClusters[i]->printForces();
-//        }
 
         //spec draw for saving
         if ( fFlagWriteEventViewCanvases && fEventId < 10 )
@@ -643,15 +573,15 @@ void NucleiCollision::createPartons( Nucleus *nucl, int nId ) //float nucleonX, 
         nucl->pNid[id] = nId;
 
         // (TMP?) 1.12.2014 - for some spec studies:
-        // make three partons to be "valence quarks" (pBusy=-1):
+        // make first three partons to be "valence quarks" (pBusy=-1):
         nucl->pBusy[id] = (iP < 3 ? -1 : 0);
-        
+
         if(1)//variant with Gaus2D position of partons
         {
             fRand->Rannor( a, b ); //mean=0 and sigma=1
             const float kNucleonGausSigma = 0.4; //0.6
-            nucl->pX[id] = nucl->nX[nId] + a*kNucleonGausSigma;//kNucleonSize; //sigma 0.6?..
-            nucl->pY[id] = nucl->nY[nId] + b*kNucleonGausSigma;//kNucleonSize;
+            nucl->pX[id] = /*nucl->nX[nId] +*/ a*kNucleonGausSigma;//kNucleonSize; //sigma 0.6?..
+            nucl->pY[id] = /*nucl->nY[nId] +*/ b*kNucleonGausSigma;//kNucleonSize;
         }
         else if(0)//variant with density func
         {
@@ -664,8 +594,8 @@ void NucleiCollision::createPartons( Nucleus *nucl, int nId ) //float nucleonX, 
             //            fHistNucleonDensityR->Fill( rRand );
             //            nucl->pX[id] = nucl->nX[nId] + rRand * sin(thetaRand) * cos( phiRand );
             //            nucl->pY[id] = nucl->nY[nId] + rRand * sin(thetaRand) * sin( phiRand );
-            nucl->pX[id] = nucl->nX[nId] + rRand * randSinTheta/*TMath::Sin(thetaRand) */ * cos( phiRand );
-            nucl->pY[id] = nucl->nY[nId] + rRand * randSinTheta/*TMath::Sin(thetaRand) */ * sin( phiRand );
+            nucl->pX[id] = /*nucl->nX[nId] +*/ rRand * randSinTheta/*TMath::Sin(thetaRand) */ * cos( phiRand );
+            nucl->pY[id] = /*nucl->nY[nId] +*/ rRand * randSinTheta/*TMath::Sin(thetaRand) */ * sin( phiRand );
         }
         else //variant with EXPONENTIAL density
         {
@@ -678,10 +608,41 @@ void NucleiCollision::createPartons( Nucleus *nucl, int nId ) //float nucleonX, 
 //            nucl->pX[id] = nucl->nX[nId] + rRand * randSinTheta/*TMath::Sin(thetaRand) */ * cos( phiRand );
 //            nucl->pY[id] = nucl->nY[nId] + rRand * randSinTheta/*TMath::Sin(thetaRand) */ * sin( phiRand );
             // 2D proton
-            nucl->pX[id] = nucl->nX[nId] + rRand * cos( phiRand );
-            nucl->pY[id] = nucl->nY[nId] + rRand * sin( phiRand );
+            nucl->pX[id] = /*nucl->nX[nId] +*/ rRand * cos( phiRand );
+            nucl->pY[id] = /*nucl->nY[nId] +*/ rRand * sin( phiRand );
         }
+    } // end of parton loop for nucleon
+
+    // RECENTER PARTONS IN NUCLEON:
+    // move partons to have center of nucleon = a center of mass for 3 valence quarks (Sept 2017)
+    double xCM = 0, yCM = 0;
+    const int nPartonsForCM = 3; // usually: take 3 valence quark for that
+    for (int vQ=0; vQ<nPartonsForCM; vQ++)
+    {
+        int id = curN+vQ;
+        xCM += nucl->pX[id];
+        yCM += nucl->pY[id];
     }
+    xCM /= nPartonsForCM;
+    yCM /= nPartonsForCM;
+//    cout << "xCM = " << xCM << ", yCM = " << yCM << endl;
+    for ( int iP = 0; iP < nPartonsInThisNucleon; iP++ )
+    {
+        int id = curN+iP;
+//        cout << "id = " << id << endl;
+        nucl->pX[id] -= xCM;
+        nucl->pY[id] -= yCM;
+    }
+
+    // finally: place partons according to nucleon position
+    for ( int iP = 0; iP < nPartonsInThisNucleon; iP++ )
+    {
+        int id = curN+iP;
+
+        nucl->pX[id] += nucl->nX[nId];
+        nucl->pY[id] += nucl->nY[nId];
+    }
+
     nucl->nPartons += nPartonsInThisNucleon;
 }
 
@@ -733,7 +694,7 @@ void NucleiCollision::createStrings()
         matrixNcoll[idNucleonInA][idNucleonInB] = 1;
         
         //mark partons to be in interaction with each other // (TMP?) 1.12.2014 - some spec studies
-        if (1)
+        if (0)//1) // commented in Sept 2017 - to use stringOrigin (below)
         {
 //            double rParton = sqrt(fA->pX[id1]*fA->pX[id1] + fA->pY[id2]*fA->pY[id2] );
 //            bool hardScatteringFlag = false; // 2.12.14: may be useful for the future: ( rParton < fPartonInteractionDistance/2 ? true: false );
@@ -747,11 +708,24 @@ void NucleiCollision::createStrings()
         //cout << "id1=" << id1 << ", id2=" << id2 << endl;
         fXstring[fNumberOfStrings] = middleX;
         fYstring[fNumberOfStrings] = middleY;
-        fStringBoostMagn[fNumberOfStrings] = 0;
-        fStringBoostAngle[fNumberOfStrings] = 0;
-        fFlagStringInInteraction[fNumberOfStrings] = 0;//false;
-        fNStringsInCluster[fNumberOfStrings] = 0;//false;
-        fClusterIdForString[fNumberOfStrings] = -1;
+
+        fDistanceBetweenPartonsForString[fNumberOfStrings] = sqrt( arrDist[iP].dist );
+
+        // string origin (Sept 2017)
+        short stringOrigin = 0; // sea quarks/gluons
+        if(0)cout << "status of partons for string id " << fNumberOfStrings << ": "
+             << fA->pBusy[id1] << " " << fB->pBusy[id2] << endl;
+        if ( fA->pBusy[id1] == -1 && fB->pBusy[id2] == -1 ) // both partons are valence quarks
+            stringOrigin = 2;
+        else if ( fA->pBusy[id1] == -1 || fB->pBusy[id2] == -1 ) // one valence, one sea/gluon
+            stringOrigin = 1;
+        fStringOrigin[fNumberOfStrings] = stringOrigin;
+
+//        fStringBoostMagn[fNumberOfStrings] = 0;
+//        fStringBoostAngle[fNumberOfStrings] = 0;
+//        fFlagStringInInteraction[fNumberOfStrings] = 0;//false;
+//        fNStringsInCluster[fNumberOfStrings] = 0;//false;
+//        fClusterIdForString[fNumberOfStrings] = -1;
 //        fFlagStringIsHardInteraction[fNumberOfStrings] = 0;//false;
 
 //        fFlagStringIsHardInteraction[fNumberOfStrings] = ( fRand->Uniform() < fHardScatteringProbability ? 1 : 0 );
@@ -770,6 +744,12 @@ void NucleiCollision::createStrings()
         
         fHistStringPositionRadius->Fill( sqrt(middleX*middleX+middleY*middleY)/fNucleusRadius );
         fHist2DNstringsXY_thisEvent->Fill( middleX_shifted, middleY );
+
+        fHistMinDistBetweenInteractingPartons->Fill( sqrt( arrDist[iP].dist ) );
+        if ( stringOrigin == 2)  // interaction b/n valence quarks
+            fHistMinDistBetweenInteractingPartonsValence->Fill( sqrt( arrDist[iP].dist ) );
+        else // all other cases
+            fHistMinDistBetweenInteractingPartonsSoft->Fill( sqrt( arrDist[iP].dist ) );
     }
     
     //set flag MB collision if have at least one string
@@ -881,15 +861,12 @@ void NucleiCollision::drawStatisticHists()
 
         //pad
         fCanvEventStatistics->cd(padId++);
-//        fHistForcesInClustersX->SetLineColor(kGreen);
-//        fHistForcesInClustersY->SetLineColor(kRed);
-//        fHistForcesInClustersMagn->DrawCopy();
-//        fHistForcesInClustersX->DrawCopy("same");
-//        fHistForcesInClustersY->DrawCopy("same");
 
-//        fHistForcesInClustersMagn->Write();
-//        fHistForcesInClustersX->Write();
-//        fHistForcesInClustersY->Write();
+        fHistMinDistBetweenInteractingPartons->DrawNormalized();
+        fHistMinDistBetweenInteractingPartonsSoft->SetLineColor(kGreen);
+        fHistMinDistBetweenInteractingPartonsSoft->DrawNormalized("same");
+        fHistMinDistBetweenInteractingPartonsValence->SetLineColor(kRed);
+        fHistMinDistBetweenInteractingPartonsValence->DrawNormalized("same");
 
         //pad 1
         fCanvEventStatistics->cd(padId++);
@@ -1238,6 +1215,8 @@ void NucleiCollision::drawPartons()
     {
         elPoints[iP] = new TEllipse( 0.5 + fVisNucleusRadiusNucleus * fA->pX[iP] / fNucleusRadius, 0.5 + fVisNucleusRadiusNucleus * fA->pY[iP] / fNucleusRadius
                                      , rVisParton, rVisParton );
+        if ( fA->pBusy[iP] == -1 ) // valence quark
+            elPoints[iP]->SetFillColorAlpha( kBlue-10, 0.6 );
         elPoints[iP]->Draw();
         
     }
@@ -1250,6 +1229,8 @@ void NucleiCollision::drawPartons()
         elPoints2[iP] = new TEllipse( 0.5 + fVisNucleusRadiusNucleus * fB->pX[iP] / fNucleusRadius, 0.5 + fVisNucleusRadiusNucleus * fB->pY[iP] / fNucleusRadius
                                       , rVisParton, rVisParton );
         elPoints2[iP]->SetLineColor( kRed );
+        if ( fB->pBusy[iP] == -1 ) // valence quark
+            elPoints2[iP]->SetFillColorAlpha( kRed-10, 0.6 );
         elPoints2[iP]->Draw();
     }
     
@@ -1276,27 +1257,27 @@ void NucleiCollision::drawStrings()
         //        elPointsStrings[iP]->SetLineColor( fNStringsInCluster[iP] ? kGreen+fNStringsInCluster[iP] : kBlue );
         //        elPointsStrings[iP]->SetFillColor( fNStringsInCluster[iP] ? kGreen+fNStringsInCluster[iP] : kBlue );
         //        int stringIdInCluster = fNStringsInCluster[iP];
-        int clusterId = fClusterIdForString[iP];
+//        int clusterId = fClusterIdForString[iP];
         
         //        cout << "draw string: " << stringIdInCluster << endl;
         //        int clusterColor = ( stringIdInCluster < 4 ? kGreen+stringIdInCluster : kRed+1 );
         
-        int clusterColor = kOrange;
-        if ( fNStringsInCluster[iP] > kNstringsWhenClustersIsConsideredLarge )
-        {
-            clusterColor = kBlue;//( clusterId < nClusterColors ? kClusterColors[clusterId] : kAzure+10 );
-        }
+//        int clusterColor = kOrange;
+//        if ( fNStringsInCluster[iP] > kNstringsWhenClustersIsConsideredLarge )
+//        {
+//            clusterColor = kBlue;//( clusterId < nClusterColors ? kClusterColors[clusterId] : kAzure+10 );
+//        }
 
-        int colorWhenNotInCluster = kBlue;
+        int stringColor = kBlue;
         //mark hard interactions
 //        if ( fFlagStringIsHardInteraction[iP] )
 //        {
 ////            cout << "string is hard: " << iP << endl;
-//            colorWhenNotInCluster = kRed;
+//            stringColor = kRed;
 //        }
 
-        elPointsStrings[iP]->SetLineColor( clusterId>=0 ? clusterColor : colorWhenNotInCluster );
-        elPointsStrings[iP]->SetFillColor( clusterId>=0 ? clusterColor : colorWhenNotInCluster );
+        elPointsStrings[iP]->SetLineColor( stringColor );
+        elPointsStrings[iP]->SetFillColor( stringColor );
         elPointsStrings[iP]->Draw();
     }
     delete [] elPointsStrings;
