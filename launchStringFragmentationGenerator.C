@@ -1,9 +1,29 @@
 void launchStringFragmentationGenerator(
-        TString inputFileName_NucleiCollisions = "nuclCollisionsTree_nEv50000.root"
+//        TString inputFileName_NucleiCollisions = "nuclCollisionsTree_nEv20000.root"
+        TString inputFileName_NucleiCollisions = "nuclCollisionsTree_nEv60000.root"
+//        TString inputFileName_NucleiCollisions = "nuclCollisionsTree_nEv10000000.root"
+//        TString inputFileName_NucleiCollisions = "nuclCollisionsTree_nEv8000000.root"
+//        TString inputFileName_NucleiCollisions = "nuclCollisionsTree_nEv1100000.root"
+//        TString inputFileName_NucleiCollisions = "nuclCollisionsTree_nEv50000.root"
 //        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv50000.root_StringBoosts_Edensity_0_0001_pp.root"
-        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv50000.root_StringBoosts_Edensity_0_0001_pp_WITH_3perc_HARD_SCATTERING.root"
-        //"nuclCollisionsTree_nEv1000.root_StringBoosts_Edensity_0_00001.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv50000.root_StringBoosts_Edensity_0_0001_pp_WITH_3perc_HARD_SCATTERING.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv20000.root_StringBoosts_density_0_00002.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv10000000.root_StringBoosts_density_0_00002.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv8000000.root_StringBoosts_density_0_0001.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv1100000.root_StringBoosts.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv20000.root_StringBoosts_r_3_density_0_00004.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv20000.root_StringBoosts_r_1_density_0_0004.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv20000.root_StringBoosts_r_2_density_0_0001_WITH_D.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv8000000.root_StringBoosts_r_2_density_0_0001_WITH_D.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv8000000.root_StringBoosts_r_2_density_0_00002_WITH_D.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv8000000.root_StringBoosts_r_2_density_0_0005_WITH_D.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv20000.root_StringBoosts_r_2_density_0_00002_WITH_D.root"
+//        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv60000.root_StringBoosts_r_2_density_0_0001_WITH_D.root"
+        , TString inputFileName_StringBoosts = "nuclCollisionsTree_nEv60000.root_StringBoosts_r_2_density_0_00002_WITH_D.root"
+
         , int nEvents = -1//100 //)
+//        , int nEvents = 1000 //1100000
+//        , int nEvents = 20000 //1100000
 //, int flagMBorFixedB = 0, float bImpact=0
         , int drawMode = 0 )
 {

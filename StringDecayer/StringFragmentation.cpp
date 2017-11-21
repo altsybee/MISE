@@ -82,7 +82,7 @@ StringFragmentation::StringFragmentation() :
         funcPtBoltzmanLikeProton->SetParameter( 2, 1.2 );
 
     }
-    else if (1) // Tsallis: tuned out to be GOOD for flow studies! July 2016
+    else if (0) // Tsallis: turned out to be GOOD for flow studies! July 2016
     {
         // Tsallis:
         // (from http://www.nikhef.nl/pub/services/biblio/theses_pdf/thesis_M_Chojnacki.pdf
@@ -107,7 +107,147 @@ StringFragmentation::StringFragmentation() :
         funcPtBoltzmanLikeProton->SetParameter( 0, 6.3 );
         funcPtBoltzmanLikeProton->SetParameter( 1, 0.212 );
         funcPtBoltzmanLikeProton->SetParameter( 2, mProton );
+
+        funcPtBoltzmanLikeDmeson = new TF1( "funcPtBoltzmanLikeDmeson", "[0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])", 0, 5 );
+        funcPtBoltzmanLikeDmeson->SetParameter( 0, 6.3 );
+        funcPtBoltzmanLikeDmeson->SetParameter( 1, 0.212 );
+        funcPtBoltzmanLikeDmeson->SetParameter( 2, mD0 );
     }
+    else if (0) // Tsallis BUT EXPO FOR pT>cut_value - to have expo tails and add hard part separately (Sept 2017)
+    {
+        // TUNING DONE IN:
+        // /opt/mygit/MISE/analysis/RAA $ root -l runAnalysis.C
+        // analyzer.cxx - generatePtDistributions()
+
+        funcPtBoltzmanLikePion = new TF1( "funcPtBoltzmanLikePion", "x>0.8 ? [3]*TMath::Exp([4]*x) : [0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])"
+                                                   , 0, 8 );
+        funcPtBoltzmanLikePion->SetParameter(0, 4.79406 );
+        funcPtBoltzmanLikePion->SetParameter(1, 2.48463e-02 );
+        funcPtBoltzmanLikePion->SetParameter(2, -2.04380e-01 );
+        funcPtBoltzmanLikePion->SetParameter(3, 8.90825e-02);
+        funcPtBoltzmanLikePion->SetParameter(4, -4.36547);
+    //    funcPtBoltzmanLikePion->Draw();
+    //    funcPtBoltzmanLikePion->Draw("same");
+
+
+        funcPtBoltzmanLikeKaon = new TF1( "funcPtBoltzmanLikeKaon", "x>1.2 ? [3]*TMath::Exp([4]*x) : [0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])"
+                                                   , 0, 8 );
+        funcPtBoltzmanLikeKaon->SetParameter( 0, 7.49377 );
+        funcPtBoltzmanLikeKaon->SetParameter( 1, 8.40325e-02 );
+        funcPtBoltzmanLikeKaon->SetParameter( 2, -4.86009e-01 );
+        funcPtBoltzmanLikeKaon->SetParameter(3, 7.26296e-02 );
+        funcPtBoltzmanLikeKaon->SetParameter(4, -2.70846 );
+    //    funcPtBoltzmanLikeKaon->Draw();
+    //    funcPtBoltzmanLikeKaon->Draw("same");
+
+
+        funcPtBoltzmanLikeProton = new TF1( "funcPtBoltzmanLikeProton", "x>2.0 ? [3]*TMath::Exp([4]*x) : [0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])"
+                                                     , 0, 10 );
+        funcPtBoltzmanLikeProton->SetParameter( 0, 9.35638e+00 );
+        funcPtBoltzmanLikeProton->SetParameter( 1, 1.34862e-01 );
+        funcPtBoltzmanLikeProton->SetParameter( 2, -7.05049e-01 );
+        funcPtBoltzmanLikeProton->SetParameter(3, 6.30711e-02 );
+        funcPtBoltzmanLikeProton->SetParameter(4, -2.12911 );
+    //    funcPtBoltzmanLikeProton->Draw();
+    //    funcPtBoltzmanLikeProton->Draw("same");
+
+
+//        funcPtBoltzmanLikeDmeson = new TF1( "funcPtBoltzmanLikeDmeson", "x>4.5 ? [3]*TMath::Exp([4]*x) : [0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])"
+//                                            , 0, 15 );
+//        funcPtBoltzmanLikeDmeson->SetParameter( 0, 6.01539 );
+//        funcPtBoltzmanLikeDmeson->SetParameter( 1, 2.01371e-01 );
+//        funcPtBoltzmanLikeDmeson->SetParameter( 2, -1.34386 );
+//        funcPtBoltzmanLikeDmeson->SetParameter(3,  2.06223e-02 );
+//        funcPtBoltzmanLikeDmeson->SetParameter(4, -8.37974e-01 );
+//        funcPtBoltzmanLikeDmeson->Draw();
+//        funcPtBoltzmanLikeDmeson->Draw("same");
+        // - D meson above: poluchilas' strannaya RAA for D meson -> back to previous variant
+        funcPtBoltzmanLikeDmeson = new TF1( "funcPtBoltzmanLikeDmeson", "[0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])", 0, 10 );
+        funcPtBoltzmanLikeDmeson->SetParameter( 0, 6.3 );
+        funcPtBoltzmanLikeDmeson->SetParameter( 1, 0.212 );
+        funcPtBoltzmanLikeDmeson->SetParameter( 2, mD0 );
+
+    }
+    else if (1) // November 9, 2017: EXP at low pT, then - Tsallis for higher pT
+    {
+        // TUNING DONE IN:
+        // /opt/mygit/MISE/analysis/RAA/_data_ALICE_pp_Spectra_pi_K_p_276/play_with_spectra.C
+
+        // ######## PIONS:
+//        >>> parameters for fFuncExp:
+//        18.042
+//        -5.60966
+//        >>> parameters for funcPtDiff:
+//        6.09662
+//        0.12469
+//        -0.172349
+//        18.042
+//        -5.60966
+        // integral from fFuncExp = 0.573339
+        // integral from funcPtDiff = 0.0446483
+//        TF1 *funcPtDiff = new TF1( "funcPtDiff", "x<0.57 ? 0 : [0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])    -   [3]*x*TMath::Exp([4]*x)", 0, 20 );
+
+        funcPtBoltzmanLikePion = new TF1( "fFuncExp", "[0]*x*TMath::Exp([1]*x)", 0.01, 8);
+        funcPtBoltzmanLikePion->SetParameter(0, 18.042 );
+        funcPtBoltzmanLikePion->SetParameter(1, -5.60966 );
+
+        // ######## KAONS:
+//        >>> parameters for fFuncExp:
+//        0.732649
+//        -3.14015
+//        >>> parameters for funcPtDiff:
+//        6.34756
+//        0.120234
+//        -0.462141
+//        0.732649
+//        -3.14015
+//        integral from fFuncExp = 0.0743011
+//        integral from funcPtDiff = 0.00184029
+//        TF1 *funcPtDiff = new TF1( "funcPtDiff", "x<1.45 ? 0 : [0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])    -   [3]*x*TMath::Exp([4]*x)", 0, 20 );
+
+        funcPtBoltzmanLikeKaon = new TF1( "fFuncExp", "[0]*x*TMath::Exp([1]*x)", 0.01, 10);
+        funcPtBoltzmanLikeKaon->SetParameter( 0, 0.732649 );
+        funcPtBoltzmanLikeKaon->SetParameter( 1, -3.14015 );
+
+
+        // ######## PROTONS:
+//        >>> parameters for fFuncExp:
+//        0.231222
+//        -2.5661
+//        >>> parameters for funcPtDiff:
+//        9.38768
+//        0.166251
+//        -0.713964
+//        0.231222
+//        -2.5661
+//        integral from fFuncExp = 0.0351141
+//        integral from funcPtDiff = 0.000208108
+        //        TF1 *funcPtDiff = new TF1( "funcPtDiff", "x<2.28 ? 0 : [0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])    -   [3]*x*TMath::Exp([4]*x)", 0, 20 );
+
+        funcPtBoltzmanLikeProton = new TF1( "fFuncExp", "[0]*x*TMath::Exp([1]*x)", 0.01, 10);
+        funcPtBoltzmanLikeProton->SetParameter( 0, 0.231222 );
+        funcPtBoltzmanLikeProton->SetParameter( 1, -2.5661 );
+
+
+
+        // ######## D mesons:
+        //        >>> parameters for fFuncExp:
+        //        2.679
+        //        -1.28389
+        //        >>> parameters for funcPtDiff:
+        //        2.78777
+        //        0.00184544
+        //        251.561
+        //        2.679
+        //        -1.28389
+        //        integral from fFuncExp = 1.62524
+        //        integral from funcPtDiff = 0.0231375
+        funcPtBoltzmanLikeDmeson = new TF1( "fFuncExp", "[0]*x*TMath::Exp([1]*x)", 0.01, 20);
+        funcPtBoltzmanLikeDmeson->SetParameter( 0, 2.679 );
+        funcPtBoltzmanLikeDmeson->SetParameter( 1, -1.28389 );
+
+    }
+
 
 
 
@@ -288,7 +428,13 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
         while ( !flagFineQuarkConfig )
         {
             double probQuarkType = fRand->Uniform( 0, 2.3); // u:d:s = 1:1:0.3 from Generators overview paper
-            if ( probQuarkType < 0.2 ) //0.3 )
+            if ( probQuarkType < 0.01 ) // Sept 2017: ASSUME SOME PROBABILITY TO DECAY INTO C-QUARK!
+            {
+                breakPointType[iBreak] = 3; // c - quark
+                breakPointPt[iBreak] = fabs(fRand->Exp( 0.35 ));
+
+            }
+            else if ( probQuarkType < 0.2 )
             {
                 breakPointType[iBreak] = 1; // s - quark
 //                breakPointPt[iBreak] = fabs(fRand->Gaus( 0, 0.47 )); //0.45 ));
@@ -444,6 +590,10 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
             else if ( (q1 == 1 && q2 == 2)
                       || (q1 == 2 && q2 == 1) ) // s quark and diquark  => Lambda
                 particleMass = mLambda;
+            else if ( q1 == 3 || q2 == 3 ) // KOSTYL': if at least one of the two string ends is a c-quark
+                //(q1 == 0 && q2 == 3)
+//                      || (q1 == 3 && q2 == 0) ) // u/d quarks and c quark  => D-meson
+                particleMass = mD0;
             else
             {
                 cout << "breakPointTypes: impossible configuration! "
@@ -467,6 +617,8 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
                 ptParticle = funcPtBoltzmanLikeKaon->GetRandom();
             else if ( fabs( particleMass-mProton) < 0.001 )
                 ptParticle = funcPtBoltzmanLikeProton->GetRandom();
+            else if ( fabs( particleMass-mD0) < 0.001 )
+                ptParticle = funcPtBoltzmanLikeDmeson->GetRandom();
         }
         if (0)
             phiParticle = fRand->Uniform( 0, TMath::TwoPi() );

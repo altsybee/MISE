@@ -80,8 +80,70 @@ StringDescr::StringDescr() //: //ParticleArr(fNparticles)
     //    TLorentzVector vMother;
     vMothers = new TLorentzVector[N_LORENTZ_VECTORS_FROM_STRING];
 
-    fFuncPowerLawPt = new TF1( "funcPowerLawPt", "[0]+[1]*TMath::Power(x,[2])", 1.0, 50);
-    fFuncPowerLawPt->SetParameters( 0, 1, -4.9 ); // from CMS paper https://arxiv.org/pdf/1104.3547.pdf
+    fFuncPowerLawPt = new TF1( "funcPowerLawPt", "[0]*TMath::Power(x,[1])", 1.0, 50);
+//    fFuncPowerLawPt->SetParameters( 1, -4.9 ); // from CMS paper https://arxiv.org/pdf/1104.3547.pdf
+    fFuncPowerLawPt->SetParameters( 1, -2.838 ); // from 0.2/distImpPar - /opt/mygit/MISE/analysis/RAA/play_with_partonIntDistHistos
+
+
+    // spec fit function constructed for pt in [3,20]
+    // to have smooth rise of the HARD PART (tuned using LHC10h Pb-Pb minBias spectra)
+//    fFunc_HARD_COMBINED = new TF1( "fFunc_HARD_COMBINED", "x<3.6 ? 7100 : [0]+[1]*TMath::Power(x,[2]) + [3]*(TMath::Exp([4]*(x+[5])))", 0.2/*3.0*/, 20);
+//    fFunc_HARD_COMBINED = new TF1( "fFunc_HARD_COMBINED", "x<4 ? 2e4-x*12800./4.0 :[0]+[1]*TMath::Power(x,[2]) + [3]*(TMath::Exp([4]*(x+[5])))", 0.5/*3.0*/, 20);
+    fFunc_HARD_COMBINED = new TF1( "fFunc_HARD_COMBINED", "x<4 ? 0.92*1e5*TMath::Exp(-0.65*x) :[0]+[1]*TMath::Power(x,[2]) + [3]*(TMath::Exp([4]*(x+[5])))", 0.5/*3.0*/, 20);
+//    fFunc_HARD_COMBINED = new TF1( "fFunc_HARD_COMBINED", "[0]+[1]*TMath::Power(x,[2]) + [3]*(TMath::Exp([4]*(x+[5])))", 3.0, 20);
+//    fFunc_HARD_COMBINED->SetParameters( 1e6, 2, 1, 0, -2 );
+    fFunc_HARD_COMBINED->SetParameter( 0, 1.54936e+00 );
+    fFunc_HARD_COMBINED->SetParameter( 1, 1.65448e+07 );
+    fFunc_HARD_COMBINED->SetParameter( 2, -5.13362e+00 );
+    fFunc_HARD_COMBINED->SetParameter( 3, -7.46413e+02 );
+    fFunc_HARD_COMBINED->SetParameter( 4, -2.14778e+00 );
+    fFunc_HARD_COMBINED->SetParameter( 5, -5.02438e+00 );
+
+
+    // November 9, 2017: try "hard components" separately for PIDs
+    fFunc_HARD_PION = new TF1( "fFunc_HARD_PION", "x<[5] ? 0 : [0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])    -   [3]*x*TMath::Exp([4]*x)", 0.4, 20 );
+    fFunc_HARD_PION->SetParameter(0, 6.09662   );
+    fFunc_HARD_PION->SetParameter(1, 0.12469   );
+    fFunc_HARD_PION->SetParameter(2, -0.172349 );
+    fFunc_HARD_PION->SetParameter(3, 18.042    );
+    fFunc_HARD_PION->SetParameter(4, -5.60966  );
+    fFunc_HARD_PION->SetParameter(5, 0.57  );
+            // integral from fFuncExp = 0.573339
+            // integral from funcPtDiff = 0.0446483
+
+
+    fFunc_HARD_KAON = new TF1( "fFunc_HARD_KAON", "x<[5] ? 0 : [0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])    -   [3]*x*TMath::Exp([4]*x)", 0.4, 20 );
+    fFunc_HARD_KAON->SetParameter(0, 6.34756   );
+    fFunc_HARD_KAON->SetParameter(1, 0.120234  );
+    fFunc_HARD_KAON->SetParameter(2, -0.462141 );
+    fFunc_HARD_KAON->SetParameter(3, 0.732649  );
+    fFunc_HARD_KAON->SetParameter(4, -3.14015  );
+    fFunc_HARD_KAON->SetParameter(5, 1.45  );
+    //        integral from fFuncExp = 0.0743011
+    //        integral from funcPtDiff = 0.00184029
+
+    fFunc_HARD_PROTONS = new TF1( "fFunc_HARD_PROTONS", "x<[5] ? 0 : [0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])    -   [3]*x*TMath::Exp([4]*x)", 0.4, 20 );
+    fFunc_HARD_PROTONS->SetParameter(0, 9.38768   );
+    fFunc_HARD_PROTONS->SetParameter(1, 0.166251  );
+    fFunc_HARD_PROTONS->SetParameter(2, -0.713964 );
+    fFunc_HARD_PROTONS->SetParameter(3, 0.231222  );
+    fFunc_HARD_PROTONS->SetParameter(4, -2.5661   );
+    fFunc_HARD_PROTONS->SetParameter(5, 2.28  );
+    //        integral from fFuncExp = 0.0351141
+    //        integral from funcPtDiff = 0.000208108
+
+
+    fFunc_HARD_D0 = new TF1( "fFunc_HARD_D0", "x<[5] ? 0 : [0]*x* ([0]-1)*([0]-2)/([0]*[1])/([0]*[1]+sqrt(x*x+[2]*[2])*([0]-2)) *TMath::Power( 1+(sqrt(x*x+[2]*[2])-[2])/([0]*[1]), -[0])    -   [3]*x*TMath::Exp([4]*x)", 0.4, 20 );
+    fFunc_HARD_D0->SetParameter(0, 2.78777    );
+    fFunc_HARD_D0->SetParameter(1, 0.00184544 );
+    fFunc_HARD_D0->SetParameter(2, 251.561    );
+    fFunc_HARD_D0->SetParameter(3, 2.679      );
+    fFunc_HARD_D0->SetParameter(4, -1.28389   );
+    fFunc_HARD_D0->SetParameter(5, 4.0  );
+    //        integral from fFuncExp = 1.62524
+    //        integral from funcPtDiff = 0.0231375
+
+
 }
 
 StringDescr::~StringDescr() {}
@@ -260,9 +322,14 @@ void StringDescr::hadronizeString( double stringBeta, double boostPhiDir )
                 charge  = 0;//strFr->probabilityChargePlusMinus();
                 pid  = kPid_Lambda;
             }
+            else if ( fabs( vMother->M() - mD0 ) < 0.01 ) // D meson
+            {
+                charge  = 0;
+                pid  = kPid_D0;
+            }
 
             // fill array with particle
-            if ( charge != 0 || pid  == kPid_Lambda || pid  == kPid_phi )
+            if ( charge != 0 || pid  == kPid_Lambda || pid  == kPid_phi || pid  == kPid_D0 )
             {
                 fParticles[nP].eta = vMother->Eta();
                 fParticles[nP].phi = vMother->Phi();
@@ -337,6 +404,18 @@ void StringDescr::makeTwoJets()
             fParticles[nP].charge  = ( fRand->Uniform() > 0.5 ? 1 : -1 );
 //            cout << "phi=" << phi << ", eta=" << fParticles[nP].eta
 //                 << ", pt=" << fParticles[nP].pt << endl;
+
+            // put PID of hard particle BY HAND:
+            double randPid = fRand->Uniform();
+            int pid = -1;
+            if ( randPid < 0.748542 ) pid = kPid_pion;
+            else if ( randPid < 0.748542 + 0.134895 ) pid = kPid_kaon;
+            else if ( randPid < 0.748542 + 0.134895 + 0.0876396 ) pid = kPid_proton;
+            else if ( randPid < 0.748542 + 0.134895 + 0.0876396 + 0.00913536 ) pid = kPid_phi;
+            else if ( randPid < 0.748542 + 0.134895 + 0.0876396 + 0.00913536 + 0.00818593 ) pid = kPid_Lambda;
+            else pid = kPid_D0;
+
+            fParticles[nP].pid  = pid;
             nP++;
 
         }
@@ -349,7 +428,7 @@ void StringDescr::makeTwoJets()
 
 }
 
-void StringDescr::makeTwoParticlesWithRandomPtEtaPhi()
+void StringDescr::makeTwoParticlesWithRandomPtEtaPhi(int _pid)
 {
     int nP = 0;
 
@@ -377,13 +456,37 @@ void StringDescr::makeTwoParticlesWithRandomPtEtaPhi()
             fParticles[nP].eta = etaJet + fRand->Gaus(0,0.15);//0.2);
             double phi = phiJet;// + fRand->Gaus(0,0.12);//15);
             //FixAngleInTwoPi(phi);
-            double pt = fFuncPowerLawPt->GetRandom(); //fRand->Exp(2.);
-            cout << "pt = " << pt << endl;
+
+            double pt = 1.; // TMP!
+            if ( _pid == kPid_pion )        pt = fFunc_HARD_PION->GetRandom();
+            else if ( _pid == kPid_kaon )   pt = fFunc_HARD_KAON->GetRandom();
+            else if ( _pid == kPid_proton)  pt = fFunc_HARD_PROTONS->GetRandom();
+            else if ( _pid == kPid_D0 )      pt = fFunc_HARD_D0->GetRandom();
+
+            // put PID of hard particle BY HAND:
+//            double randPid = fRand->Uniform();
+//            int pid = -1;
+//            if ( randPid < 0.748542 ) pid = kPid_pion;
+//            else if ( randPid < 0.748542 + 0.134895 ) pid = kPid_kaon;
+//            else if ( randPid < 0.748542 + 0.134895 + 0.0876396 ) pid = kPid_proton;
+//            else if ( randPid < 0.748542 + 0.134895 + 0.0876396 + 0.00913536 ) pid = kPid_phi;
+//            else if ( randPid < 0.748542 + 0.134895 + 0.0876396 + 0.00913536 + 0.00818593 ) pid = kPid_Lambda;
+//            else pid = kPid_D0;
+
+            fParticles[nP].pid  = _pid; //pid;
+
+
+
+
+//            double pt = fFuncPowerLawPt->GetRandom(); //fRand->Exp(2.);
+            //double pt = fFunc_HARD_COMBINED->GetRandom(); //fRand->Exp(2.);
+//            cout << "pt = " << pt << endl;
             fParticles[nP].phi = phi;
             fParticles[nP].pt  = pt;
             fParticles[nP].charge  = ( fRand->Uniform() > 0.5 ? 1 : -1 );
 //            cout << "phi=" << phi << ", eta=" << fParticles[nP].eta
 //                 << ", pt=" << fParticles[nP].pt << endl;
+
             nP++;
 
         }

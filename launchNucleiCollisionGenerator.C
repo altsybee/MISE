@@ -47,17 +47,6 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
     TStopwatch timer;
     timer.Start();
 
-    ManagerNucleiCollisions.cpp             \
-    ManagerStringFragmentation.cpp          \
-    ManagerStringFragmentation.h            \
-    StringDecayer/StringDescr.cpp           \
-    StringDecayer/StringDescr.h             \
-    StringGeneration/MinDistanceFinder.cpp  \
-    StringGeneration/MinDistanceFinder.h    \
-    StringGeneration/NucleiCollision.cpp    \
-    StringGeneration/NucleiCollision.h      \
-    launchNucleiCollisionGenerator.C        \
-    launchStringFragmentationGenerator.C
     if(1)
     {
         NucleiCollision *d = new NucleiCollision;
@@ -85,7 +74,12 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         // 40 - 50 %
 //        d->setImpactParameterRange( 9.92, 11.1 );
 
-        d->setImpactParameterRange( 13, 18 );
+        // try 30-50% range (for D meson v2)
+//        d->setImpactParameterRange( 8.59, 11.1 );
+        // try 20-40% range (for D meson v2)
+        d->setImpactParameterRange( 7.01, 9.92 );
+
+//        d->setImpactParameterRange( 13, 18 );
 
 
 

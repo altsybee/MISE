@@ -169,6 +169,7 @@ void ManagerStringFragmentation::initOutputObjects()
     fHistPtAfterCutsPID[3] = new TH1D("fHistPtAfterCutsPID_phis", "p_{T} distribution;p_{T} (GeV/c);1/2#pi p_{T} dN/dp_{T} (GeV/c)^{-2}", 1000, 0.0, 20);
     fHistPtAfterCutsPID[4] = new TH1D("fHistPtAfterCutsPID_lambdas", "p_{T} distribution;p_{T} (GeV/c);1/2#pi p_{T} dN/dp_{T} (GeV/c)^{-2}", 1000, 0.0, 20);
 
+    fHistPtAfterCutsPID[5] = new TH1D("fHistPtAfterCutsPID_Dmeson", "p_{T} distribution;p_{T} (GeV/c);1/2#pi p_{T} dN/dp_{T} (GeV/c)^{-2}", 1000, 0.0, 20);
 
     fHistNeventsInCentralityClasses = new TH1D("fHistNeventsInCentralityClasses", "N particles in class;class;n events", fNumberOfCentralityBins, -0.5, fNumberOfCentralityBins-0.5 );
     //    fHistNeventsInCentralityClasses->SetMarkerStyle(kFullCircle);
@@ -208,7 +209,7 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
     fHistParticlesInEvent->Reset();
     fHistPt->Reset();
     fHistPtAfterCuts->Reset();
-    for ( int i = 0; i < 3; i++)
+    for ( int i = 0; i < 6; i++)
         fHistPtAfterCutsPID[i]->Reset();
     fHistPtBeforeKick->Reset();
     fHistEta->Reset();
@@ -254,7 +255,7 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
     Float_t fNuclTreeStringBoostAngle[NMaxStrings];
     Float_t fNuclTreeStringBoostMagn[NMaxStrings];
     Float_t fNuclTreeStringRadiusVectorAngle[NMaxStrings];
-    Bool_t fNuclTreeIsHardInteractionString[NMaxStrings];
+    Short_t fNuclTreeIsHardInteractionString[NMaxStrings]; // was Bool_t
 
     Float_t fNuclTreeRandomEventPlanePhi = 0;
     Float_t fNuclTreeNu = 0;
@@ -298,7 +299,7 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
 
 
 
-    const int nPIDs = 5;
+    const int nPIDs = 6;//5;
     int nParticlesPID[nPIDs];
     for ( int i = 0; i < nPIDs; i++)
         nParticlesPID[i] = 0;
@@ -308,7 +309,7 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
     // ##### event loop
     for ( int iEvent = 0; iEvent < nEvents; iEvent++)
     {
-        if ( iEvent % 1 == 0 )
+        if ( iEvent % 100 == 0 )
             cout <<"generating " << (int)iEvent << "\r"; cout.flush();
         //            printf("generating %d event...\n",(int)iEvent );
 
@@ -334,23 +335,25 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
                 return;
             }
 
+//            cout << "number of strings: " << fNuclTreeNumberOfStrings << endl;
             for ( int iString = 0; iString < fNuclTreeNumberOfStrings; iString++)
             {
                 // TMP CUT!!! July 2016 tests
 //                if ( fNuclTreeStringBoostMagn[iString] < 0.5 )
 //                    continue;
 
-                if (iString==0) //QA plotting
+                if (0)//iString==0) //QA plotting
                     cout << " fNuclTreeStringBoostMagn[iString] = " << fNuclTreeStringBoostMagn[iString] << endl;
 
-                if ( !fNuclTreeIsHardInteractionString[iString] ) // this string is a soft interaction
+                int isHardInteraction = fNuclTreeIsHardInteractionString[iString]; // if >= 0 - value provides PID! (Nov 2017)
+                if ( isHardInteraction == -1 ) // this string is a soft interaction
                     strDescr->hadronizeString( fNuclTreeStringBoostMagn[iString], fNuclTreeStringBoostAngle[iString] );
                 else //hard interaction
                 {
                     if (whatToDoWithHardScattering==0) // create two jets
                         strDescr->makeTwoJets();
                     else if (whatToDoWithHardScattering==1) // particle pair with random pt from Power law
-                        strDescr->makeTwoParticlesWithRandomPtEtaPhi();
+                        strDescr->makeTwoParticlesWithRandomPtEtaPhi( isHardInteraction );
                 }
 
                 int nParticlesInString = strDescr->getNparticles();
@@ -409,6 +412,7 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
                         if ( p->pid == 2 ) { fHistPtAfterCutsPID[2]->Fill(p->pt, weightForPt ); nParticlesPID[2]++; }
                         if ( p->pid == 3 ) { fHistPtAfterCutsPID[3]->Fill(p->pt, weightForPt ); nParticlesPID[3]++; }
                         if ( p->pid == 4 ) { fHistPtAfterCutsPID[4]->Fill(p->pt, weightForPt ); nParticlesPID[4]++; }
+                        if ( p->pid == 5 ) { fHistPtAfterCutsPID[5]->Fill(p->pt, weightForPt ); nParticlesPID[5]++; }
 
                         if ( 0 )//not used... ( p->ptBeforeKick > 0.0 )
                         {
@@ -455,7 +459,7 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
                         fNumberOfTracks++;
                     }
                 } // end of loop over particles from string
-            }
+            } // end of loop over strings
             fHistParticlesInEvent->Fill(nParticles);
 
             fHistParticlesInCutConditionInEvent->Fill( (double)nParticlesWithinEtaPtCuts/(2*cutEtaWithinDetectorAcceptance ) ); // !
@@ -487,6 +491,7 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
     cout << ">> protons/all = " << (double)nParticlesPID[2]/nParticlesPID_All<< endl;
     cout << ">> phi-s/all = " << (double)nParticlesPID[3]/nParticlesPID_All<< endl;
     cout << ">> Lambda-s/all = " << (double)nParticlesPID[4]/nParticlesPID_All<< endl;
+    cout << ">> Dmesons/all = " << (double)nParticlesPID[5]/nParticlesPID_All<< endl;
 
 
     //fill centralities
@@ -663,11 +668,15 @@ void ManagerStringFragmentation::drawStatHists()
     fHistPtAfterCutsPID[1]->DrawNormalized("same");
     fHistPtAfterCutsPID[2]->DrawNormalized("same");
 
+    fHistPtAfterCutsPID[5]->SetLineColor(kGray+1);
+    fHistPtAfterCutsPID[5]->DrawNormalized("same");
+
     cout << ">> <pT> pions = " <<       fHistPtAfterCutsPID[0]->GetMean()<< endl;
     cout << ">> <pT> kaons = " <<       fHistPtAfterCutsPID[1]->GetMean()<< endl;
     cout << ">> <pT> protons = " <<     fHistPtAfterCutsPID[2]->GetMean()<< endl;
     cout << ">> <pT> phi-s = " <<     fHistPtAfterCutsPID[3]->GetMean()<< endl;
     cout << ">> <pT> Lambda-s = " <<     fHistPtAfterCutsPID[4]->GetMean()<< endl;
+    cout << ">> <pT> D mesons = " <<     fHistPtAfterCutsPID[5]->GetMean()<< endl;
 
 
     TLegend *legPt = new TLegend(0.65,0.5,0.95,0.8);
@@ -733,6 +742,9 @@ void ManagerStringFragmentation::drawStatHists()
     fHistPtAfterCutsPID[0]->Write();
     fHistPtAfterCutsPID[1]->Write();
     fHistPtAfterCutsPID[2]->Write();
+    fHistPtAfterCutsPID[3]->Write();
+    fHistPtAfterCutsPID[4]->Write();
+    fHistPtAfterCutsPID[5]->Write();
     //    fHistPtBeforeKick->Write();
     fHistEta->Write();
     fHistPhi->Write();

@@ -101,7 +101,7 @@ private:
     TH1D* fHistEtaInPtCuts[5];
     TH1D* fHistPhi;
     TH1D* fHistPtAfterCuts;
-    TH1D* fHistPtAfterCutsPID[5];
+    TH1D* fHistPtAfterCutsPID[6]; // [5];
     TH1D* fHistPtBeforeKick;
 
     TH1D* fHistNeventsInCentralityClasses;

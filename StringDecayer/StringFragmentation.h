@@ -19,6 +19,7 @@ const double mProton = 0.938;
 const double mPhi = 1.020;
 const double mLambda = 1.115;
 
+const double mD0 = 1.865;
 
 class StringFragmentation
 {
@@ -37,6 +38,7 @@ private:
     TF1 *funcPtBoltzmanLikePion; // from OnTheFlyDoc.pdf
     TF1 *funcPtBoltzmanLikeKaon; // from OnTheFlyDoc.pdf
     TF1 *funcPtBoltzmanLikeProton; // from OnTheFlyDoc.pdf
+    TF1 *funcPtBoltzmanLikeDmeson; // from OnTheFlyDoc.pdf
 //    double stringDecay(Double_t *x, Double_t *par);
     TRandom *fRand;
 

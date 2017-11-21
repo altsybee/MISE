@@ -121,13 +121,13 @@ void flowAnalyserNewJuly2016( TString fileDir, TString fileName, Int_t fPID = -1
 
     cutsRP = new AliFlowTrackSimpleCuts();
     cutsRP->SetPtMin(0.1);
-    cutsRP->SetPtMax(4.0);
+    cutsRP->SetPtMax(10.0);
     cutsRP->SetEtaMin(-3.0);
     cutsRP->SetEtaMax(3.0);//-0.5);
 
     cutsPOI = new AliFlowTrackSimpleCuts();
     cutsPOI->SetPtMin(0.1);
-    cutsPOI->SetPtMax(4.0);
+    cutsPOI->SetPtMax(10.0);
     //    cutsPOI->SetEtaMin(-2.0);//0.5);
     //    cutsPOI->SetEtaMax(2.0);
 //    cutsPOI->SetEtaMin(-1);
