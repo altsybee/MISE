@@ -616,7 +616,7 @@ void NucleiCollision::createPartons( Nucleus *nucl, int nId ) //float nucleonX, 
     // RECENTER PARTONS IN NUCLEON:
     // move partons to have center of nucleon = a center of mass for 3 valence quarks (Sept 2017)
     double xCM = 0, yCM = 0;
-    const int nPartonsForCM = 3; // usually: take 3 valence quark for that
+    const int nPartonsForCM = (nPartonsInThisNucleon > 3 ? 3 : nPartonsInThisNucleon); // usually: take 3 valence quark for that
     for (int vQ=0; vQ<nPartonsForCM; vQ++)
     {
         int id = curN+vQ;
@@ -1198,7 +1198,7 @@ void NucleiCollision::drawPartons()
         elNucl[iP] = new TEllipse( 0.5 + fVisNucleusRadiusNucleus * fA->nX[iP] / fNucleusRadius, 0.5 + fVisNucleusRadiusNucleus * fA->nY[iP] / fNucleusRadius
                                    , rVisNucleon, rVisNucleon );
         elNucl[iP]->SetLineColor( kGray );
-        elNucl[iP]->Draw();
+//        elNucl[iP]->Draw();
         //        hist2DNuclear->Fill( fX1[iP], fY1[iP] );
         
         elNucl2[iP] = new TEllipse( 0.5 + fVisNucleusRadiusNucleus * fB->nX[iP] / fNucleusRadius, 0.5 + fVisNucleusRadiusNucleus * fB->nY[iP] / fNucleusRadius
@@ -1217,7 +1217,7 @@ void NucleiCollision::drawPartons()
                                      , rVisParton, rVisParton );
         if ( fA->pBusy[iP] == -1 ) // valence quark
             elPoints[iP]->SetFillColorAlpha( kBlue-10, 0.6 );
-        elPoints[iP]->Draw();
+//        elPoints[iP]->Draw();
         
     }
     

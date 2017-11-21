@@ -104,7 +104,7 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
     // ##### event loop
     for ( int iEvent = 0; iEvent < nEvents; iEvent++)
     {
-        if ( iEvent % 1 == 0 )
+        if ( iEvent % 10 == 0 )
             cout <<"generating " << (int)iEvent << "\r"; cout.flush();
 
         //building event, spec impact parameter if requested:

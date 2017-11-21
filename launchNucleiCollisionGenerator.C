@@ -54,9 +54,9 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         d->setOutputDirectoryName( strOutputDirName_NucleiCollision );
 
         // set nuclei type
-          d->setNucleusType( nucleus_Pb );
+//          d->setNucleusType( nucleus_Pb );
 //          d->setNucleusType( nucleus_Au );
-//        d->setNucleusType( nucleus_proton );
+        d->setNucleusType( nucleus_proton );
 
         // tune impact parameter
         d->setImpactParSpecification( flagMBorFixedB ); //0,1,2 - MB event, precise b, b in range
