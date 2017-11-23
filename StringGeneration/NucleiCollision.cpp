@@ -33,6 +33,7 @@ const float Mstring = 1.0; // string energy density 1 GeV (from Abromovsky) //0.
 double kCoeffRadiusForMB = 1.75;  //tuned to be Ok for MB! (for NN)
 
 
+
 const int nClusterColors = 14;
 const int kClusterColors[nClusterColors] = {
     kRed, kRed+2,
@@ -1142,6 +1143,11 @@ void NucleiCollision::finalActions()
         cout << " >>>>> areaOfTrials = " << areaOfTrials << endl;
         double crossSection = (double)fEvTrialsSuccess / nTrials * areaOfTrials / 100; //100 fm2 in 1 barn
         cout << " >>>>> crossSection (in barns?..)= " << crossSection << endl;
+
+        ofstream fout_crossSection( Form( "%s/tmp_cross_section.txt", fOutDirName.Data() ), ios::out | ios::binary);
+        fout_crossSection << crossSection << endl;
+        fout_crossSection.close();
+
     }
 
     cout << "########## End NucleiCollision::finalActions()" << endl;

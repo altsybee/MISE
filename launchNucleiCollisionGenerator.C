@@ -77,11 +77,28 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         // try 30-50% range (for D meson v2)
 //        d->setImpactParameterRange( 8.59, 11.1 );
         // try 20-40% range (for D meson v2)
-        d->setImpactParameterRange( 7.01, 9.92 );
+//        d->setImpactParameterRange( 7.01, 9.92 );
 
 //        d->setImpactParameterRange( 13, 18 );
 
 
+        // Nov 2017 BY HAND:     (ALICE centrality 2.76 paper: https://arxiv.org/pdf/1301.4361.pdf)
+//        d->setImpactParameterRange( 0, 1.57 ); // 0-5%
+//        d->setImpactParameterRange( 9.88, 12.09 ); // 40–60%
+//        d->setImpactParameterRange( 12.09, 13.97  );  // 60–80%
+        if ( flagMBorFixedB == 2) // bImpPar ranges cooked using centrality paper: https://arxiv.org/pdf/1301.4361.pdf
+        {
+            if (int(bImpact)==0)         d->setImpactParameterRange( 0, 3.50  );  // 0-5%
+            else if (int(bImpact)==1)    d->setImpactParameterRange( 3.5, 4.94  );  // 5-10%
+            else if (int(bImpact)==2)    d->setImpactParameterRange( 4.94, 6.98  );  // 10-20%
+            else if (int(bImpact)==3)    d->setImpactParameterRange( 6.98, 8.55  );  // 20-30%
+            else if (int(bImpact)==4)    d->setImpactParameterRange( 8.55, 9.88  );  // 30-40%
+            else if (int(bImpact)==5)    d->setImpactParameterRange( 9.88, 11.04  );  // 40-50%
+            else if (int(bImpact)==6)    d->setImpactParameterRange( 11.04, 12.09  );  // 50-60%
+            else if (int(bImpact)==7)    d->setImpactParameterRange( 12.09, 13.05  );  // 60-70%
+            else if (int(bImpact)==8)    d->setImpactParameterRange( 13.05, 13.97  );  // 70-80%
+
+        }
 
 
 //        d->setImpactParameterRange( 0, 0.01 );
@@ -148,7 +165,6 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         //        d->drawEventStructure();
 
     }
-//    gROOT->ProcessLine(".q");
 
     //time estimation
     timer.Stop();
@@ -156,5 +172,7 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
     Double_t ctime = timer.CpuTime();
 
     printf("RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
+
+        gROOT->ProcessLine(".q");
 
 }
