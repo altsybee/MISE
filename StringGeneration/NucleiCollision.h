@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   NucleiCollision.h
  * Author: altsybee
  *
@@ -113,6 +113,7 @@ public:
 //    void setNumberOfNucleons(int nNucleons) { fNumberOfNucleons = nNucleons; }
     void setMaxNumberOfPartons(int nPartons) { fMaxPartons = nPartons; }
     void setMeanNofPartonsInNucleon(float n) { fMeanNofPartonsInNucleon = n; }
+    void setNucleonGaussianRadius(float r) { fNucleonGaussianRadius = r; }
 
     float getRandomEventPlanePhi() { return fRandomEventPlane; }
 
@@ -151,6 +152,8 @@ public:
     void calcEccentricity();
     void fillNumberOfStringsInXY();
     void getIngredientsForEccentricity(Nucleus *nucl, Nucleus *nucl2, int &nWounded, float &num, float &denom );
+
+    int getMultFromAllStringsFictive() { return fMultFromAllStringsFictive; }
 
 
 //    float*  getArrStringX() const { return fXstring; }
@@ -219,6 +222,7 @@ private:
 //    double fStringInteractionParA;  //parameterization a-la Woods-Saxon, fm
 //    double fClusterFormationDist; //distance b/n strings to form a cluster, fm
     double fMeanNofPartonsInNucleon; //mean n of partons in nucleon
+    double fNucleonGaussianRadius; // nucleon radius, fm
 
 //    float fHardScatteringProbability; //probability for a string to be a hard partonic collision
 
@@ -284,6 +288,8 @@ private:
     int fNparticipants; // for nu calculation
     int fNcollisions; // for nu calculation
 
+    int fMultFromAllStringsFictive;  // Nov 2017: fictive multiplicities from strings (to control mult distr and for centrality determination)
+
     // ##### output directory name
     TString fOutDirName;
 
@@ -344,6 +350,9 @@ private:
     TH1D *fHistNucleonDensityR; //nucleon r density hist
     TH1D *fHistNumberWoundedNucleons; //number of wounded nucleons
     TH1D *fHistNcoll; //number of binary nucleon collisions
+
+    // Nov 2017: fictive multiplicities from strings (to control mult distr and for centrality determination)
+    TH1D *fHistFictiveMultDistr; // mult distribution
 
     //##### visualisation parameters
     double fVisNucleusRadiusNucleus; //visual size nucleus

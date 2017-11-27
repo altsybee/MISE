@@ -120,6 +120,15 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
 
 //        d->setHardScatteringProbability(0);//0.03);
 
+        // Nov 2017: EXPERIMENTAL FEATURE!
+        // FROM Ulrich Heinz, J. Scott Moreland (2011) - https://arxiv.org/pdf/1108.5379.pdf
+        // TABLE 1: sqrt(B) ---> r_transv = sqrt(2B)
+        // ASSUME PROPORTIONALITY B/N parameter B and avNpart
+        d->setNucleonGaussianRadius( 0.1038 * meanPartonsInNucleon ); // 0.1038 is a conversion factor = 0.935/sqrt(9.)  , where avNpart=9.
+
+
+
+
         //d->setComputeStringRepulsion(1);
 
         //string decayer

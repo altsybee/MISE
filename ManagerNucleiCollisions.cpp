@@ -77,6 +77,7 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
     Float_t fNuclTreeRandomEventPlanePhi = 0;
     Float_t fNuclTreeNu = 0;
     Int_t fNuclTreeNumberOfStrings = 0;
+    Int_t fMultFromAllStringsFictive = 0;
 //    Float_t fNuclTreeStringBoostAngle[NMaxStrings];
 //    Float_t fNuclTreeStringBoostMagn[NMaxStrings];
     Float_t fDistanceBetweenPartonsForString[NMaxStrings];
@@ -99,6 +100,8 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
     fNucleiCollisionsTree->Branch("stringRadiusVectorAngle", fNuclTreeStringRadiusVectorAngle,"fNuclTreeStringRadiusVectorAngle[fNuclTreeNumberOfStrings]/F");
     fNucleiCollisionsTree->Branch("stringOrigin", fStringOrigin,"fStringOrigin[fNuclTreeNumberOfStrings]/S");
 //    fNucleiCollisionsTree->Branch("isHardInteraction",fNuclTreeIsHardInteractionString,"fNuclTreeIsHardInteractionString[fNuclTreeNumberOfStrings]/O");
+
+    fNucleiCollisionsTree->Branch( "multFromAllStringsFictive", &fMultFromAllStringsFictive,"fMultFromAllStringsFictive/I");
 
 
     // ##### event loop
@@ -123,6 +126,8 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
         fNuclTreeNumberOfStrings = fPtrNuclStruct->getNstrings();
         fNuclTreeRandomEventPlanePhi = fPtrNuclStruct->getRandomEventPlanePhi();
         fNuclTreeNu = fPtrNuclStruct->getNu();
+        fMultFromAllStringsFictive = fPtrNuclStruct->getMultFromAllStringsFictive();
+        //cout << fMultFromAllStringsFictive << endl;
 
         if ( fNuclTreeNumberOfStrings >= NMaxStrings )
         {

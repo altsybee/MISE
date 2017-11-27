@@ -174,7 +174,10 @@ NucleiCollision::NucleiCollision(/*int seed*/) :
   //  , fRadiusParton(0.1)    //radius "parton", fm
   , fPartonInteractionDistance(0.2)//0.2)
   , fMeanNofPartonsInNucleon(5)
+  , fNucleonGaussianRadius(0.4)
 //  , fHardScatteringProbability(0.03)
+
+  , fMultFromAllStringsFictive(0)
   
   , fImpactParameter(0.) //fm (is MC-played)
   //  , fImpactParameterByHand_0_100(0.)
@@ -207,14 +210,14 @@ void NucleiCollision::initDataMembers()
         break;
     case nucleus_Pb:
         fNumberOfNucleons = 208; // !! Centrality p-Pb ALICE: arXiv:1412.6828       //207;//8;
-        fNucleusRadius = 6.62;//6.413;
-        fNucleusWSa = 0.546; // from ASer
+        fNucleusRadius = 6.62;// 6.62 ± 0.06 // Loizides
+        fNucleusWSa = 0.546; // 0.546 ± 0.010 // Loizides
         //        cout << "Pb" << endl;
         break;
     case nucleus_Au:
         fNumberOfNucleons = 197;
-        fNucleusRadius = 6.38; // // from GlauberFull
-        fNucleusWSa = 0.535; // from GlauberFull
+        fNucleusRadius = 6.38; // 6.38 ± 0.13 // Loizides
+        fNucleusWSa = 0.535; // 0.535 ± 0.053 // Loizides
         break;
     default:
         break;
@@ -324,7 +327,11 @@ void NucleiCollision::initDataMembers()
     fHistNumberWoundedNucleons = new TH1D("fHistNumberWoundedNucleons", ";number of wounded nucleons;n events", 5*2*fNumberOfNucleons+1, -0.5, 5*2*fNumberOfNucleons+0.5 );
     fHistNcoll = new TH1D("fHistNcoll", ";N_{coll};n events", 5*2*fNumberOfNucleons+1, -0.5, 5*2*fNumberOfNucleons+0.5 );
     
-    
+    // Nov 2017: fictive multiplicities from strings (to control mult distr and for centrality determination)
+    fHistFictiveMultDistr = new TH1D("fHistFictiveMultDistr", "n particles;P(n);entries", 12001, -0.5, 12000.5 );
+
+
+    //
     fVisNucleusRadiusNucleus = 0.35; //visual size nucleus
     //    rVisParton = fRadiusParton / fNucleusRadius * fVisNucleusRadiusNucleus; //visual nucleon
     
@@ -367,6 +374,8 @@ void NucleiCollision::buildEvent()
     
     fFlagHaveMBcollision = false;
     fEccentricity = -1;
+
+    fMultFromAllStringsFictive = 0;
 
     // generate random event plane (EP) for later use outside
     fRandomEventPlane = fRand->Uniform( 0, 2*TMath::Pi() );
@@ -429,7 +438,12 @@ void NucleiCollision::buildEvent()
             fCanvEventView->SaveAs( Form( "%s/canv_eventView_%d.eps", fOutDirName.Data(), fEventId));
             fCanvEventView->SaveAs( Form( "%s/canv_eventView_%d.png", fOutDirName.Data(), fEventId));
         }
-    }
+
+        // Nov 2017: fictive multiplicities from strings (to control mult distr and for centrality determination)
+        for( int i = 0; i < fNumberOfStrings; ++i )
+            fMultFromAllStringsFictive += TMath::Nint( fRand->Poisson( 4.3*1.1 ) ); // 4.3=acceptance of V0, 1.1 particle per unit of rapidity
+        fHistFictiveMultDistr->Fill( fMultFromAllStringsFictive );
+    } // endl of if fFlagHaveMBcollision
 }
 
 void NucleiCollision::createNucleiPair()
@@ -580,7 +594,7 @@ void NucleiCollision::createPartons( Nucleus *nucl, int nId ) //float nucleonX, 
         if(1)//variant with Gaus2D position of partons
         {
             fRand->Rannor( a, b ); //mean=0 and sigma=1
-            const float kNucleonGausSigma = 0.4; //0.6
+            const float kNucleonGausSigma = fNucleonGaussianRadius; //0.4 - WAS A DEFAULT BEFORE 27 NOV 2017; //0.6
             nucl->pX[id] = /*nucl->nX[nId] +*/ a*kNucleonGausSigma;//kNucleonSize; //sigma 0.6?..
             nucl->pY[id] = /*nucl->nY[nId] +*/ b*kNucleonGausSigma;//kNucleonSize;
         }
@@ -946,6 +960,8 @@ void NucleiCollision::drawStatisticHists()
         fHistNstrings->Write();
         fHistNcoll->Write();
         fHistNumberWoundedNucleons->Write();
+
+        fHistFictiveMultDistr->Write();
 
         //pad
         fCanvEventStatistics->cd(padId++);
