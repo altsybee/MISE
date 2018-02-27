@@ -27,6 +27,7 @@ enum en_nucleus_type
     nucleus_proton = 0,
     nucleus_Pb = 1,
     nucleus_Au = 2,
+    nucleus_p_Pb = 3,
 };
 
 struct Nucleus
@@ -175,7 +176,7 @@ public:
 
 private:
     //##### event construction
-    void createNucleus( Nucleus *nucl, float bx, float by ); //(float *nuclX, float *nuclY, float bx=0, float by=0, float *x, float *y ); //x, y - tmp, potom ubrat'!!!
+    void createNucleus(int nucleusId, Nucleus *nucl, float bx, float by ); //(float *nuclX, float *nuclY, float bx=0, float by=0, float *x, float *y ); //x, y - tmp, potom ubrat'!!!
     void createPartonsOld(float *x, float *y, float bx=0, float by=0 ); //bx, by - used only for backward capability!
     void createPartons( Nucleus *nucl, int nId ); //(float nucleonX, float nucleonY, float *x=0, float *y=0 ); //bx, by - used only for backward capability!
     void createNucleiPair();

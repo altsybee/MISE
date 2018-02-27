@@ -219,6 +219,11 @@ void NucleiCollision::initDataMembers()
         fNucleusRadius = 6.38; // 6.38 ± 0.13 // Loizides
         fNucleusWSa = 0.535; // 0.535 ± 0.053 // Loizides
         break;
+    case nucleus_p_Pb:
+        fNumberOfNucleons = 197;
+        fNucleusRadius = 6.38; // 6.38 ± 0.13 // Loizides
+        fNucleusWSa = 0.535; // 0.535 ± 0.053 // Loizides
+        break;
     default:
         break;
     }
@@ -294,7 +299,7 @@ void NucleiCollision::initDataMembers()
     fHistMinDistBetweenInteractingPartonsSoft = new TH1D("fHistMinDistBetweenInteractingPartonsSoft","min distances b/n interacting partons - SOFT INTERACTION;r, fm;n entries",400,0, fPartonInteractionDistance*1.2 );
     fHistMinDistBetweenInteractingPartonsValence = new TH1D("fHistMinDistBetweenInteractingPartonsValence","min distances b/n interacting VALENCE QUARKS;r, fm;n entries",400,0, fPartonInteractionDistance*1.2 );
 
-    fHistNstrings = new TH1D("fHistNstrings", "n strings;N;entries", 5*2*fNumberOfNucleons+1+20, -0.5, 5*2*fNumberOfNucleons+0.5+20 );
+    fHistNstrings = new TH1D("fHistNstrings", "n strings;N;entries", 2*5*2*fNumberOfNucleons+1+20, -0.5, 2*5*2*fNumberOfNucleons+0.5+20 );
     fHistStringInteractions = new TH1D("fHistStringInteractions", "n string intersections", fMaxPartons+1, -0.5, fMaxPartons+0.5 );
     fHistStringPositionRadius = new TH1D("fHistStringPositionRadius", "string r position/R", 50, 0, 2.5 );
     fHistImpactParameter = new TH1D("fHistImpactParameter", "impact parameter", 50, 0, fNucleusRadius*4 );
@@ -308,7 +313,7 @@ void NucleiCollision::initDataMembers()
     const int nBinsXY = 41;
     const double sizeForXY = 2*fNucleusRadius;
     fHist2DNstringsXY_thisEvent = new TH2D("fHist2DNstringsXY_thisEvent", "nStr_xy_this", nBinsXY, -sizeForXY, sizeForXY , nBinsXY, -sizeForXY, sizeForXY );
-    fHist2DNstringsXY = new TH2D("fHist2DNstringsXY", "nStr in xy"                      , nBinsXY, -sizeForXY, sizeForXY , nBinsXY, -sizeForXY, sizeForXY );
+    fHist2DNstringsXY = new TH2D("fHist2DNstringsXY", "n strings in xy"                      , nBinsXY, -sizeForXY, sizeForXY , nBinsXY, -sizeForXY, sizeForXY );
     fHist2DN2stringsXY = new TH2D("fHist2DN2stringsXY", "nStr in xy"                    , nBinsXY, -sizeForXY, sizeForXY , nBinsXY, -sizeForXY, sizeForXY );
     fHist2DSigmaNstringsXY = new TH2D("fHist2DSigmaNstringsXY", "#sigma n strings in xy", nBinsXY, -sizeForXY, sizeForXY , nBinsXY, -sizeForXY, sizeForXY );
 
@@ -490,8 +495,8 @@ void NucleiCollision::createNucleiPair()
     //create nuclei
     //    createPartonsOld( fX1, fY1, 0, 0 );
     //    createPartonsOld( fX2, fY2, bx, by );
-    createNucleus( fA, 0, 0 );  //fNuclX1, fNuclY1, 0, 0, fX1, fY1 );
-    createNucleus( fB, bx, by ); //fNuclX2, fNuclY2, bx, by, fX2, fY2 );
+    createNucleus( 0, fA, 0, 0 );  //fNuclX1, fNuclY1, 0, 0, fX1, fY1 );
+    createNucleus( 1, fB, bx, by ); //fNuclX2, fNuclY2, bx, by, fX2, fY2 );
     
     //fill histos with nucleons from A
     for ( int iP = 0; iP < fA->nNucleons; iP++ )
@@ -529,7 +534,7 @@ void NucleiCollision::createNucleiPair()
 
 }
 
-void NucleiCollision::createNucleus( Nucleus *nucl, float bx, float by )
+void NucleiCollision::createNucleus( int nucleusId, Nucleus *nucl, float bx, float by )
 {
     //remember impact parameter (bx,by)
     nucl->bx = bx;
@@ -537,7 +542,7 @@ void NucleiCollision::createNucleus( Nucleus *nucl, float bx, float by )
     double rRand = 0;
     double phiRand = 0;
     //    double thetaRand = 0;
-    if (fNucleusType == nucleus_proton)
+    if (fNucleusType == nucleus_proton || (fNucleusType == nucleus_p_Pb && nucleusId == 0 ) )
     {
         nucl->nX[0] = bx;
         nucl->nY[0] = by;
@@ -1137,10 +1142,12 @@ void NucleiCollision::finalActions()
                 fHist2DSigmaNstringsXY->SetBinContent( i+1,j+1, omega );
             }
         }
-        TCanvas *lCanvTransvStringDensity = new TCanvas("lCanvTransvStringDensity","string density in xy",280,180,500,500);
-        lCanvTransvStringDensity->cd(); //to avoid warning
+        TCanvas *lCanvTransvStringDensity = new TCanvas("lCanvTransvStringDensity","string density in xy",280,180,1000,500);
+        lCanvTransvStringDensity->Divide(2,1);
+        lCanvTransvStringDensity->cd(1); //to avoid warning
         fHist2DSigmaNstringsXY->DrawCopy( "cont1z" );
-        //        fHist2DNstringsXY->DrawCopy( "colz" );
+        lCanvTransvStringDensity->cd(2);
+        fHist2DNstringsXY->DrawCopy( "colz" );
     }
 
 
@@ -1220,7 +1227,7 @@ void NucleiCollision::drawPartons()
         elNucl[iP] = new TEllipse( 0.5 + fVisNucleusRadiusNucleus * fA->nX[iP] / fNucleusRadius, 0.5 + fVisNucleusRadiusNucleus * fA->nY[iP] / fNucleusRadius
                                    , rVisNucleon, rVisNucleon );
         elNucl[iP]->SetLineColor( kGray );
-//        elNucl[iP]->Draw();
+        elNucl[iP]->Draw();
         //        hist2DNuclear->Fill( fX1[iP], fY1[iP] );
         
         elNucl2[iP] = new TEllipse( 0.5 + fVisNucleusRadiusNucleus * fB->nX[iP] / fNucleusRadius, 0.5 + fVisNucleusRadiusNucleus * fB->nY[iP] / fNucleusRadius
@@ -1239,7 +1246,7 @@ void NucleiCollision::drawPartons()
                                      , rVisParton, rVisParton );
         if ( fA->pBusy[iP] == -1 ) // valence quark
             elPoints[iP]->SetFillColorAlpha( kBlue-10, 0.6 );
-//        elPoints[iP]->Draw();
+        elPoints[iP]->Draw();
         
     }
     

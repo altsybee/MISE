@@ -54,9 +54,10 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         d->setOutputDirectoryName( strOutputDirName_NucleiCollision );
 
         // set nuclei type
-//          d->setNucleusType( nucleus_Pb );
+//        d->setNucleusType( nucleus_proton );
+          d->setNucleusType( nucleus_Pb );
 //          d->setNucleusType( nucleus_Au );
-        d->setNucleusType( nucleus_proton );
+//        d->setNucleusType( nucleus_p_Pb );
 
         // tune impact parameter
         d->setImpactParSpecification( flagMBorFixedB ); //0,1,2 - MB event, precise b, b in range
@@ -124,8 +125,8 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         // FROM Ulrich Heinz, J. Scott Moreland (2011) - https://arxiv.org/pdf/1108.5379.pdf
         // TABLE 1: sqrt(B) ---> r_transv = sqrt(2B)
         // ASSUME PROPORTIONALITY B/N parameter B and avNpart
-        d->setNucleonGaussianRadius( 0.1038 * meanPartonsInNucleon ); // 0.1038 is a conversion factor = 0.935/sqrt(9.)  , where avNpart=9.
-
+//        d->setNucleonGaussianRadius( 0.22 * sqrt(2*meanPartonsInNucleon) ); // 0.1038 is a conversion factor = 0.935/9.  , where avNpart=9.
+        d->setNucleonGaussianRadius( 0.4 ); // 0.1038 is a conversion factor = 0.935/9.  , where avNpart=9.
 
 
 
@@ -182,6 +183,6 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
 
     printf("RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
 
-        gROOT->ProcessLine(".q");
+//        gROOT->ProcessLine(".q");
 
 }
