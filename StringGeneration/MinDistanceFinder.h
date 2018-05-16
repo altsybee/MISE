@@ -25,7 +25,9 @@ class MinDistanceFinder
 
 public:
     MinDistanceFinder(float minDistance = 100000);
-    void FindMinDistancesBetweenPairs( const float *x1, const float *y1, const float *x2, const float *y2, int Nrows, int Ncols );
+    void FindMinDistancesBetweenPairs( const float *x1, const float *y1, const float *x2, const float *y2, int Nrows, int Ncols,
+                                       bool flagOnlyOneInteractionPerParton );
+    // not really used now? Was used to find clusters of strings, as far as I remember... (comment from May 10, 2018)
     void FindMinDistancesWithinArray( const float *x, const float *y, int arrSize );
     DistanceEntry* GetMinDistanceArray( int &arraySize ) { arraySize = fSizeOfArrayWithMinimums; return arrDist; }
 //    int GetNumberOfInteractions() { return fNumberOfInteractions; }

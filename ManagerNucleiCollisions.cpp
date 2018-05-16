@@ -71,13 +71,14 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
 
     // ##### 10.07.2016 - save NucleiCollision info into the tree
     TTree *fNucleiCollisionsTree = new TTree("NucleiCollisionsTree","NucleiCollisionsTree");
-    const int NMaxStrings = 5000;
+    const int NMaxStrings = 35000;//8000;
 
     Float_t fImpactParameter = 0;
     Float_t fNuclTreeRandomEventPlanePhi = 0;
     Float_t fNuclTreeNu = 0;
     Int_t fNuclTreeNumberOfStrings = 0;
-    Int_t fMultFromAllStringsFictive = 0;
+    Int_t fMultFromAllStringsFictiveV0 = 0;
+    Int_t fMultFromAllStringsFictiveMidEta = 0;
 //    Float_t fNuclTreeStringBoostAngle[NMaxStrings];
 //    Float_t fNuclTreeStringBoostMagn[NMaxStrings];
     Float_t fDistanceBetweenPartonsForString[NMaxStrings];
@@ -101,7 +102,8 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
     fNucleiCollisionsTree->Branch("stringOrigin", fStringOrigin,"fStringOrigin[fNuclTreeNumberOfStrings]/S");
 //    fNucleiCollisionsTree->Branch("isHardInteraction",fNuclTreeIsHardInteractionString,"fNuclTreeIsHardInteractionString[fNuclTreeNumberOfStrings]/O");
 
-    fNucleiCollisionsTree->Branch( "multFromAllStringsFictive", &fMultFromAllStringsFictive,"fMultFromAllStringsFictive/I");
+    fNucleiCollisionsTree->Branch( "multFromAllStringsFictiveV0", &fMultFromAllStringsFictiveV0,"fMultFromAllStringsFictiveV0/I");
+    fNucleiCollisionsTree->Branch( "multFromAllStringsFictiveMidEta", &fMultFromAllStringsFictiveMidEta,"fMultFromAllStringsFictiveMidEta/I");
 
 
     // ##### event loop
@@ -126,7 +128,8 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
         fNuclTreeNumberOfStrings = fPtrNuclStruct->getNstrings();
         fNuclTreeRandomEventPlanePhi = fPtrNuclStruct->getRandomEventPlanePhi();
         fNuclTreeNu = fPtrNuclStruct->getNu();
-        fMultFromAllStringsFictive = fPtrNuclStruct->getMultFromAllStringsFictive();
+        fMultFromAllStringsFictiveV0 = fPtrNuclStruct->getMultFromAllStringsFictiveV0();
+        fMultFromAllStringsFictiveMidEta = fPtrNuclStruct->getMultFromAllStringsFictiveMidEta();
         //cout << fMultFromAllStringsFictive << endl;
 
         if ( fNuclTreeNumberOfStrings >= NMaxStrings )
@@ -162,6 +165,24 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
     }
     fPtrNuclStruct->finalActions();
 
+
+    // ##### additional histogram with info (cross-section, etc) - March 2018
+    const int nBinLabels = 3;
+    TH1D *fAdditionalInfo = new TH1D( "fAdditionalInfo", "additional information from simulations;bin;value", nBinLabels,-0.5,nBinLabels-0.5);
+    TString strBinLabels[nBinLabels] =
+    {
+//        "cross_seciton", // TUT OSHIBKA V NAPISANII!!!
+        "cross_section",
+        "mean_n_strings",
+    };
+    for( Int_t i = 1; i <= nBinLabels; i++ )
+        fAdditionalInfo->GetXaxis()->SetBinLabel( i, strBinLabels[i-1].Data() );
+
+    fAdditionalInfo->SetBinContent( 1, fPtrNuclStruct->getCrossSection() );
+    fAdditionalInfo->SetBinContent( 2, fPtrNuclStruct->getMeanNstrings() );
+
+
+    //
     TCanvas *canv_impParVSnStrings = new TCanvas("canv_impParVSnStrings","canvas impPar VS nStrings",380,280,800,600);
     fHist2D_impParVSnStrings->DrawCopy("colz");
 
@@ -170,6 +191,7 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
     outFileNuclColTree->cd();
     fNucleiCollisionsTree->Write();
     fHist2D_impParVSnStrings->Write();
+    fAdditionalInfo->Write();
     outFileNuclColTree->Close();
 }
 

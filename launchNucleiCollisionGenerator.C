@@ -5,6 +5,10 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         , double meanPartonsInNucleon = 6
 //        , double stringOverlapEnergyDensity = 0.1
 //        , double coeffPtKickPerUnitMagn = 0.1
+        , double nucleonGaussianRadius = 0.4
+        , double meanMultFromOneStringForFictiveMultStudies = 1.1
+        , bool flagUsePoissonianNpartonsFluctuations = 1
+        , bool flagOnlyOneInteractionPerParton = 1
         , int drawMode = 0 )
 {
     // dist to form a cluster: now (from Aug 2014) we consider All strings to be in cluster
@@ -121,14 +125,20 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
 
 //        d->setHardScatteringProbability(0);//0.03);
 
+        d->setFlagUsePoissonianNpartonsFluctuations( flagUsePoissonianNpartonsFluctuations );
+        d->setFlagOnlyOneInteractionPerParton( flagOnlyOneInteractionPerParton );
         // Nov 2017: EXPERIMENTAL FEATURE!
         // FROM Ulrich Heinz, J. Scott Moreland (2011) - https://arxiv.org/pdf/1108.5379.pdf
         // TABLE 1: sqrt(B) ---> r_transv = sqrt(2B)
         // ASSUME PROPORTIONALITY B/N parameter B and avNpart
 //        d->setNucleonGaussianRadius( 0.22 * sqrt(2*meanPartonsInNucleon) ); // 0.1038 is a conversion factor = 0.935/9.  , where avNpart=9.
-        d->setNucleonGaussianRadius( 0.4 ); // 0.1038 is a conversion factor = 0.935/9.  , where avNpart=9.
+//        d->setNucleonGaussianRadius( 0.4 ); // 0.1038 is a conversion factor = 0.935/9.  , where avNpart=9.
+        d->setNucleonGaussianRadius( nucleonGaussianRadius );
 
 
+        // Nov 2017 - Feb 2018: av mult from one string = 1.1 particle per unit of rapidity (FOR FICTIVE MULT NucleiCollision-only studies)
+//        d->setMeanMultFromOneStringForFictiveMultStudies( 1.1 );
+        d->setMeanMultFromOneStringForFictiveMultStudies( meanMultFromOneStringForFictiveMultStudies );
 
         //d->setComputeStringRepulsion(1);
 

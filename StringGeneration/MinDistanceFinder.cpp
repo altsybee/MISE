@@ -45,8 +45,8 @@ void MinDistanceFinder::quickSortR( DistanceEntry* a, long N )
 }
 
 
-void MinDistanceFinder::FindMinDistancesBetweenPairs( const float *x1, const float *y1
-                                                      , const float *x2, const float *y2, int Nrows, int Ncols )
+void MinDistanceFinder::FindMinDistancesBetweenPairs(const float *x1, const float *y1
+                                                      , const float *x2, const float *y2, int Nrows, int Ncols , bool flagOnlyOneInteractionPerParton )
 {
     fNrows = Nrows;
     fNcols = Ncols;
@@ -93,8 +93,12 @@ void MinDistanceFinder::FindMinDistancesBetweenPairs( const float *x1, const flo
             cout << "\n";
         }
         //check occupation
-        if ( occupiedX[d->x] || occupiedY[d->y] )
-            continue;
+        // !!! ADDED FLAG ON MAY 2018: if true - works as before, if false - partons not "occupied", each parton can interact with many others, like in WQM (to be confirmed that it works like desired)
+        if ( flagOnlyOneInteractionPerParton )
+        {
+            if ( occupiedX[d->x] || occupiedY[d->y] )
+                continue;
+        }
 
         //check distance (HERE DIST IS IN ^2!)
         if ( d->dist < fMinDistance*fMinDistance ) // !occupiedX[d->x] && !occupiedY[d->y] )

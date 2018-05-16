@@ -173,12 +173,16 @@ NucleiCollision::NucleiCollision(/*int seed*/) :
   , fNucleusWSa(1.)
   //  , fRadiusParton(0.1)    //radius "parton", fm
   , fPartonInteractionDistance(0.2)//0.2)
+  , fFlagUsePoissonianNpartonsFluctuations(true)
+  , fFlagOnlyOneInteractionPerParton(true)
   , fMeanNofPartonsInNucleon(5)
   , fNucleonGaussianRadius(0.4)
 //  , fHardScatteringProbability(0.03)
 
-  , fMultFromAllStringsFictive(0)
-  
+  , fAvMultFromOneStringPerEtaUnitFictive(1.1) // 1.1 particle per unit of rapidity
+  , fMultFromAllStringsFictiveV0(0)
+  , fMultFromAllStringsFictiveMidEta(0)
+
   , fImpactParameter(0.) //fm (is MC-played)
   //  , fImpactParameterByHand_0_100(0.)
   //  , fImpactParameter_rangeMin_0_100(0)
@@ -286,6 +290,9 @@ void NucleiCollision::initDataMembers()
     fEvTrialsSuccess = 0;
     fEvTrialsFailed = 0;
 
+    fCrossSectionFinal = 0;
+    fMeanNstringsFinal = 0;
+
     fNparticipants = 0;
     fNcollisions = 0;
     
@@ -299,7 +306,7 @@ void NucleiCollision::initDataMembers()
     fHistMinDistBetweenInteractingPartonsSoft = new TH1D("fHistMinDistBetweenInteractingPartonsSoft","min distances b/n interacting partons - SOFT INTERACTION;r, fm;n entries",400,0, fPartonInteractionDistance*1.2 );
     fHistMinDistBetweenInteractingPartonsValence = new TH1D("fHistMinDistBetweenInteractingPartonsValence","min distances b/n interacting VALENCE QUARKS;r, fm;n entries",400,0, fPartonInteractionDistance*1.2 );
 
-    fHistNstrings = new TH1D("fHistNstrings", "n strings;N;entries", 2*5*2*fNumberOfNucleons+1+20, -0.5, 2*5*2*fNumberOfNucleons+0.5+20 );
+    fHistNstrings = new TH1D("fHistNstrings", "n strings;N;entries", 4*2*2*5*2*fNumberOfNucleons+1+20, -0.5, 4*2*2*5*2*fNumberOfNucleons+0.5+20 );
     fHistStringInteractions = new TH1D("fHistStringInteractions", "n string intersections", fMaxPartons+1, -0.5, fMaxPartons+0.5 );
     fHistStringPositionRadius = new TH1D("fHistStringPositionRadius", "string r position/R", 50, 0, 2.5 );
     fHistImpactParameter = new TH1D("fHistImpactParameter", "impact parameter", 50, 0, fNucleusRadius*4 );
@@ -333,8 +340,9 @@ void NucleiCollision::initDataMembers()
     fHistNcoll = new TH1D("fHistNcoll", ";N_{coll};n events", 5*2*fNumberOfNucleons+1, -0.5, 5*2*fNumberOfNucleons+0.5 );
     
     // Nov 2017: fictive multiplicities from strings (to control mult distr and for centrality determination)
-    fHistFictiveMultDistr = new TH1D("fHistFictiveMultDistr", "n particles;P(n);entries", 12001, -0.5, 12000.5 );
-
+    fHistFictiveMultDistrV0 = new TH1D("fHistFictiveMultDistrV0", ";n particles;entries", 12001, -0.5, 12000.5 );
+    // Feb 2018:
+    fHistFictiveMultDistrMidEta = new TH1D("fHistFictiveMultDistrMidEta", ";n particles;entries", 12001, -0.5, 12000.5 );
 
     //
     fVisNucleusRadiusNucleus = 0.35; //visual size nucleus
@@ -380,7 +388,8 @@ void NucleiCollision::buildEvent()
     fFlagHaveMBcollision = false;
     fEccentricity = -1;
 
-    fMultFromAllStringsFictive = 0;
+    fMultFromAllStringsFictiveV0 = 0;
+    fMultFromAllStringsFictiveMidEta = 0;
 
     // generate random event plane (EP) for later use outside
     fRandomEventPlane = fRand->Uniform( 0, 2*TMath::Pi() );
@@ -446,8 +455,12 @@ void NucleiCollision::buildEvent()
 
         // Nov 2017: fictive multiplicities from strings (to control mult distr and for centrality determination)
         for( int i = 0; i < fNumberOfStrings; ++i )
-            fMultFromAllStringsFictive += TMath::Nint( fRand->Poisson( 4.3*1.1 ) ); // 4.3=acceptance of V0, 1.1 particle per unit of rapidity
-        fHistFictiveMultDistr->Fill( fMultFromAllStringsFictive );
+        {
+            fMultFromAllStringsFictiveV0 += TMath::Nint( fRand->Poisson( 4.3*fAvMultFromOneStringPerEtaUnitFictive ) ); // 4.3=acceptance of V0, 1.1 particle per unit of rapidity
+            fMultFromAllStringsFictiveMidEta += TMath::Nint( fRand->Poisson( 1.0*fAvMultFromOneStringPerEtaUnitFictive ) ); // "|dN/dEta|<0.5"
+        }
+        fHistFictiveMultDistrV0->Fill( fMultFromAllStringsFictiveV0 );
+        fHistFictiveMultDistrMidEta->Fill( fMultFromAllStringsFictiveMidEta );
     } // endl of if fFlagHaveMBcollision
 }
 
@@ -575,7 +588,9 @@ void NucleiCollision::createPartons( Nucleus *nucl, int nId ) //float nucleonX, 
     
     //generate n of partons in this nucleon
     int curN = nucl->nPartons; //overall number of partons in this NUCLEUS
-    int nPartonsInThisNucleon = TMath::Nint( fRand->Poisson(fMeanNofPartonsInNucleon) );
+    // MAY 9, 2018: add possibility to fix nPartons in eachNucleon - like in WQM (?) )
+    int nPartonsInThisNucleon = ( fFlagUsePoissonianNpartonsFluctuations ? TMath::Nint( fRand->Poisson(fMeanNofPartonsInNucleon) )
+                                                                         : fMeanNofPartonsInNucleon ); // ADDED ON MAY 9, 2018!
     if ( curN + nPartonsInThisNucleon > nucl->maxNofPartons )
     {
         cout << "MAX N OF PARTONS EXCEEDED!!! => don't generate partons..." << endl;
@@ -690,7 +705,8 @@ void NucleiCollision::createPartonsOld(float *x, float *y, float bx, float by )
 void NucleiCollision::createStrings()
 {
     //find the closest parton pairs
-    fPartonInteractionsFinder->FindMinDistancesBetweenPairs(fA->pX,fA->pY,fB->pX,fB->pY,fA->nPartons,fB->nPartons); //fX1,fY1,fX2,fY2,fMaxPartons,fMaxPartons);
+    fPartonInteractionsFinder->FindMinDistancesBetweenPairs(fA->pX,fA->pY,fB->pX,fB->pY,fA->nPartons,fB->nPartons
+                                                            , fFlagOnlyOneInteractionPerParton ); //fX1,fY1,fX2,fY2,fMaxPartons,fMaxPartons);
     
     //define "strings" as the middles between interacting pairs
     int distArraySize = 0;
@@ -966,7 +982,8 @@ void NucleiCollision::drawStatisticHists()
         fHistNcoll->Write();
         fHistNumberWoundedNucleons->Write();
 
-        fHistFictiveMultDistr->Write();
+        fHistFictiveMultDistrV0->Write();
+        fHistFictiveMultDistrMidEta->Write();
 
         //pad
         fCanvEventStatistics->cd(padId++);
@@ -1044,6 +1061,8 @@ void NucleiCollision::finalActions()
                 //         << fHist2DStringsSVsImpactS->ProfileY()->GetMean() << " "
              << ratioToNstrings << endl;
         cout << "mean N strings = " << nStringsMean << endl;
+
+        fMeanNstringsFinal = nStringsMean; // to take out into spec hist in ManagerNucleiCollisions
 
         double err1 = fHistNStringsInLargestCluster->GetMeanError();
         double err2 = fHistNstrings->GetMeanError();
@@ -1142,12 +1161,26 @@ void NucleiCollision::finalActions()
                 fHist2DSigmaNstringsXY->SetBinContent( i+1,j+1, omega );
             }
         }
-        TCanvas *lCanvTransvStringDensity = new TCanvas("lCanvTransvStringDensity","string density in xy",280,180,1000,500);
-        lCanvTransvStringDensity->Divide(2,1);
+        TCanvas *lCanvTransvStringDensity = new TCanvas("lCanvTransvStringDensity","string density in xy",280,10,800,800);
+        lCanvTransvStringDensity->Divide(2,2);
         lCanvTransvStringDensity->cd(1); //to avoid warning
         fHist2DSigmaNstringsXY->DrawCopy( "cont1z" );
         lCanvTransvStringDensity->cd(2);
         fHist2DNstringsXY->DrawCopy( "colz" );
+
+        // ### May 2018: add profiles across centers (along x-axis)
+        // ### projection for omega
+        int nBinsTmp = fHist2DSigmaNstringsXY->GetNbinsY();
+        TH1D *profXomega = fHist2DSigmaNstringsXY->ProjectionX( "profNstringsFluctOmega", (nBinsTmp-1)/2-3, (nBinsTmp-1)/2+3 );
+        lCanvTransvStringDensity->cd(3);
+        profXomega->DrawCopy();
+
+        // ### projection for omega
+        nBinsTmp = fHist2DNstringsXY->GetNbinsY();
+        TH1D *profXmeanNstrings = fHist2DNstringsXY->ProjectionX( "profNstrings", (nBinsTmp-1)/2-3, (nBinsTmp-1)/2+3 );
+        lCanvTransvStringDensity->cd(4);
+        profXmeanNstrings->DrawCopy();
+
     }
 
 
@@ -1171,6 +1204,7 @@ void NucleiCollision::finalActions()
         fout_crossSection << crossSection << endl;
         fout_crossSection.close();
 
+        fCrossSectionFinal = crossSection;
     }
 
     cout << "########## End NucleiCollision::finalActions()" << endl;
@@ -1277,7 +1311,9 @@ void NucleiCollision::drawStrings()
 {
     //visualize "strings"
     TEllipse **elPointsStrings = new TEllipse* [fNumberOfStrings];
-    float rVisString = 0.008;//rVisParton * 0.2;
+//    float rVisString = 0.008;//rVisParton * 0.2;
+    float rVisString = 0.006;//rVisParton * 0.2;
+//    float rVisString = 0.002;//rVisParton * 0.2;
     //    int nUsedClusterColors = 0;
     for ( int iP = 0; iP < fNumberOfStrings; iP++ )
     {

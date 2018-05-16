@@ -116,6 +116,8 @@ public:
     void setMeanNofPartonsInNucleon(float n) { fMeanNofPartonsInNucleon = n; }
     void setNucleonGaussianRadius(float r) { fNucleonGaussianRadius = r; }
 
+    void setMeanMultFromOneStringForFictiveMultStudies(float avMult) { fAvMultFromOneStringPerEtaUnitFictive = avMult; }
+
     float getRandomEventPlanePhi() { return fRandomEventPlane; }
 
     void setPartonInteractionDistance(float dist) { fPartonInteractionDistance = dist; }
@@ -136,6 +138,9 @@ public:
     void setWriteEventViewCanvas(int flag) { fFlagWriteEventViewCanvases = flag; }
 //    void setComputeStringRepulsion(int flag) { fFlagComputeStringRepulsion = flag; }
 
+    void setFlagUsePoissonianNpartonsFluctuations(int flag) { fFlagUsePoissonianNpartonsFluctuations = flag; }
+    void setFlagOnlyOneInteractionPerParton(int flag) { fFlagOnlyOneInteractionPerParton = flag; }
+
     void buildEvent(); //int flagSpecImpactPar=0);
     void finalActions();
 
@@ -154,7 +159,8 @@ public:
     void fillNumberOfStringsInXY();
     void getIngredientsForEccentricity(Nucleus *nucl, Nucleus *nucl2, int &nWounded, float &num, float &denom );
 
-    int getMultFromAllStringsFictive() { return fMultFromAllStringsFictive; }
+    int getMultFromAllStringsFictiveV0() { return fMultFromAllStringsFictiveV0; }
+    int getMultFromAllStringsFictiveMidEta() { return fMultFromAllStringsFictiveMidEta; }
 
 
 //    float*  getArrStringX() const { return fXstring; }
@@ -173,6 +179,8 @@ public:
     //    bool*   isStringInInteractionArr() const { return fFlagStringInInteraction; }
 //    bool isHardInteractionString(int stringId) const { return fFlagStringIsHardInteraction[stringId]; }
 
+    float  getCrossSection() const { return fCrossSectionFinal;   }
+    float  getMeanNstrings() const { return fMeanNstringsFinal;   }
 
 private:
     //##### event construction
@@ -222,6 +230,9 @@ private:
 //    double fStringOverlapEnergyDensity; //overlap energy density per fm2 of area
 //    double fStringInteractionParA;  //parameterization a-la Woods-Saxon, fm
 //    double fClusterFormationDist; //distance b/n strings to form a cluster, fm
+    bool fFlagUsePoissonianNpartonsFluctuations; // by default - YES // ADDED ON MAY 9, 2018!
+    bool fFlagOnlyOneInteractionPerParton; // by default - YES, in NO - should be like in WQM! // ADDED ON MAY 10, 2018
+
     double fMeanNofPartonsInNucleon; //mean n of partons in nucleon
     double fNucleonGaussianRadius; // nucleon radius, fm
 
@@ -286,10 +297,15 @@ private:
     int fEvTrialsSuccess;
     int fEvTrialsFailed;
 
+    float fCrossSectionFinal;  // cross section after calculation of all events
+    float fMeanNstringsFinal;  // mean n stringsafter calculation of all events
+
     int fNparticipants; // for nu calculation
     int fNcollisions; // for nu calculation
 
-    int fMultFromAllStringsFictive;  // Nov 2017: fictive multiplicities from strings (to control mult distr and for centrality determination)
+    float fAvMultFromOneStringPerEtaUnitFictive;  // Nov 2017 - Feb 2018: fictive multiplicities from strings (to control mult distr and for centrality determination)
+    int fMultFromAllStringsFictiveV0;  // Nov 2017: fictive multiplicities from strings (to control mult distr and for centrality determination)
+    int fMultFromAllStringsFictiveMidEta;  // Feb 2018
 
     // ##### output directory name
     TString fOutDirName;
@@ -353,7 +369,8 @@ private:
     TH1D *fHistNcoll; //number of binary nucleon collisions
 
     // Nov 2017: fictive multiplicities from strings (to control mult distr and for centrality determination)
-    TH1D *fHistFictiveMultDistr; // mult distribution
+    TH1D *fHistFictiveMultDistrV0; // mult distribution in V0
+    TH1D *fHistFictiveMultDistrMidEta; // mult distribution at mid rap
 
     //##### visualisation parameters
     double fVisNucleusRadiusNucleus; //visual size nucleus
