@@ -9,6 +9,7 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         , double meanMultFromOneStringForFictiveMultStudies = 1.1
         , bool flagUsePoissonianNpartonsFluctuations = 1
         , bool flagOnlyOneInteractionPerParton = 1
+        , bool flagConsiderWoundedPartonsAsStrings = 0
         , int drawMode = 0 )
 {
     // dist to form a cluster: now (from Aug 2014) we consider All strings to be in cluster
@@ -127,6 +128,8 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
 
         d->setFlagUsePoissonianNpartonsFluctuations( flagUsePoissonianNpartonsFluctuations );
         d->setFlagOnlyOneInteractionPerParton( flagOnlyOneInteractionPerParton );
+        d->setFlagConsiderWoundedPartonsAsStrings( flagConsiderWoundedPartonsAsStrings );
+
         // Nov 2017: EXPERIMENTAL FEATURE!
         // FROM Ulrich Heinz, J. Scott Moreland (2011) - https://arxiv.org/pdf/1108.5379.pdf
         // TABLE 1: sqrt(B) ---> r_transv = sqrt(2B)

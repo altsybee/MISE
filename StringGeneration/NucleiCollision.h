@@ -17,6 +17,7 @@
 class TF1;
 class TH1D;
 class TH2D;
+class TH2I;
 class TCanvas;
 class MinDistanceFinder;
 class TRandom;
@@ -49,6 +50,10 @@ struct Nucleus
     float *pY; // y array partons in nucleus
     int *pNid; // which nucleon each parton is assigned to
     int *pBusy; // (TMP?) 1.12.2014: array of flags for partons which are in interactioт with other nucleus
+
+    //May 2018: for WQM mode:
+    int *isWoundedParton;
+
     Nucleus(int nNucleons_, int maxNofPartons_)
     {
         bx = 0;
@@ -66,6 +71,8 @@ struct Nucleus
         pY = new float[maxNofPartons];
         pNid = new int[maxNofPartons];
         pBusy = new int[maxNofPartons];
+
+        isWoundedParton = new int[maxNofPartons];
     }
     virtual ~Nucleus()
     {
@@ -81,6 +88,8 @@ struct Nucleus
     }
     void reset()
     {
+        for ( int i = 0; i < nPartons; i++ )
+            isWoundedParton[i] = 0;
         nPartons = 0;
         for ( int i = 0; i < nNucleons; i++ )
             nuclWounded[i] = 0;
@@ -93,6 +102,15 @@ struct Nucleus
                 nWounded++;
         return nWounded;
     }
+    int getNumberOfWoundedOnlyOnceNucleons()
+    {
+        int nWoundedOnlyOnce = 0;
+        for ( int i = 0; i < nNucleons; i++ )
+            if ( nuclWounded[i] == 1 )
+                nWoundedOnlyOnce++;
+        return nWoundedOnlyOnce;
+    }
+
 };
 
 class NucleiCollision {
@@ -140,6 +158,7 @@ public:
 
     void setFlagUsePoissonianNpartonsFluctuations(int flag) { fFlagUsePoissonianNpartonsFluctuations = flag; }
     void setFlagOnlyOneInteractionPerParton(int flag) { fFlagOnlyOneInteractionPerParton = flag; }
+    void setFlagConsiderWoundedPartonsAsStrings(int flag) { fFlagConsiderWoundedPartonsAsStrings = flag; }
 
     void buildEvent(); //int flagSpecImpactPar=0);
     void finalActions();
@@ -152,7 +171,20 @@ public:
     float getImpactParameterByHand() { return fImpactParameterByHand; }
     float getImpactParameter() { return fImpactParameter; }
     int getMaxNpartons() { return fMaxPartons; }
+
     int getNstrings() { return fNumberOfStrings; }
+
+    int getNumberOfWoundedPartonsA() { return fNumberOfWoundedPartonsA; }
+    int getNumberOfWoundedPartonsB() { return fNumberOfWoundedPartonsB; }
+    int getNumberOfWoundedOnlyOncePartonsA() { return fNumberOfWoundedOnlyOncePartonsA; }
+    int getNumberOfWoundedOnlyOncePartonsB() { return fNumberOfWoundedOnlyOncePartonsB; }
+
+    int getNumberOfWoundedNucleonsA() { return fA->getNumberOfWoundedNucleons(); }
+    int getNumberOfWoundedNucleonsB() { return fB->getNumberOfWoundedNucleons(); }
+    int getNumberOfWoundedOnlyOnceNucleonsA() { return fA->getNumberOfWoundedOnlyOnceNucleons(); }
+    int getNumberOfWoundedOnlyOnceNucleonsB() { return fB->getNumberOfWoundedOnlyOnceNucleons(); }
+
+
     double getNu();
     bool isMBcollision() { return fFlagHaveMBcollision; }
     void calcEccentricity();
@@ -181,6 +213,8 @@ public:
 
     float  getCrossSection() const { return fCrossSectionFinal;   }
     float  getMeanNstrings() const { return fMeanNstringsFinal;   }
+
+    TH2I * getHist2DNstringsXY_thisEv_CoreCorona() { return fHist2DNstringsXY_thisEv_CoreCorona; }
 
 private:
     //##### event construction
@@ -232,6 +266,7 @@ private:
 //    double fClusterFormationDist; //distance b/n strings to form a cluster, fm
     bool fFlagUsePoissonianNpartonsFluctuations; // by default - YES // ADDED ON MAY 9, 2018!
     bool fFlagOnlyOneInteractionPerParton; // by default - YES, in NO - should be like in WQM! // ADDED ON MAY 10, 2018
+    bool fFlagConsiderWoundedPartonsAsStrings; // by default - NO
 
     double fMeanNofPartonsInNucleon; //mean n of partons in nucleon
     double fNucleonGaussianRadius; // nucleon radius, fm
@@ -292,6 +327,11 @@ private:
 //    int fNumberOfClusters;   //n of clusters in the event
     int fNumberOfStringInteractions;    //n of interacting string pairs in the event
 
+    int fNumberOfWoundedPartonsA;   //
+    int fNumberOfWoundedPartonsB;   //
+    int fNumberOfWoundedOnlyOncePartonsA;   //
+    int fNumberOfWoundedOnlyOncePartonsB;   //
+
     float fEccentricity;
 
     int fEvTrialsSuccess;
@@ -337,6 +377,8 @@ private:
     TH2D *fHist2DNstringsXY; //2d plot n strings in xy
     TH2D *fHist2DN2stringsXY; //2d plot n2 strings in xy
     TH2D *fHist2DSigmaNstringsXY; //2d plot sigma n strings in xy
+
+    TH2I *fHist2DNstringsXY_thisEv_CoreCorona; //2d plot n strings in xy (this event) - May 2018 - for Core-corona study
 
     TH1D *fHistStringRadiusVectorPhi; //radius-vectors phi-s of strings wrt (0,0)
 

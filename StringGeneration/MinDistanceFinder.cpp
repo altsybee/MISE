@@ -151,6 +151,19 @@ void MinDistanceFinder::FindMinDistancesBetweenPairs(const float *x1, const floa
 
         cout << "after taking minimums:" << endl;
     }
+
+    // May 2018: total number of occupied (=wounded) partons in nuclA and nuclB - to compare with wounded quark model:
+    nWoundedPartonsInA = 0;
+    nWoundedPartonsInB = 0;
+    for ( int i = 0; i < Nrows; i++ )
+        if ( occupiedX[i] )
+            nWoundedPartonsInA++;
+    for ( int i = 0; i < Ncols; i++ )
+        if ( occupiedY[i] )
+            nWoundedPartonsInB++;
+    if(0)
+        cout << "nPartonsA = " << Nrows << ", nPartonsB = " << Ncols
+             << ", nWoundedPartonsInA = " << nWoundedPartonsInA << ", nWoundedPartonsInB = " << nWoundedPartonsInB << endl;
 }
 
 

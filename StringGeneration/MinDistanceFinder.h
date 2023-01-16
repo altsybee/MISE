@@ -21,6 +21,10 @@ class MinDistanceFinder
     bool occupiedX[NMAX];
     bool occupiedY[NMAX];
 
+    // May 2018: total number of occupied (=wounded) partons in nuclA and nuclB - to compare with wounded quark model:
+    int nWoundedPartonsInA;
+    int nWoundedPartonsInB;
+
     void quickSortR( DistanceEntry* a, long N );
 
 public:
@@ -33,6 +37,11 @@ public:
 //    int GetNumberOfInteractions() { return fNumberOfInteractions; }
     void PrintMinDistanceMatrix();
 
+//    int getNwoundedPartonsNuclA() { return nWoundedPartonsInA; }
+//    int getNwoundedPartonsNuclB() { return nWoundedPartonsInB; }
+
+//    bool *getOccupiedFlagsForPartonsNuclA() { return occupiedX; }
+//    bool *getOccupiedFlagsForPartonsNuclB() { return occupiedY; }
 };
 
 #endif // MINDISTANCEFINDER_H

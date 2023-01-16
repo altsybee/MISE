@@ -88,19 +88,49 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
     short fStringOrigin[NMaxStrings];
 //    Bool_t fNuclTreeIsHardInteractionString[NMaxStrings];
 
+    Int_t fNumberOfWoundedPartonsA = 0;
+    Int_t fNumberOfWoundedPartonsB = 0;
+    Int_t fNumberOfWoundedOnlyOncePartonsA = 0;
+    Int_t fNumberOfWoundedOnlyOncePartonsB = 0;
+
+    Int_t fNumberOfWoundedNucleonsA = 0;
+    Int_t fNumberOfWoundedNucleonsB = 0;
+    Int_t fNumberOfWoundedOnlyOnceNucleonsA = 0;
+    Int_t fNumberOfWoundedOnlyOnceNucleonsB = 0;
+
+    // May 2018: for core-corona:
+    const int maxBinsCoreCorona = 23;
+    int fStringsInCells[maxBinsCoreCorona][maxBinsCoreCorona];
+
     fNucleiCollisionsTree->Branch("impactParameter",&fImpactParameter,"fImpactParameter/F");
     fNucleiCollisionsTree->Branch("randomEventPlanePhi",&fNuclTreeRandomEventPlanePhi,"fNuclTreeRandomEventPlanePhi/F");
     fNucleiCollisionsTree->Branch("nu",&fNuclTreeNu,"fNuclTreeNu/F");
     fNucleiCollisionsTree->Branch("numberOfStrings",&fNuclTreeNumberOfStrings,"fNuclTreeNumberOfStrings/I");
 
-//    fNucleiCollisionsTree->Branch("stringBoostAngle", fNuclTreeStringBoostAngle,"fNuclTreeStringBoostAngle[fNuclTreeNumberOfStrings]/F");
-//    fNucleiCollisionsTree->Branch("stringBoostMagn", fNuclTreeStringBoostMagn,"fNuclTreeStringBoostMagn[fNuclTreeNumberOfStrings]/F");
-    fNucleiCollisionsTree->Branch("stringX", fNuclTreeStringX,"fNuclTreeStringX[fNuclTreeNumberOfStrings]/F");
-    fNucleiCollisionsTree->Branch("stringY", fNuclTreeStringY,"fNuclTreeStringY[fNuclTreeNumberOfStrings]/F");
-    fNucleiCollisionsTree->Branch("distanceBetweenPartonsForString", fDistanceBetweenPartonsForString,"fDistanceBetweenPartonsForString[fNuclTreeNumberOfStrings]/F");
-    fNucleiCollisionsTree->Branch("stringRadiusVectorAngle", fNuclTreeStringRadiusVectorAngle,"fNuclTreeStringRadiusVectorAngle[fNuclTreeNumberOfStrings]/F");
-    fNucleiCollisionsTree->Branch("stringOrigin", fStringOrigin,"fStringOrigin[fNuclTreeNumberOfStrings]/S");
-//    fNucleiCollisionsTree->Branch("isHardInteraction",fNuclTreeIsHardInteractionString,"fNuclTreeIsHardInteractionString[fNuclTreeNumberOfStrings]/O");
+    fNucleiCollisionsTree->Branch("nWoundedPartonsA",&fNumberOfWoundedPartonsA,"fNumberOfWoundedPartonsA/I");
+    fNucleiCollisionsTree->Branch("nWoundedPartonsB",&fNumberOfWoundedPartonsB,"fNumberOfWoundedPartonsB/I");
+    fNucleiCollisionsTree->Branch("nWoundedOnlyOncePartonsA",&fNumberOfWoundedOnlyOncePartonsA,"fNumberOfWoundedOnlyOncePartonsA/I");
+    fNucleiCollisionsTree->Branch("nWoundedOnlyOncePartonsB",&fNumberOfWoundedOnlyOncePartonsB,"fNumberOfWoundedOnlyOncePartonsB/I");
+
+    fNucleiCollisionsTree->Branch("nWoundedNucleonsA",&fNumberOfWoundedNucleonsA,"fNumberOfWoundedNucleonsA/I");
+    fNucleiCollisionsTree->Branch("nWoundedNucleonsB",&fNumberOfWoundedNucleonsB,"fNumberOfWoundedNucleonsB/I");
+    fNucleiCollisionsTree->Branch("nWoundedOnlyOnceNucleonsA",&fNumberOfWoundedOnlyOnceNucleonsA,"fNumberOfWoundedOnlyOnceNucleonsA/I");
+    fNucleiCollisionsTree->Branch("nWoundedOnlyOnceNucleonsB",&fNumberOfWoundedOnlyOnceNucleonsB,"fNumberOfWoundedOnlyOnceNucleonsB/I");
+
+    if(1)
+        fNucleiCollisionsTree->Branch("nStringsInCells", fStringsInCells,"fStringsInCells[23][23]/I");
+
+    if(0)
+    {
+        //    fNucleiCollisionsTree->Branch("stringBoostAngle", fNuclTreeStringBoostAngle,"fNuclTreeStringBoostAngle[fNuclTreeNumberOfStrings]/F");
+        //    fNucleiCollisionsTree->Branch("stringBoostMagn", fNuclTreeStringBoostMagn,"fNuclTreeStringBoostMagn[fNuclTreeNumberOfStrings]/F");
+            fNucleiCollisionsTree->Branch("stringX", fNuclTreeStringX,"fNuclTreeStringX[fNuclTreeNumberOfStrings]/F");
+            fNucleiCollisionsTree->Branch("stringY", fNuclTreeStringY,"fNuclTreeStringY[fNuclTreeNumberOfStrings]/F");
+            fNucleiCollisionsTree->Branch("distanceBetweenPartonsForString", fDistanceBetweenPartonsForString,"fDistanceBetweenPartonsForString[fNuclTreeNumberOfStrings]/F");
+            fNucleiCollisionsTree->Branch("stringRadiusVectorAngle", fNuclTreeStringRadiusVectorAngle,"fNuclTreeStringRadiusVectorAngle[fNuclTreeNumberOfStrings]/F");
+            fNucleiCollisionsTree->Branch("stringOrigin", fStringOrigin,"fStringOrigin[fNuclTreeNumberOfStrings]/S");
+        //    fNucleiCollisionsTree->Branch("isHardInteraction",fNuclTreeIsHardInteractionString,"fNuclTreeIsHardInteractionString[fNuclTreeNumberOfStrings]/O");
+    }
 
     fNucleiCollisionsTree->Branch( "multFromAllStringsFictiveV0", &fMultFromAllStringsFictiveV0,"fMultFromAllStringsFictiveV0/I");
     fNucleiCollisionsTree->Branch( "multFromAllStringsFictiveMidEta", &fMultFromAllStringsFictiveMidEta,"fMultFromAllStringsFictiveMidEta/I");
@@ -132,6 +162,16 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
         fMultFromAllStringsFictiveMidEta = fPtrNuclStruct->getMultFromAllStringsFictiveMidEta();
         //cout << fMultFromAllStringsFictive << endl;
 
+        fNumberOfWoundedPartonsA = fPtrNuclStruct->getNumberOfWoundedPartonsA();
+        fNumberOfWoundedPartonsB = fPtrNuclStruct->getNumberOfWoundedPartonsB();
+        fNumberOfWoundedOnlyOncePartonsA = fPtrNuclStruct->getNumberOfWoundedOnlyOncePartonsA();
+        fNumberOfWoundedOnlyOncePartonsB = fPtrNuclStruct->getNumberOfWoundedOnlyOncePartonsB();
+
+        fNumberOfWoundedNucleonsA = fPtrNuclStruct->getNumberOfWoundedNucleonsA();
+        fNumberOfWoundedNucleonsB = fPtrNuclStruct->getNumberOfWoundedNucleonsB();
+        fNumberOfWoundedOnlyOnceNucleonsA = fPtrNuclStruct->getNumberOfWoundedOnlyOnceNucleonsA();
+        fNumberOfWoundedOnlyOnceNucleonsB = fPtrNuclStruct->getNumberOfWoundedOnlyOnceNucleonsB();
+
         if ( fNuclTreeNumberOfStrings >= NMaxStrings )
         {
             cout << "AHTUNG: fNuclTreeNumberOfStrings >= NMaxStrings!!!" << endl;
@@ -153,6 +193,19 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
 
         fHist2D_impParVSnStrings->Fill( fImpactParameter, fNuclTreeNumberOfStrings );
 
+        // ##### May 2018: core-corona:
+        TH2I *fHist2DNstringsXY_thisEv_CoreCorona = fPtrNuclStruct->getHist2DNstringsXY_thisEv_CoreCorona();
+        for ( int i = 0; i < fHist2DNstringsXY_thisEv_CoreCorona->GetNbinsX(); i++) //x
+        {
+            for ( int j = 0; j < fHist2DNstringsXY_thisEv_CoreCorona->GetNbinsY(); j++) //y
+            {
+                fStringsInCells[i][j] = fHist2DNstringsXY_thisEv_CoreCorona->GetBinContent(i+1,j+1);
+//                cout << fStringsInCells[i][j] << " "; //endl;
+            }
+//            cout << endl;
+        }
+
+
         fNucleiCollisionsTree->Fill();
 
     } // end of the event loop
@@ -167,7 +220,7 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
 
 
     // ##### additional histogram with info (cross-section, etc) - March 2018
-    const int nBinLabels = 3;
+    const int nBinLabels = 2;
     TH1D *fAdditionalInfo = new TH1D( "fAdditionalInfo", "additional information from simulations;bin;value", nBinLabels,-0.5,nBinLabels-0.5);
     TString strBinLabels[nBinLabels] =
     {
