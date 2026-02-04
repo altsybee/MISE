@@ -50,6 +50,7 @@ struct Nucleus
     float *pY; // y array partons in nucleus
     int *pNid; // which nucleon each parton is assigned to
     int *pBusy; // (TMP?) 1.12.2014: array of flags for partons which are in interactioт with other nucleus
+    float *pxMom; // parton mom x fraction // ADDED Jan 2023
 
     //May 2018: for WQM mode:
     int *isWoundedParton;
@@ -73,6 +74,9 @@ struct Nucleus
         pBusy = new int[maxNofPartons];
 
         isWoundedParton = new int[maxNofPartons];
+
+        pxMom = new float[maxNofPartons];
+
     }
     virtual ~Nucleus()
     {
@@ -85,6 +89,7 @@ struct Nucleus
         delete [] pX;
         delete [] pY;
         delete [] pNid;
+        delete [] pxMom;
     }
     void reset()
     {
@@ -159,6 +164,8 @@ public:
     void setFlagUsePoissonianNpartonsFluctuations(int flag) { fFlagUsePoissonianNpartonsFluctuations = flag; }
     void setFlagOnlyOneInteractionPerParton(int flag) { fFlagOnlyOneInteractionPerParton = flag; }
     void setFlagConsiderWoundedPartonsAsStrings(int flag) { fFlagConsiderWoundedPartonsAsStrings = flag; }
+    void setFlagUsePartonPDFs(int flag) { fFlagUsePartonPDFs = flag; }
+
 
     void buildEvent(); //int flagSpecImpactPar=0);
     void finalActions();
@@ -244,6 +251,14 @@ private:
     TF1 *funcPartonDensity;
 //    TF1 *funcStringInteractionDist;
     TF1 *funcImpactPar1D;
+
+    // PDFs (2023)
+    TF1 *funcGluon;
+    TF1 *funcU;
+    TF1 *funcD;
+    TF1 *funcSea;
+    TF1 *funcCrossSect;
+
     bool fFlagDataMembersInitialized;
     bool fFlagHaveMBcollision;
     bool fFlagWriteEventViewCanvases;
@@ -267,6 +282,7 @@ private:
     bool fFlagUsePoissonianNpartonsFluctuations; // by default - YES // ADDED ON MAY 9, 2018!
     bool fFlagOnlyOneInteractionPerParton; // by default - YES, in NO - should be like in WQM! // ADDED ON MAY 10, 2018
     bool fFlagConsiderWoundedPartonsAsStrings; // by default - NO
+    bool fFlagUsePartonPDFs; // by default - No // ADDED IN Jan 2023
 
     double fMeanNofPartonsInNucleon; //mean n of partons in nucleon
     double fNucleonGaussianRadius; // nucleon radius, fm
@@ -413,6 +429,11 @@ private:
     // Nov 2017: fictive multiplicities from strings (to control mult distr and for centrality determination)
     TH1D *fHistFictiveMultDistrV0; // mult distribution in V0
     TH1D *fHistFictiveMultDistrMidEta; // mult distribution at mid rap
+
+    TH1D *fHist_x_partons_QA;
+    TH1D *fHist_x_g_QA;
+    TH1D *fHist_x_u_QA;
+    TH1D *fHist_x_d_QA;
 
     //##### visualisation parameters
     double fVisNucleusRadiusNucleus; //visual size nucleus

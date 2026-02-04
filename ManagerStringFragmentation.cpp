@@ -1,11 +1,11 @@
-#include "/Users/macbook/alice/simpleAnalysis/commonTools/Tools.cxx"  //  "../../commonTools/Tools.cxx"
+//#include "/Users/macbook/alice/simpleAnalysis/commonTools/Tools.cxx"  //  "../../commonTools/Tools.cxx"
 //#include "../../commonTools/SimpleTrack.cxx"
 
 
 #include "ManagerStringFragmentation.h"
 #include "StringGeneration/NucleiCollision.h"
 #include "StringDecayer/StringDescr.h"
-#include "/Users/macbook/alice/simpleAnalysis/simpleEventAnalyzer/AliSimpleEvent.h"    // "../../simpleEventAnalyzer/AliSimpleEvent.h"
+//#include "/Users/macbook/alice/simpleAnalysis/simpleEventAnalyzer/AliSimpleEvent.h"    // "../../simpleEventAnalyzer/AliSimpleEvent.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -229,7 +229,7 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
 
     // ##### 10.07.2016 - attempt to save NucleiCollision info into the tree
     TFile* inputFileNuclColTree = 0x0;
-    TString strInputFile = Form( "outputs_NucleiCollision/%s", fInputFileName_NucleiCollisions.Data() );
+    TString strInputFile = fInputFileName_NucleiCollisions;//Form( "outputs_NucleiCollision_REWAKE_2023/%s", fInputFileName_NucleiCollisions.Data() );
 //    TString strInputFile = fInputFileName_NucleiCollisions;//Form( "%s/%s", "outputs_NucleiCollision", fInputFileName.Data() );
     inputFileNuclColTree = new TFile( strInputFile );
 
@@ -264,7 +264,7 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
 
     // ##### Friend tree
 //    fNucleiCollisionsTree->AddFriend( "StringBoostsTree", Form( "%s_StringBoosts.root", strInputFile.Data() ) );
-    fNucleiCollisionsTree->AddFriend( "StringBoostsTree", Form( "outputs_NucleiCollision/%s", fInputFileName_StringBoosts.Data() ) );
+    fNucleiCollisionsTree->AddFriend( "StringBoostsTree", fInputFileName_StringBoosts );//Form( "outputs_NucleiCollision/%s", fInputFileName_StringBoosts.Data() ) );
 
     fNucleiCollisionsTree->SetBranchAddress( "stringBoostAngle", fNuclTreeStringBoostAngle );
     fNucleiCollisionsTree->SetBranchAddress( "stringBoostMagn", fNuclTreeStringBoostMagn );
@@ -278,7 +278,9 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
 
     //output file for the events
 //    fOutputFileName = Form( "%s/eventTree_nEv%d_try13_TSALLIS_r2fm.root", fOutputDirName.Data(), nEvents );
-    fOutputFileName = Form( "%s/%s_StringFragm_nEv%d_TSALLIS_try1.root", fOutputDirName.Data(), fInputFileName_StringBoosts.Data(), nEvents );
+//    fOutputFileName = Form( "%s/%s_StringFragm_nEv%d_TSALLIS_try1.root", fOutputDirName.Data(), fInputFileName_StringBoosts.Data(), nEvents );
+//            //Form( "%s/eventTree_nEv%d_PP_TRY3_TSALLIS_r2fm.root", fOutputDirName.Data(), nEvents );
+    fOutputFileName = Form( "%s/StringFragm_nEv%d_TSALLIS_try1.root", fOutputDirName.Data(),  nEvents );
             //Form( "%s/eventTree_nEv%d_PP_TRY3_TSALLIS_r2fm.root", fOutputDirName.Data(), nEvents );
     TFile* outFile = new TFile( fOutputFileName, "RECREATE" );
 
@@ -590,14 +592,22 @@ void ManagerStringFragmentation::applyFragmentationToEvents(StringDescr *strDesc
 
 
     //write objects
+    cout << "check 1" << endl;
     outFile->cd();
+    cout << "check 2" << endl;
     fEventTrackTree->Write();
+    cout << "check 3" << endl;
     fHistMultClassBoundaries->Write();
+    cout << "check 4" << endl;
     fHistMultClassMeanNch->Write();
+    cout << "check 5" << endl;
     fHistParticlesInCutConditionVsNu->Write();
+    cout << "check 6" << endl;
     outFile->Close();
+    cout << "check 7" << endl;
 
     inputFileNuclColTree->Close();
+    cout << "check 8" << endl;
 
 
     //    delete outFile;

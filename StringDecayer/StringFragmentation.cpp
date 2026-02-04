@@ -428,7 +428,7 @@ int StringFragmentation::decayStringIntoParticles( TLorentzVector *vArr, double 
         while ( !flagFineQuarkConfig )
         {
             double probQuarkType = fRand->Uniform( 0, 2.3); // u:d:s = 1:1:0.3 from Generators overview paper
-            if ( probQuarkType < 0.01 ) // Sept 2017: ASSUME SOME PROBABILITY TO DECAY INTO C-QUARK!
+            if ( probQuarkType < 0 ) //0.01 ) // Sept 2017: ASSUME SOME PROBABILITY TO DECAY INTO C-QUARK!
             {
                 breakPointType[iBreak] = 3; // c - quark
                 breakPointPt[iBreak] = fabs(fRand->Exp( 0.35 ));

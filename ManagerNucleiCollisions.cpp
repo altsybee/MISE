@@ -120,7 +120,7 @@ void ManagerNucleiCollisions::generateEvents( NucleiCollision *fPtrNuclStruct, i
     if(1)
         fNucleiCollisionsTree->Branch("nStringsInCells", fStringsInCells,"fStringsInCells[23][23]/I");
 
-    if(0)
+    if(1)
     {
         //    fNucleiCollisionsTree->Branch("stringBoostAngle", fNuclTreeStringBoostAngle,"fNuclTreeStringBoostAngle[fNuclTreeNumberOfStrings]/F");
         //    fNucleiCollisionsTree->Branch("stringBoostMagn", fNuclTreeStringBoostMagn,"fNuclTreeStringBoostMagn[fNuclTreeNumberOfStrings]/F");

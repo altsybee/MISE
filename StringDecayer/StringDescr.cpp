@@ -173,48 +173,56 @@ void StringDescr::hadronizeString( double stringBeta, double boostPhiDir )
 
     //TMP!!!? make mother eta=0
     double motherPt, motherPhi, motherEta;
-    if(1)for ( int iMother = 0; iMother < nParticlesInString; iMother++ )
+    bool DO_TRANSVERSE_STRING_BOOST = false; // !!! it is the main idea of the string repulsion. It was used for all studies before 2023 (QM2018, D-meson 2017...)
+    if( DO_TRANSVERSE_STRING_BOOST )
     {
-        vMother = &vMothers[iMother];
-        motherPt = vMother->Pt();
-        motherPhi = vMother->Phi();
-        etaArrTmp[iMother] = vMother->Rapidity(); //keep values to set back (see below)
-        motherEta = 0;
-        vMother->SetPtEtaPhiM( motherPt, motherEta, motherPhi, vMother->M() );
-    }
+        if(1)for ( int iMother = 0; iMother < nParticlesInString; iMother++ )
+        {
+            vMother = &vMothers[iMother];
+            motherPt = vMother->Pt();
+            motherPhi = vMother->Phi();
+            etaArrTmp[iMother] = vMother->Rapidity(); //keep values to set back (see below)
+            motherEta = 0;
+            vMother->SetPtEtaPhiM( motherPt, motherEta, motherPhi, vMother->M() );
+        }
 
-    //boost mothers in string
-    stringBoostT.SetXYZ(0,0,0);
-    if(1)for ( int iMother = 0; iMother < nParticlesInString; iMother++ )
-    {
-        vMother = &vMothers[iMother];
-        double stringBetaAtY = stringBeta;// * fFuncGausYBoost->Eval( vMother->Rapidity() );
-        stringBoostT.SetX( stringBetaAtY * cos(boostPhiDir) );//gRandom->Uniform( 0.0, 0.6 ) );
-        stringBoostT.SetY( stringBetaAtY * sin(boostPhiDir) );//gRandom->Uniform( 0.0, 0.6 ) );
+        //boost mothers in string
+        stringBoostT.SetXYZ(0,0,0);
+        if(1)for ( int iMother = 0; iMother < nParticlesInString; iMother++ )
+        {
+            vMother = &vMothers[iMother];
+            double stringBetaAtY = stringBeta;// * fFuncGausYBoost->Eval( vMother->Rapidity() );
+            stringBoostT.SetX( stringBetaAtY * cos(boostPhiDir) );//gRandom->Uniform( 0.0, 0.6 ) );
+            stringBoostT.SetY( stringBetaAtY * sin(boostPhiDir) );//gRandom->Uniform( 0.0, 0.6 ) );
 
-        if ( stringBoostT.Mag() > 0 )
-            vMother->Boost( stringBoostT );
+            if ( stringBoostT.Mag() > 0 )
+                vMother->Boost( stringBoostT );
+        }
+
     }
 
     //boost mothers in string ALONG Z (TMP? redo?..) 26.12.2014
     // MOTIVATION: to smooth y distribution of rho and products!
-    double boostBetaZ = stringBeta;
-    //    boostBetaZ = fRand->Gaus( 0, stringBeta/2 );
-    //    while ( fabs(boostBetaZ) > 1 )
-    //        boostBetaZ = fRand->Gaus( 0, stringBeta/2 );
-
-    stringBoostZ.SetZ( fRand->Uniform( -boostBetaZ, boostBetaZ ) );
-
-    if(0)for ( int iMother = 0; iMother < nParticlesInString; iMother++ )
+    if(0)
     {
-        vMother = &vMothers[iMother];
-        //                 prepareMother( vMother );
-        if ( stringBoostZ.Mag() > 0 )
-            vMother->Boost( stringBoostZ );
+        double boostBetaZ = stringBeta;
+        //    boostBetaZ = fRand->Gaus( 0, stringBeta/2 );
+        //    while ( fabs(boostBetaZ) > 1 )
+        //        boostBetaZ = fRand->Gaus( 0, stringBeta/2 );
+
+        stringBoostZ.SetZ( fRand->Uniform( -boostBetaZ, boostBetaZ ) );
+
+        for ( int iMother = 0; iMother < nParticlesInString; iMother++ )
+        {
+            vMother = &vMothers[iMother];
+            //                 prepareMother( vMother );
+            if ( stringBoostZ.Mag() > 0 )
+                vMother->Boost( stringBoostZ );
+        }
     }
 
-    // TMP!!!? randomize eta
-    if(1)for ( int iMother = 0; iMother < nParticlesInString; iMother++ )
+    // TMP!!!? randomize eta (seems that if(1) was used for RAA QM2018 and for D-meson RAA (2019) - Ok.)
+    if(0)for ( int iMother = 0; iMother < nParticlesInString; iMother++ )
     {
         vMother = &vMothers[iMother];
         //                 prepareMother( vMother );
@@ -326,6 +334,7 @@ void StringDescr::hadronizeString( double stringBeta, double boostPhiDir )
             {
                 charge  = 0;
                 pid  = kPid_D0;
+                cout << "AHTUNG - DO!" << endl;
             }
 
             // fill array with particle

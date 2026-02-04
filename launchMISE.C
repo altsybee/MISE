@@ -1,8 +1,8 @@
-#include "StringGeneration/DistanceEntry.h"
-#include "StringGeneration/NucleiCollision.h"
-#include "ManagerNucleiCollisions.h"
+//#include "StringGeneration/DistanceEntry.h"
+//#include "StringGeneration/NucleiCollision.h"
+//#include "ManagerNucleiCollisions.h"
 
-void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, float bImpact=0
+void launchMISE( int nEvents = 1000, int flagMBorFixedB = 0, float bImpact=0
         , double partonInteractionDist = 0.25
 //        , double stringInteractionRadius = 0.4
 //        , double strIntDistFractionParA = 10.
@@ -19,43 +19,31 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
     // dist to form a cluster: now (from Aug 2014) we consider All strings to be in cluster
 //    double clusterFormDist = 100; //0.4;
 
+//    gROOT->ProcessLine(".x compile.C");
+
     //nuclei generation routine
-    gROOT->ProcessLine(".L StringGeneration/DistanceEntry.cpp+");
-    gROOT->ProcessLine(".L StringGeneration/MinDistanceFinder.cpp+");
-    gROOT->ProcessLine(".L StringGeneration/NucleiCollision.cpp+");
-
-    //string fragmentation and particle decays
-//    gROOT->ProcessLine(".L StringDecayer/ParticleDescr.cpp+");
-//    gROOT->ProcessLine(".L StringDecayer/DecayInTwo.cpp+");
-//    gROOT->ProcessLine(".L StringDecayer/StringFragmentation.cpp+");
-//    gROOT->ProcessLine(".L StringDecayer/StringDescr.cpp+");
+//    gROOT->ProcessLine(".L StringGeneration/DistanceEntry.cpp+");
+//    gROOT->ProcessLine(".L StringGeneration/MinDistanceFinder.cpp+");
+//    gROOT->ProcessLine(".L StringGeneration/NucleiCollision.cpp+");
 
 
-    //simple event routine
-//    gROOT->LoadMacro( "/Users/macbook/alice/aliceAnalysis/analysisTask/analysis/AliSimpleEvent.cxx+g" );
-//    gROOT->LoadMacro( "/Users/macbook/alice/simpleAnalysis/simpleEventAnalyzer/AliSimpleEvent.cxx+g" );    // "../../simpleEventAnalyzer/AliSimpleEvent.cxx+g" );
+//    gROOT->ProcessLine(".L ManagerNucleiCollisions.cpp+");
 
-//    gROOT->ProcessLine( ".L /Users/macbook/alice/simpleAnalysis/commonTools/QAforWindows.cxx+" );     // ".L ../../commonTools/QAforWindows.cxx+");
-    //    gROOT->ProcessLine(".L ../../analysers/AnalyserBase.cxx+");
-    //    gROOT->ProcessLine(".L ../../analysers/diHadronMethod/DiHadronAnalyser.cxx+");
-    //    gROOT->ProcessLine(".L ../../analysers/tileCorrelations/TileCorrelations.cxx+");
 
-    gROOT->ProcessLine(".L ManagerNucleiCollisions.cpp+");
 
-    //create directory for output files
-//    gROOT->ProcessLine(".mkdir tmpOutputs");
-
-    //prepare directories for outputs
-//    char *strOutputDirName_NucleiCollision = "outputs_NucleiCollision_REWAKE_2023";
     TString strOutputDirName_NucleiCollision = "outputs_NucleiCollision_REWAKE_2023";
 //    char *strOutputDirName_EventManager = "outputs_EventManager";
-    gROOT->ProcessLine( Form( ".! mkdir %s", strOutputDirName_NucleiCollision.Data() ) );
+    gROOT->ProcessLine( Form( ".!mkdir %s", strOutputDirName_NucleiCollision.Data() ) );
 //    gROOT->ProcessLine( Form( ".mkdir %s", strOutputDirName_EventManager ) );
 
     gRandom->SetSeed(0);
 
     TStopwatch timer;
     timer.Start();
+
+
+
+
 
     if(1)
     {
@@ -135,8 +123,6 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
         d->setFlagOnlyOneInteractionPerParton( flagOnlyOneInteractionPerParton );
         d->setFlagConsiderWoundedPartonsAsStrings( flagConsiderWoundedPartonsAsStrings );
 
-        d->setFlagUsePartonPDFs( true ); // Jan 2023; !!! it overrides the flagUsePoissonianNpartonsFluctuations!
-
         // Nov 2017: EXPERIMENTAL FEATURE!
         // FROM Ulrich Heinz, J. Scott Moreland (2011) - https://arxiv.org/pdf/1108.5379.pdf
         // TABLE 1: sqrt(B) ---> r_transv = sqrt(2B)
@@ -202,6 +188,8 @@ void launchNucleiCollisionGenerator( int nEvents = 100, int flagMBorFixedB = 0, 
     Double_t ctime = timer.CpuTime();
 
     printf("RealTime=%f seconds, CpuTime=%f seconds\n",rtime,ctime);
+
+
 
 //        gROOT->ProcessLine(".q");
 

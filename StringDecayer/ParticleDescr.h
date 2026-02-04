@@ -34,8 +34,8 @@ struct ParticleDescr
 struct ParticleArr
 {
 private:
-    ParticleDescr fParticles[MAX_PARTICLES_IN_ARRAY];
 protected:
+    ParticleDescr fParticles[MAX_PARTICLES_IN_ARRAY];
     int fNparticles;
 
 public:

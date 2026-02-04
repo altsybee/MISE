@@ -9,6 +9,7 @@
 #include "TH2D.h"
 #include "TProfile.h"
 
+#include "TLegend.h"
 #include "TEllipse.h"
 #include "TLine.h"
 #include "TArrow.h"
@@ -164,6 +165,10 @@ NucleiCollision::NucleiCollision(/*int seed*/) :
   , funcPartonDensity(0x0)
   //  , funcStringInteractionDist(0x0)
   , funcImpactPar1D(0)
+  , funcGluon(0)
+  , funcU(0)
+  , funcD(0)
+  , funcSea(0)
   , fFlagDataMembersInitialized(false)
   , fFlagHaveMBcollision(false)
   , fFlagWriteEventViewCanvases(false)
@@ -178,6 +183,7 @@ NucleiCollision::NucleiCollision(/*int seed*/) :
   , fFlagUsePoissonianNpartonsFluctuations(true)
   , fFlagOnlyOneInteractionPerParton(true)
   , fFlagConsiderWoundedPartonsAsStrings(false)
+  , fFlagUsePartonPDFs(false)
   , fMeanNofPartonsInNucleon(5)
   , fNucleonGaussianRadius(0.4)
   //  , fHardScatteringProbability(0.03)
@@ -362,6 +368,40 @@ void NucleiCollision::initDataMembers()
     //event construction helpers
     fPartonInteractionsFinder = new MinDistanceFinder( fPartonInteractionDistance );
     //    fStringInteractionsFinder = new MinDistanceFinder( fStringInteractionRadius ); //NOT USED NOW!!! it's for old implementation of strings interactions
+
+
+
+
+    // ### PDFs - Jan 2023:
+    funcGluon = new TF1( "funcGluon", " [0] * TMath::Power( x, -0.2 ) * TMath::Power( 1-x, 5.4 )", 0.0000005, 0.99999 );
+    funcGluon->SetNpx(2000);
+    funcGluon->SetParameter(0,1);
+
+    funcU = new TF1( "fU", " [0] * TMath::Power( x, 0.7 ) * TMath::Power( 1-x, 3.5 )", 0.0001, 0.99999 );
+    funcU->SetParameter(0,1);
+    funcU->SetNpx(2000);
+
+    funcD = new TF1( "fD", " [0] * TMath::Power( x, 0.7 ) * TMath::Power( 1-x, 5.2 )", 0.0001, 0.99999 );
+    funcD->SetParameter(0,1);
+    funcD->SetNpx(2000);
+
+    funcSea = new TF1( "fSea", " [0] * TMath::Power( x, -0.2 ) * TMath::Power( 1-x, 7 )", 0.0001, 0.99999 );
+    funcSea->SetParameter(0,1);
+    funcSea->SetNpx(2000);
+
+    fHist_x_partons_QA = new TH1D( "hist_x_partons_QA", ";x;n", 100, 0, 1 );
+    fHist_x_g_QA = new TH1D( "hist_x_g_QA", ";x;n", 100, 0, 1 );
+    fHist_x_u_QA = new TH1D( "hist_x_u_QA", ";x;n", 100, 0, 1 );
+    fHist_x_d_QA = new TH1D( "hist_x_d_QA", ";x;n", 100, 0, 1 );
+
+    // ### parton scattering angle:
+    // from The physics of hadronic jets (2004), Physics Reports 403(1):147-164
+    funcCrossSect = new TF1( "fCrossSect", "[0] * TMath::Power( 3 + x*x, 3 ) / TMath::Power( 1 - x*x, 2 )", 0.0, 0.999 );
+    funcCrossSect->SetNpx(4000);
+    funcCrossSect->SetParameter( 0, 1 ); // Norm   //, alpha_s, x1, x2
+    double Norm = funcCrossSect->Eval(0);
+    funcCrossSect->SetParameter(0, 1./Norm );
+
 }
 
 NucleiCollision::NucleiCollision(const NucleiCollision& ) {
@@ -599,16 +639,78 @@ void NucleiCollision::createPartons( Nucleus *nucl, int nId ) //float nucleonX, 
     
     //generate n of partons in this nucleon
     int curN = nucl->nPartons; //overall number of partons in this NUCLEUS
-    // MAY 9, 2018: add possibility to fix nPartons in eachNucleon - like in WQM (?) )
-    int nPartonsInThisNucleon = ( fFlagUsePoissonianNpartonsFluctuations ? TMath::Nint( fRand->Poisson(fMeanNofPartonsInNucleon) )
-                                                                         : fMeanNofPartonsInNucleon ); // ADDED ON MAY 9, 2018!
+
+    int nPartonsInThisNucleon = 0;
+
+
+    if( !fFlagUsePartonPDFs ) // used for all studies before Jan 2023
+    {
+        // MAY 9, 2018: add possibility to fix nPartons in eachNucleon - like in WQM (?) )
+        nPartonsInThisNucleon = ( fFlagUsePoissonianNpartonsFluctuations ? TMath::Nint( fRand->Poisson(fMeanNofPartonsInNucleon) )
+                                                                             : fMeanNofPartonsInNucleon ); // ADDED ON MAY 9, 2018!
+    }
+    else // USE PDFs
+    {
+        double xRemnant = 1.0;
+        int partonCounter = 0;
+        const int maxPartonsFromPDFs = 100;
+//        double arr_x[maxPartonsFromPDFs];
+        while( xRemnant > 0.001 )
+        {
+            double x;
+            double factorToStrinkIfValenceQ = 1;
+            if( partonCounter < 2 )
+            {
+                x = funcU->GetRandom();
+                factorToStrinkIfValenceQ = 0.6;
+            }
+            else if( partonCounter == 2 )
+            {
+                x = funcD->GetRandom();
+                factorToStrinkIfValenceQ = 0.6;
+            }
+            else  // gluons (OR sea quarks...)
+            {
+                x = funcGluon->GetRandom();
+            }
+            if( xRemnant-x < 0 )
+                continue;
+
+            // QA:
+            fHist_x_partons_QA->Fill(x);
+            if( partonCounter < 2 )
+                fHist_x_u_QA->Fill(x);
+            else if( partonCounter == 2 )
+                fHist_x_d_QA->Fill(x);
+            else
+                fHist_x_g_QA->Fill(x);
+
+
+            // if ok - proceed
+//            arr_x[ partonCounter] = x;
+            nucl->pxMom[ curN + partonCounter ] = x;
+
+            xRemnant -= x;
+
+            //            cout << x << endl;
+
+            partonCounter++;
+            if( partonCounter >= maxPartonsFromPDFs)
+            {
+                cout << "AHTUNG!!! too many partons.." << endl;
+                break;
+            }
+        } // end of partons loop for assigment of xMom
+        nPartonsInThisNucleon = partonCounter;
+    } // end of USE PDFs (fFlagUsePartonPDFs==true)
+
     if ( curN + nPartonsInThisNucleon > nucl->maxNofPartons )
     {
-        cout << "MAX N OF PARTONS EXCEEDED!!! => don't generate partons..." << endl;
+        cout << "MAX N OF PARTONS EXCEEDED!!! " << curN + nPartonsInThisNucleon << " > " <<  nucl->maxNofPartons << " => don't generate partons..." << endl;
         return;
     }
     
-    //distribute partons
+    // ### distribute partons in x,y:
     double rRand = 0;
     double phiRand = 0;
     //    double thetaRand = 0;
@@ -656,10 +758,14 @@ void NucleiCollision::createPartons( Nucleus *nucl, int nId ) //float nucleonX, 
             // 2D proton
             nucl->pX[id] = /*nucl->nX[nId] +*/ rRand * cos( phiRand );
             nucl->pY[id] = /*nucl->nY[nId] +*/ rRand * sin( phiRand );
-        }
+        }            
     } // end of parton loop for nucleon
 
-    // RECENTER PARTONS IN NUCLEON:
+
+
+
+
+    // ### RECENTER PARTONS IN NUCLEON:
     // move partons to have center of nucleon = a center of mass for 3 valence quarks (Sept 2017)
     double xCM = 0, yCM = 0;
     const int nPartonsForCM = (nPartonsInThisNucleon > 3 ? 3 : nPartonsInThisNucleon); // usually: take 3 valence quark for that
@@ -1113,6 +1219,36 @@ void NucleiCollision::drawStatisticHists()
         fHistNumberWoundedNucleons->SetLineColor(kRed);
         fHistNumberWoundedNucleons->DrawCopy("same");
     }
+
+
+    //
+    if( fFlagUsePartonPDFs )
+    {
+        TCanvas *canv_x_partons_QA = new TCanvas( "canv_x_partons_QA", "canv_x_partons_QA", 80, 80, 800, 600 );
+//        tuneCanvas( canv_x_partons_QA );
+
+        gPad->SetLogy();
+
+        fHist_x_partons_QA->DrawCopy();
+        fHist_x_g_QA->SetLineColor(kGreen+1);
+        fHist_x_g_QA->DrawCopy("same");
+        fHist_x_u_QA->SetLineColor(kRed+1);
+        fHist_x_u_QA->DrawCopy("same");
+        fHist_x_d_QA->SetLineColor(kGray+1);
+        fHist_x_d_QA->DrawCopy("same");
+
+        TLegend *legPDFs = new TLegend( 0.55,0.5,0.95,0.8 );
+        legPDFs->SetFillColor(kWhite);
+        legPDFs->SetFillStyle(0);
+        legPDFs->SetBorderSize(0);
+        legPDFs->AddEntry( fHist_x_partons_QA     , "all partons", "L" );
+        legPDFs->AddEntry( fHist_x_u_QA     , "u", "L" );
+        legPDFs->AddEntry( fHist_x_d_QA     , "d", "L" );
+        legPDFs->AddEntry( fHist_x_g_QA     , "g", "L" );
+        legPDFs->Draw();
+
+    }
+
     
 }
 
